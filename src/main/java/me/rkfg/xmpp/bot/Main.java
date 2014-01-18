@@ -8,11 +8,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 
-import me.rkfg.xmpp.bot.plugins.DiversityCommandPlugin;
 import me.rkfg.xmpp.bot.plugins.GoogleCommandPlugin;
 import me.rkfg.xmpp.bot.plugins.MarkovCollectorPlugin;
-import me.rkfg.xmpp.bot.plugins.MarkovImportCommandPlugin;
-import me.rkfg.xmpp.bot.plugins.MarkovResponseCommandPlugin;
+import me.rkfg.xmpp.bot.plugins.MarkovResponsePlugin;
 import me.rkfg.xmpp.bot.plugins.MessagePlugin;
 import me.rkfg.xmpp.bot.plugins.TitlePlugin;
 
@@ -26,12 +24,17 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.filter.AndFilter;
+import org.jivesoftware.smack.filter.IQTypeFilter;
+import org.jivesoftware.smack.filter.PacketTypeFilter;
+import org.jivesoftware.smack.packet.IQ.Type;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.muc.DefaultParticipantStatusListener;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.packet.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,11 +45,12 @@ public class Main {
 
     private static Logger log = LoggerFactory.getLogger(Main.class);
     private static String nick;
+    private static ChatAdapter mucAdapted;
     private static SettingsManager sm = SettingsManager.getInstance();
     private static ConcurrentLinkedQueue<BotMessage> outgoingMsgs = new ConcurrentLinkedQueue<BotMessage>();
-    private static MessagePlugin[] plugins = { new MarkovImportCommandPlugin(), new GoogleCommandPlugin(), new DiversityCommandPlugin(),
-            new MarkovResponseCommandPlugin(), new TitlePlugin(), new MarkovCollectorPlugin() };
-    private static ExecutorService commandExecutor = Executors.newCachedThreadPool();
+    private static MessagePlugin[] plugins = { new GoogleCommandPlugin(), new MarkovResponsePlugin(), new TitlePlugin(),
+            new MarkovCollectorPlugin() };
+    private static ExecutorService commandExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public static void main(String[] args) throws InterruptedException {
         log.info("Starting up...");
@@ -66,7 +70,11 @@ public class Main {
         defaults.put("login", "talho");
         defaults.put("resource", "jbot");
         nick = sm.getStringSetting("nick");
-        Connection connection = new XMPPConnection(sm.getStringSetting("server"));
+        for (MessagePlugin plugin : plugins) {
+            plugin.init();
+        }
+
+        final Connection connection = new XMPPConnection(sm.getStringSetting("server"));
         try {
             connection.connect();
             connection.login(sm.getStringSetting("login"), sm.getStringSetting("password"), sm.getStringSetting("resource"));
@@ -93,7 +101,7 @@ public class Main {
         } catch (XMPPException e) {
             log.warn("Joining error: ", e);
         }
-        final ChatAdapter mucAdapted = new MUCAdapterImpl(muc);
+        mucAdapted = new MUCAdapterImpl(muc);
 
         muc.addMessageListener(new PacketListener() {
 
@@ -115,8 +123,8 @@ public class Main {
 
             @Override
             public void kicked(String participant, String actor, String reason) {
-                outgoingMsgs.offer(new BotMessage(mucAdapted, String.format("Ха-ха, загнали под шконарь %s! %s", StringUtils
-                        .parseResource(participant), !reason.isEmpty() ? "Мотивировали тем, что " + reason : "Без всякой мотивации.")));
+                sendMessage(mucAdapted, String.format("Ха-ха, загнали под шконарь %s! %s", StringUtils.parseResource(participant),
+                        !reason.isEmpty() ? "Мотивировали тем, что " + reason : "Без всякой мотивации."));
             }
         });
 
@@ -134,6 +142,21 @@ public class Main {
             }
         });
 
+        connection.addPacketListener(new PacketListener() {
+
+            @Override
+            public void processPacket(Packet packet) {
+                Version version = new Version();
+                version.setOs("Nirvash OpenFirmware v7.1");
+                version.setName("Gekko-go console");
+                version.setVersion("14.7");
+                version.setFrom(packet.getTo());
+                version.setTo(packet.getFrom());
+                version.setType(Type.RESULT);
+                version.setPacketID(packet.getPacketID());
+                connection.sendPacket(version);
+            }
+        }, new AndFilter(new IQTypeFilter(Type.GET), new PacketTypeFilter(Version.class)));
         new Thread(new Runnable() {
 
             @Override
@@ -183,7 +206,7 @@ public class Main {
                     if (matcher.find()) {
                         String result = plugin.process(message, matcher);
                         if (result != null && !result.isEmpty()) {
-                            outgoingMsgs.offer(new BotMessage(chat, StringEscapeUtils.unescapeHtml4(result)));
+                            sendMessage(chat, StringEscapeUtils.unescapeHtml4(result));
                             break;
                         }
                     }
@@ -192,7 +215,17 @@ public class Main {
         });
     }
 
+    public static void sendMessage(ChatAdapter chatAdapter, String message) {
+        outgoingMsgs.offer(new BotMessage(chatAdapter, message));
+    }
+
     public static String getNick() {
         return nick;
+    }
+
+    public static void sendMUCMessage(String message) {
+        if (mucAdapted != null) {
+            sendMessage(mucAdapted, message);
+        }
     }
 }

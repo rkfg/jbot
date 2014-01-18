@@ -9,4 +9,6 @@ public interface MessagePlugin {
     public Pattern getPattern();
 
     public String process(Message message, Matcher matcher);
+    
+    public void init();
 }

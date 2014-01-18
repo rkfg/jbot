@@ -5,7 +5,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import me.rkfg.xmpp.bot.domain.Markov;
+import me.rkfg.xmpp.bot.domain.MarkovFirstWord;
+import me.rkfg.xmpp.bot.domain.MarkovFirstWordCount;
 
+import org.hibernate.NonUniqueResultException;
 import org.hibernate.Session;
 import org.jivesoftware.smack.packet.Message;
 
@@ -35,7 +38,7 @@ public class MarkovCollectorPlugin extends MessagePluginImpl {
         return null;
     }
 
-    protected void processLine(final String text) {
+    protected synchronized void processLine(final String text) {
         try {
             HibernateUtil.exec(new HibernateCallback<Void>() {
 
@@ -50,19 +53,32 @@ public class MarkovCollectorPlugin extends MessagePluginImpl {
                     do {
                         if (c + SEGMENT_WORDS < words.length) {
                             segment = SharedUtils.join(Arrays.copyOfRange(words, c + 1, c + SEGMENT_WORDS), " ");
-                            firstWord = words[c];
-                            lastWord = words[c + SEGMENT_WORDS - 1];
+                            firstWord = purify(words[c]);
+                            lastWord = purify(words[c + SEGMENT_WORDS - 1]);
                         } else {
                             if (c + 1 < words.length) {
                                 segment = SharedUtils.join(Arrays.copyOfRange(words, c + 1, words.length), " ");
                             } else {
                                 segment = "";
                             }
-                            firstWord = words[c];
-                            lastWord = words[words.length - 1];
+                            firstWord = purify(words[c]);
+                            lastWord = purify(words[words.length - 1]);
                         }
-                        if (segment.length() < 256 && firstWord.length() < 256 && lastWord.length() < 256) {
-                            session.merge(new Markov(segment, pos, purify(firstWord), purify(lastWord)));
+                        if (segment.length() < 256 && firstWord.length() < 256 && lastWord.length() < 256 && !firstWord.isEmpty()
+                                && !lastWord.isEmpty()) {
+                            Markov markov = (Markov) session.merge(new Markov(segment, pos, purify(firstWord), purify(lastWord)));
+                            try {
+                                MarkovFirstWordCount count = (MarkovFirstWordCount) session
+                                        .createQuery("from MarkovFirstWordCount where word = :fw").setString("fw", firstWord)
+                                        .uniqueResult();
+                                if (count == null) {
+                                    count = (MarkovFirstWordCount) session.merge(new MarkovFirstWordCount(firstWord));
+                                }
+                                count.incCount();
+                                session.merge(new MarkovFirstWord(count, count.getCount() - 1, markov));
+                            } catch (NonUniqueResultException e) {
+                                log.warn("Non-unique word found: {}", firstWord);
+                            }
                             pos++;
                         }
                     } while (c++ < words.length - SEGMENT_WORDS);
@@ -79,6 +95,6 @@ public class MarkovCollectorPlugin extends MessagePluginImpl {
     }
 
     private String purify(String str) {
-        return str.toLowerCase().replaceAll("[,.?!;:\"'`«»()\\[\\]{}]", "");
+        return str.toLowerCase().trim().replaceAll("[,.?!;:\"'`«»()\\[\\]{}]", "");
     }
 }

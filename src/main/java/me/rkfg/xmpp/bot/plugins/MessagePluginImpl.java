@@ -11,4 +11,9 @@ public abstract class MessagePluginImpl implements MessagePlugin {
     protected boolean isMessageFromUser(Message message) {
         return !StringUtils.parseResource(message.getFrom()).isEmpty();
     }
+    
+    @Override
+    public void init() {
+        // do nothing by default
+    }
 }
