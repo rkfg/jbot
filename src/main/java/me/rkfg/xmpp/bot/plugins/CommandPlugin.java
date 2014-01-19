@@ -17,7 +17,7 @@ public abstract class CommandPlugin extends MessagePluginImpl {
 
     @Override
     public Pattern getPattern() {
-        return Pattern.compile("^" + PREFIX + "(" + SharedUtils.join(getCommand(), "|") + ")( (.*)|$)");
+        return Pattern.compile("^" + PREFIX + "(" + SharedUtils.join(getCommand(), "|") + ")( +(.*)|$)");
     }
 
     @Override
