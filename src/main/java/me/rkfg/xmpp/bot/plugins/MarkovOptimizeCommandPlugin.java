@@ -81,11 +81,13 @@ public class MarkovOptimizeCommandPlugin extends CommandPlugin {
                                 } catch (NonUniqueResultException e) {
                                     log.warn("Non-unique word found: {}", firstWord);
                                 }
-                                if (cnt % 1000 == 0) {
+                                if (cnt % 10000 == 0) {
                                     log.info("processed {} lines...", cnt);
                                 }
                                 synchronized (wordsInProcess) {
-                                    wordsInProcess.remove(firstWord);
+                                    if (!lock.hasQueuedThreads()) {
+                                        wordsInProcess.remove(firstWord);
+                                    }
                                 }
                                 lock.unlock();
                                 return null;

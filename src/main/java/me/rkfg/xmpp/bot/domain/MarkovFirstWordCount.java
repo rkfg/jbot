@@ -49,6 +49,6 @@ public class MarkovFirstWordCount {
     }
 
     public void incCount() {
-        count++;
+        setCount(getCount() + 1);
     }
 }
