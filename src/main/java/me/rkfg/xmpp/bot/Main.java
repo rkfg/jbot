@@ -16,7 +16,9 @@ import me.rkfg.xmpp.bot.plugins.MarkovCollectorPlugin;
 import me.rkfg.xmpp.bot.plugins.MarkovResponsePlugin;
 import me.rkfg.xmpp.bot.plugins.MessagePlugin;
 import me.rkfg.xmpp.bot.plugins.MessagePluginImpl;
+import me.rkfg.xmpp.bot.plugins.OpinionCommandPlugin;
 import me.rkfg.xmpp.bot.plugins.TitlePlugin;
+import me.rkfg.xmpp.bot.plugins.WhoisCommandPlugin;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jivesoftware.smack.AbstractConnectionListener;
@@ -52,8 +54,9 @@ public class Main {
     private static ChatAdapter mucAdapted;
     private static SettingsManager sm = SettingsManager.getInstance();
     private static ConcurrentLinkedQueue<BotMessage> outgoingMsgs = new ConcurrentLinkedQueue<BotMessage>();
-    public static List<MessagePluginImpl> plugins = new LinkedList<MessagePluginImpl>(Arrays.asList(new GoogleCommandPlugin(),
-            new MarkovResponsePlugin(), new TitlePlugin(), new MarkovCollectorPlugin()));
+    public static List<MessagePluginImpl> plugins = new LinkedList<MessagePluginImpl>(
+            Arrays.asList(new OpinionCommandPlugin(), new WhoisCommandPlugin(), new GoogleCommandPlugin(), new MarkovResponsePlugin(),
+                    new TitlePlugin(), new MarkovCollectorPlugin()));
     private static ExecutorService commandExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public static void main(String[] args) throws InterruptedException {

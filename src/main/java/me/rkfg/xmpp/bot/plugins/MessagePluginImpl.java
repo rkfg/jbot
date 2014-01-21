@@ -8,12 +8,21 @@ import org.slf4j.LoggerFactory;
 public abstract class MessagePluginImpl implements MessagePlugin {
     protected Logger log = LoggerFactory.getLogger(getClass());
 
-    protected boolean isMessageFromUser(Message message) {
-        return !StringUtils.parseResource(message.getFrom()).isEmpty();
+    protected String getNick(Message message) {
+        return StringUtils.parseResource(message.getFrom());
     }
-    
+
+    protected boolean isMessageFromUser(Message message) {
+        return !getNick(message).isEmpty();
+    }
+
     @Override
     public void init() {
         // do nothing by default
+    }
+
+    @Override
+    public String getManual() {
+        return "справка по плагину отсутствует.";
     }
 }
