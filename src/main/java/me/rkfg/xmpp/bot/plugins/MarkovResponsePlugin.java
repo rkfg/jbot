@@ -111,7 +111,9 @@ public class MarkovResponsePlugin extends MessagePluginImpl {
                                     .createQuery("from MarkovFirstWord where word = :fw and number = :n").setEntity("fw", segmentsCount)
                                     .setInteger("n", n).uniqueResult();
                             segment = markovFirstWord.getMarkov();
-                            result.add(segment.getText());
+                            if (!segment.getText().isEmpty()) {
+                                result.add(segment.getText());
+                            }
                         } catch (NonUniqueResultException e) {
                             log.warn("Non-unique word in the index found: {}/{}.", segmentsCount.getWord(), n);
                         }

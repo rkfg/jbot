@@ -2,6 +2,7 @@ package me.rkfg.xmpp.bot.plugins;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -72,6 +73,8 @@ public class TitlePlugin extends MessagePluginImpl {
                 }
                 return String.format("Title: %s", titleStr);
             }
+        } catch (InterruptedIOException e) {
+            // timeout, doing nothing
         } catch (ClientProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -79,5 +82,4 @@ public class TitlePlugin extends MessagePluginImpl {
         }
         return null;
     }
-
 }

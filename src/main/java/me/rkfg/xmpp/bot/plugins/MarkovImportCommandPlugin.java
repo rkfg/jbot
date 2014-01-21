@@ -57,7 +57,7 @@ public class MarkovImportCommandPlugin extends CommandPlugin {
 
     @Override
     public List<String> getCommand() {
-        return Arrays.asList("i");
+        return Arrays.asList("i", "ш");
     }
 
 }

@@ -2,7 +2,10 @@ package me.rkfg.xmpp.bot;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -12,6 +15,7 @@ import me.rkfg.xmpp.bot.plugins.GoogleCommandPlugin;
 import me.rkfg.xmpp.bot.plugins.MarkovCollectorPlugin;
 import me.rkfg.xmpp.bot.plugins.MarkovResponsePlugin;
 import me.rkfg.xmpp.bot.plugins.MessagePlugin;
+import me.rkfg.xmpp.bot.plugins.MessagePluginImpl;
 import me.rkfg.xmpp.bot.plugins.TitlePlugin;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -48,8 +52,8 @@ public class Main {
     private static ChatAdapter mucAdapted;
     private static SettingsManager sm = SettingsManager.getInstance();
     private static ConcurrentLinkedQueue<BotMessage> outgoingMsgs = new ConcurrentLinkedQueue<BotMessage>();
-    private static MessagePlugin[] plugins = { new GoogleCommandPlugin(), new MarkovResponsePlugin(), new TitlePlugin(),
-            new MarkovCollectorPlugin() };
+    public static List<MessagePluginImpl> plugins = new LinkedList<MessagePluginImpl>(Arrays.asList(new GoogleCommandPlugin(),
+            new MarkovResponsePlugin(), new TitlePlugin(), new MarkovCollectorPlugin()));
     private static ExecutorService commandExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public static void main(String[] args) throws InterruptedException {
@@ -171,15 +175,14 @@ public class Main {
                             } catch (XMPPException e) {
                                 e.printStackTrace();
                             } catch (InterruptedException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
+                                Thread.currentThread().interrupt();
                             }
                         }
                     } else {
                         try {
                             Thread.sleep(100);
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            Thread.currentThread().interrupt();
                         }
                     }
                 }

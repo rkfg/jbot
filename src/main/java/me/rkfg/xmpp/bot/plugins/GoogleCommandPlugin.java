@@ -1,11 +1,12 @@
 package me.rkfg.xmpp.bot.plugins;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 
 import me.rkfg.xmpp.bot.Utils;
@@ -28,9 +29,10 @@ public class GoogleCommandPlugin extends CommandPlugin {
             HttpResponse response = client.execute(new HttpGet(String.format(
                     "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=%s&hl=ru", URLEncoder.encode(matcher.group(2), "utf-8"))));
             StringBuilder builder = new StringBuilder();
-            Scanner scanner = new Scanner(response.getEntity().getContent());
-            while (scanner.hasNextLine()) {
-                builder.append(scanner.nextLine());
+            BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                builder.append(line);
             }
             JSONObject jsonObject = new JSONObject(builder.toString());
             if (jsonObject.getInt("responseStatus") != 200) {
