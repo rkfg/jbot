@@ -64,4 +64,9 @@ public class GoogleCommandPlugin extends CommandPlugin {
     public List<String> getCommand() {
         return Arrays.asList("g", "п");
     }
+
+    @Override
+    public String getManual() {
+        return "выдать первый результат из гугла.\n" + "Формат: <текст запроса>\n" + "Пример: " + PREFIX + "g тест";
+    }
 }
