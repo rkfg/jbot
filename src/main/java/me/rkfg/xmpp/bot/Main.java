@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 
 import me.rkfg.xmpp.bot.plugins.GoogleCommandPlugin;
+import me.rkfg.xmpp.bot.plugins.ManCommandPlugin;
 import me.rkfg.xmpp.bot.plugins.MarkovCollectorPlugin;
 import me.rkfg.xmpp.bot.plugins.MarkovResponsePlugin;
 import me.rkfg.xmpp.bot.plugins.MessagePlugin;
@@ -54,9 +55,9 @@ public class Main {
     private static ChatAdapter mucAdapted;
     private static SettingsManager sm = SettingsManager.getInstance();
     private static ConcurrentLinkedQueue<BotMessage> outgoingMsgs = new ConcurrentLinkedQueue<BotMessage>();
-    public static List<MessagePluginImpl> plugins = new LinkedList<MessagePluginImpl>(
-            Arrays.asList(new OpinionCommandPlugin(), new WhoisCommandPlugin(), new GoogleCommandPlugin(), new MarkovResponsePlugin(),
-                    new TitlePlugin(), new MarkovCollectorPlugin()));
+    public static List<MessagePluginImpl> plugins = new LinkedList<MessagePluginImpl>(Arrays.asList(new OpinionCommandPlugin(),
+            new WhoisCommandPlugin(), new GoogleCommandPlugin(), new ManCommandPlugin(), new MarkovResponsePlugin(), new TitlePlugin(),
+            new MarkovCollectorPlugin()));
     private static ExecutorService commandExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public static void main(String[] args) throws InterruptedException {
