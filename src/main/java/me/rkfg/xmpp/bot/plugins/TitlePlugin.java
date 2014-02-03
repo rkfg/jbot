@@ -53,7 +53,7 @@ public class TitlePlugin extends MessagePluginImpl {
             inputStream.close();
             String page = "";
             String charsetPage = new String(buf, 0, readCount, "latin1");
-            Matcher charset = Pattern.compile("charset=\"?(.+?)\"").matcher(charsetPage);
+            Matcher charset = Pattern.compile("<meta.*charset=\"?(.+?)\"", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE).matcher(charsetPage);
             if (charset.find()) {
                 if ("windows-1251".equalsIgnoreCase(charset.group(1))) {
                     page = new String(buf, 0, readCount, "cp1251");
