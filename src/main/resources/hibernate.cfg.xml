@@ -7,6 +7,8 @@
   <property name="hibernate.connection.url">jdbc:h2:data/database;MVCC=TRUE;LOCK_TIMEOUT=10000;IGNORECASE=TRUE</property>
   <property name="hibernate.dialect">org.hibernate.dialect.H2Dialect</property>
   <property name="hibernate.hbm2ddl.auto">update</property>
+  <property name="hibernate.query.plan_cache_max_strong_references">1</property>
+  <property name="hibernate.query.plan_cache_max_soft_references">1</property>
   <property name="hibernate.show_sql">false</property>
   <mapping class="me.rkfg.xmpp.bot.domain.Markov"/>
   <mapping class="me.rkfg.xmpp.bot.domain.MarkovFirstWord"/>
