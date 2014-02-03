@@ -130,10 +130,10 @@
 					<artifactId>shiro-core</artifactId>
 					<groupId>org.apache.shiro</groupId>
 				</exclusion>
-                <exclusion>
-                    <artifactId>shiro-web</artifactId>
-                    <groupId>org.apache.shiro</groupId>
-                </exclusion>
+				<exclusion>
+					<artifactId>shiro-web</artifactId>
+					<groupId>org.apache.shiro</groupId>
+				</exclusion>
 				<exclusion>
 					<artifactId>dozer</artifactId>
 					<groupId>net.sf.dozer</groupId>
@@ -160,4 +160,10 @@
 			<version>1.3.174</version>
 		</dependency>
 	</dependencies>
+	<repositories>
+		<repository>
+			<id>rkfg_maven</id>
+			<url>http://rkfg.me/maven</url>
+		</repository>
+	</repositories>
 </project>
