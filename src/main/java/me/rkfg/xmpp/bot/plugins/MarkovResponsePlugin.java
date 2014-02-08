@@ -3,6 +3,7 @@ package me.rkfg.xmpp.bot.plugins;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,7 +26,9 @@ import ru.ppsrk.gwt.shared.SharedUtils;
 public class MarkovResponsePlugin extends MessagePluginImpl {
 
     Random random = new Random();
-    private int answersLimit = 0;
+    private static final int answersLimit = 30;
+    private LinkedBlockingDeque<Long> answersTimes = new LinkedBlockingDeque<Long>(answersLimit + 1);
+    private boolean cooldown = false;
     private String[] excuses = { "отстань, голова болит.", "устала я, потом поговорим.", "у меня ТЕ САМЫЕ часы, не видишь, что ли?",
             "Т___Т", "._.", ":[" };
     private final static int cooldownHoursMin = 3;
@@ -34,22 +37,31 @@ public class MarkovResponsePlugin extends MessagePluginImpl {
     private final static int softSegmentLimit = 7;
     private final static int hardSegmentLimit = 12;
     private final static int minLastWordLength = 5;
+    private static final int answersLimitTime = 5 * 60 * 1000; // 5 minutes in ms
 
     @Override
     public void init() {
-        answersLimit = random.nextInt(50) + 50;
         new Thread(new Runnable() {
 
             @Override
             public void run() {
                 while (true) {
                     try {
-                        if (answersLimit == 0) {
-                            Thread.sleep(random.nextInt(1000) + 1000);
-                            Main.sendMUCMessage("Устала вам отвечать. Отдохну.");
-                            Thread.sleep(random.nextInt((cooldownHoursMax - cooldownHoursMin) * 3600000) + cooldownHoursMin * 3600000);
-                            answersLimit = random.nextInt(50) + 50;
-                            Main.sendMUCMessage("Отдохнула.");
+                        if (answersTimes.size() > answersLimit) {
+                            answersTimes.poll();
+                            Long first = answersTimes.peekFirst();
+                            Long last = answersTimes.peekLast();
+                            if (first != null && last != null) {
+                                if (last - first < answersLimitTime) {
+                                    cooldown = true;
+                                    Thread.sleep(random.nextInt(1000) + 1000);
+                                    Main.sendMUCMessage("Устала вам отвечать. Отдохну.");
+                                    Thread.sleep(random.nextInt((cooldownHoursMax - cooldownHoursMin) * 3600000) + cooldownHoursMin
+                                            * 3600000);
+                                    cooldown = false;
+                                    Main.sendMUCMessage("Отдохнула.");
+                                }
+                            }
                         } else {
                             Thread.sleep(1000);
                         }
@@ -74,7 +86,7 @@ public class MarkovResponsePlugin extends MessagePluginImpl {
 
                 @Override
                 public String run(Session session) throws LogicException, ClientAuthenticationException {
-                    if (answersLimit == 0) {
+                    if (cooldown) {
                         return excuse();
                     }
                     int hash = 0;
@@ -121,7 +133,7 @@ public class MarkovResponsePlugin extends MessagePluginImpl {
                             len = 1;
                         }
                     }
-                    answersLimit--;
+                    answersTimes.offer(System.currentTimeMillis());
                     return SharedUtils.join(result, " ");
                 }
             });
