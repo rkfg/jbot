@@ -32,7 +32,7 @@ public class TitlePlugin extends MessagePluginImpl {
             url = "http://" + IDN.toASCII(url.replaceAll("http://", ""));
         }
         try {
-            Document doc = Jsoup.connect(url).userAgent("Mozilla").cookie("auth", "token").get();
+            Document doc = Jsoup.connect(url).maxBodySize(102400).userAgent("Mozilla").cookie("auth", "token").get();
             String titleStr = doc.title();
             return String.format("Title: %s", titleStr);
         } catch (InterruptedIOException e) {
