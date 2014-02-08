@@ -27,8 +27,9 @@ public class TitlePlugin extends MessagePluginImpl {
         String url = matcher.group(1);
         log.info("*** URL ***: {}", url);
         // punycode my ass
-        if (url.matches("(?iu).+\\.(рф|ру)$")) {
-            url = "http://" + IDN.toASCII(url.replaceAll("http://",""));
+        // need to make it more versatile and not bounded to .рф/.ру only
+        if (url.matches("(?iu).+\\.(рф|ру)")) {
+            url = "http://" + IDN.toASCII(url.replaceAll("http://", ""));
         }
         try {
             Document doc = Jsoup.connect(url).userAgent("Mozilla").cookie("auth", "token").get();
