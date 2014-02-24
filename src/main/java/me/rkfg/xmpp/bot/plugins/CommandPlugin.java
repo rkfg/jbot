@@ -16,7 +16,7 @@ public abstract class CommandPlugin extends MessagePluginImpl {
 
     @Override
     public Pattern getPattern() {
-        return Pattern.compile("^" + PREFIX + "(" + SharedUtils.join(getCommand(), "|") + ")( +(.*)|$)");
+        return Pattern.compile("^" + PREFIX + "(" + SharedUtils.join(getCommand(), "|") + ")( +(.+?)( *> *(.+?) *)?$|$)");
     }
 
     @Override
@@ -25,7 +25,11 @@ public abstract class CommandPlugin extends MessagePluginImpl {
             return null;
         }
         try {
-            return getNick(message) + ", " + processCommand(message, matcher);
+            String target = getNick(message);
+            if (matcher.group(5) != null) {
+                target = matcher.group(5);
+            }
+            return target + ", " + processCommand(message, matcher);
         } catch (ClientAuthenticationException e) {
             e.printStackTrace();
         } catch (LogicException e) {
