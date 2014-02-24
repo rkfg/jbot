@@ -27,7 +27,7 @@ public class GoogleCommandPlugin extends CommandPlugin {
         HttpClient client = Utils.getHTTPClient();
         try {
             HttpResponse response = client.execute(new HttpGet(String.format(
-                    "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=%s&hl=ru", URLEncoder.encode(matcher.group(2), "utf-8"))));
+                    "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=%s&hl=ru", URLEncoder.encode(matcher.group(3), "utf-8"))));
             StringBuilder builder = new StringBuilder();
             BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
             String line;
