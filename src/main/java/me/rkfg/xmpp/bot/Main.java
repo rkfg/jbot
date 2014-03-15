@@ -16,7 +16,6 @@ import me.rkfg.xmpp.bot.plugins.ManCommandPlugin;
 import me.rkfg.xmpp.bot.plugins.MarkovCollectorPlugin;
 import me.rkfg.xmpp.bot.plugins.MarkovResponsePlugin;
 import me.rkfg.xmpp.bot.plugins.MessagePlugin;
-import me.rkfg.xmpp.bot.plugins.MessagePluginImpl;
 import me.rkfg.xmpp.bot.plugins.OpinionCommandPlugin;
 import me.rkfg.xmpp.bot.plugins.TitlePlugin;
 import me.rkfg.xmpp.bot.plugins.WhoisCommandPlugin;
@@ -25,10 +24,12 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.jivesoftware.smack.AbstractConnectionListener;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManagerListener;
-import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.SmackConfiguration;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.TCPConnection;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.AndFilter;
@@ -41,7 +42,7 @@ import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.muc.DefaultParticipantStatusListener;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
-import org.jivesoftware.smackx.packet.Version;
+import org.jivesoftware.smackx.iqversion.packet.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +61,7 @@ public class Main {
             new MarkovCollectorPlugin()));
     private static ExecutorService commandExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, SmackException, IOException {
         log.info("Starting up...");
         HibernateUtil.initSessionFactory("hibernate.cfg.xml");
         sm.setFilename("settings.ini");
@@ -82,7 +83,7 @@ public class Main {
             plugin.init();
         }
 
-        final Connection connection = new XMPPConnection(sm.getStringSetting("server"));
+        final XMPPConnection connection = new TCPConnection(sm.getStringSetting("server"));
         try {
             connection.connect();
             connection.login(sm.getStringSetting("login"), sm.getStringSetting("password"), sm.getStringSetting("resource"));
@@ -97,17 +98,23 @@ public class Main {
             @Override
             public void reconnectionSuccessful() {
                 try {
-                    muc.join(nick, "", history, SmackConfiguration.getPacketReplyTimeout());
+                    muc.join(nick, "", history, SmackConfiguration.getDefaultPacketReplyTimeout());
                 } catch (XMPPException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (NoResponseException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
         });
         try {
-            muc.join(nick, "", history, SmackConfiguration.getPacketReplyTimeout());
+            muc.join(nick, "", history, SmackConfiguration.getDefaultPacketReplyTimeout());
         } catch (XMPPException e) {
             log.warn("Joining error: ", e);
+        } catch (NoResponseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
         mucAdapted = new MUCAdapterImpl(muc);
 
@@ -154,10 +161,7 @@ public class Main {
 
             @Override
             public void processPacket(Packet packet) {
-                Version version = new Version();
-                version.setOs("Nirvash OpenFirmware v7.1");
-                version.setName("Gekko-go console");
-                version.setVersion("14.7");
+                Version version = new Version("Gekko-go console", "14.7", "Nirvash OpenFirmware v7.1");
                 version.setFrom(packet.getTo());
                 version.setTo(packet.getFrom());
                 version.setType(Type.RESULT);
