@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import me.rkfg.xmpp.bot.plugins.GoogleCommandPlugin;
 import me.rkfg.xmpp.bot.plugins.ManCommandPlugin;
@@ -17,6 +18,8 @@ import me.rkfg.xmpp.bot.plugins.MarkovCollectorPlugin;
 import me.rkfg.xmpp.bot.plugins.MarkovResponsePlugin;
 import me.rkfg.xmpp.bot.plugins.MessagePlugin;
 import me.rkfg.xmpp.bot.plugins.OpinionCommandPlugin;
+import me.rkfg.xmpp.bot.plugins.QalcCommandPlugin;
+import me.rkfg.xmpp.bot.plugins.StdinPlugin;
 import me.rkfg.xmpp.bot.plugins.TitlePlugin;
 import me.rkfg.xmpp.bot.plugins.WhoisCommandPlugin;
 
@@ -56,9 +59,9 @@ public class Main {
     private static ChatAdapter mucAdapted;
     private static SettingsManager sm = SettingsManager.getInstance();
     private static ConcurrentLinkedQueue<BotMessage> outgoingMsgs = new ConcurrentLinkedQueue<BotMessage>();
-    public static List<MessagePluginImpl> plugins = new LinkedList<MessagePluginImpl>(Arrays.asList(new OpinionCommandPlugin(),
-            new WhoisCommandPlugin(), new GoogleCommandPlugin(), new ManCommandPlugin(), new MarkovResponsePlugin(), new TitlePlugin(),
-            new MarkovCollectorPlugin()));
+    public static List<MessagePlugin> plugins = new LinkedList<MessagePlugin>(Arrays.asList(new StdinPlugin(), new QalcCommandPlugin(),
+            new OpinionCommandPlugin(), new WhoisCommandPlugin(), new GoogleCommandPlugin(), new ManCommandPlugin(),
+            new MarkovResponsePlugin(), new TitlePlugin(), new MarkovCollectorPlugin()));
     private static ExecutorService commandExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public static void main(String[] args) throws InterruptedException, SmackException, IOException {
@@ -213,12 +216,15 @@ public class Main {
                 String text = message.getBody();
                 log.info("<{}>: {}", message.getFrom(), text);
                 for (MessagePlugin plugin : plugins) {
-                    Matcher matcher = plugin.getPattern().matcher(text);
-                    if (matcher.find()) {
-                        String result = plugin.process(message, matcher);
-                        if (result != null && !result.isEmpty()) {
-                            sendMessage(chat, StringEscapeUtils.unescapeHtml4(result));
-                            break;
+                    Pattern pattern = plugin.getPattern();
+                    if (pattern != null) {
+                        Matcher matcher = pattern.matcher(text);
+                        if (matcher.find()) {
+                            String result = plugin.process(message, matcher);
+                            if (result != null && !result.isEmpty()) {
+                                sendMessage(chat, StringEscapeUtils.unescapeHtml4(result));
+                                break;
+                            }
                         }
                     }
                 }

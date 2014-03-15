@@ -19,7 +19,7 @@ public class ManCommandPlugin extends CommandPlugin {
     public String processCommand(Message message, Matcher matcher) throws ClientAuthenticationException, LogicException {
         if (matcher.group(3) == null || matcher.group(3).isEmpty()) {
             List<String> commands = new LinkedList<String>();
-            for (MessagePluginImpl plugin : Main.plugins) {
+            for (MessagePlugin plugin : Main.plugins) {
                 if (plugin instanceof CommandPlugin) {
                     commands.addAll(((CommandPlugin) plugin).getCommand());
                 }
@@ -27,7 +27,7 @@ public class ManCommandPlugin extends CommandPlugin {
             return "доступные команды: " + SharedUtils.join(commands, ", ");
         } else {
             String cmd = matcher.group(3);
-            for (MessagePluginImpl plugin : Main.plugins) {
+            for (MessagePlugin plugin : Main.plugins) {
                 if (plugin instanceof CommandPlugin) {
                     if (((CommandPlugin) plugin).getCommand().contains(cmd)) {
                         return plugin.getManual();
