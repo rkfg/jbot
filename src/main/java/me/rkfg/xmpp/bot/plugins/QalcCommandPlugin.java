@@ -14,11 +14,25 @@ import ru.ppsrk.gwt.client.LogicException;
 
 public class QalcCommandPlugin extends CommandPlugin {
 
+    private final int TIMELIMIT = 3;
+
     @Override
     public String processCommand(Message message, Matcher matcher) throws ClientAuthenticationException, LogicException {
         try {
             Process processQalc = Runtime.getRuntime().exec(new String[] { "qalc", matcher.group(3) });
-            processQalc.waitFor();
+            int i;
+            for (i = 0; i < TIMELIMIT; i++) {
+                try {
+                    processQalc.exitValue();
+                    break;
+                } catch (IllegalThreadStateException e) {
+                    Thread.sleep(1000);
+                }
+            }
+            if (i == TIMELIMIT) {
+                processQalc.destroy();
+                return "долго считать.";
+            }
             BufferedReader resultReader = new BufferedReader(new InputStreamReader(processQalc.getInputStream()));
             StringBuilder result = new StringBuilder();
             String line;
