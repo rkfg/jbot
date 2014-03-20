@@ -47,7 +47,7 @@ public class GoogleCommandPlugin extends CommandPlugin {
             }
             JSONObject result = results.getJSONObject(0);
             return String.format("%s\n%s\n%s", result.getString("titleNoFormatting"), result.getString("content")
-                    .replaceAll("<b>|</b>", ""), URLDecoder.decode(result.getString("url"), "utf-8"));
+                    .replaceAll("<b>|</b>", ""), URLDecoder.decode(URLDecoder.decode(result.getString("url"), "utf-8"), "utf-8"));
         } catch (ClientProtocolException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
