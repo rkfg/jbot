@@ -26,12 +26,14 @@ import me.rkfg.xmpp.bot.plugins.WhoisCommandPlugin;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jivesoftware.smack.AbstractConnectionListener;
 import org.jivesoftware.smack.Chat;
+import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.ChatManagerListener;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.TCPConnection;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -108,6 +110,9 @@ public class Main {
                 } catch (NoResponseException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
+                } catch (NotConnectedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
             }
         });
@@ -146,7 +151,7 @@ public class Main {
             }
         });
 
-        connection.getChatManager().addChatListener(new ChatManagerListener() {
+        ChatManager.getInstanceFor(connection).addChatListener(new ChatManagerListener() {
 
             @Override
             public void chatCreated(Chat chat, boolean createdLocally) {
@@ -169,7 +174,11 @@ public class Main {
                 version.setTo(packet.getFrom());
                 version.setType(Type.RESULT);
                 version.setPacketID(packet.getPacketID());
-                connection.sendPacket(version);
+                try {
+                    connection.sendPacket(version);
+                } catch (NotConnectedException e) {
+                    e.printStackTrace();
+                }
             }
         }, new AndFilter(new IQTypeFilter(Type.GET), new PacketTypeFilter(Version.class)));
         new Thread(new Runnable() {
@@ -187,6 +196,9 @@ public class Main {
                                 e.printStackTrace();
                             } catch (InterruptedException e) {
                                 Thread.currentThread().interrupt();
+                            } catch (NotConnectedException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
                             }
                         }
                     } else {

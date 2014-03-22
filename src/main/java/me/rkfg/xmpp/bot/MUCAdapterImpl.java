@@ -1,5 +1,6 @@
 package me.rkfg.xmpp.bot;
 
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.muc.MultiUserChat;
@@ -11,11 +12,11 @@ public class MUCAdapterImpl implements ChatAdapter {
         this.multiUserChat = multiUserChat;
     }
 
-    public void sendMessage(String message) throws XMPPException {
+    public void sendMessage(String message) throws XMPPException, NotConnectedException {
         multiUserChat.sendMessage(message);
     }
 
-    public void sendMessage(Message message) throws XMPPException {
+    public void sendMessage(Message message) throws XMPPException, NotConnectedException {
         multiUserChat.sendMessage(message);
     }
 }
