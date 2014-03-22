@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import me.rkfg.xmpp.bot.plugins.BehindComputerPlugin;
 import me.rkfg.xmpp.bot.plugins.GoogleCommandPlugin;
 import me.rkfg.xmpp.bot.plugins.ManCommandPlugin;
 import me.rkfg.xmpp.bot.plugins.MarkovCollectorPlugin;
@@ -59,11 +60,11 @@ public class Main {
     private static Logger log = LoggerFactory.getLogger(Main.class);
     private static String nick;
     private static ChatAdapter mucAdapted;
-    private static SettingsManager sm = SettingsManager.getInstance();
+    public static SettingsManager sm = SettingsManager.getInstance();
     private static ConcurrentLinkedQueue<BotMessage> outgoingMsgs = new ConcurrentLinkedQueue<BotMessage>();
-    public static List<MessagePlugin> plugins = new LinkedList<MessagePlugin>(Arrays.asList(new StdinPlugin(), new QalcCommandPlugin(),
-            new OpinionCommandPlugin(), new WhoisCommandPlugin(), new GoogleCommandPlugin(), new ManCommandPlugin(),
-            new MarkovResponsePlugin(), new TitlePlugin(), new MarkovCollectorPlugin()));
+    public static List<MessagePlugin> plugins = new LinkedList<MessagePlugin>(Arrays.asList(new StdinPlugin(), new BehindComputerPlugin(),
+            new QalcCommandPlugin(), new OpinionCommandPlugin(), new WhoisCommandPlugin(), new GoogleCommandPlugin(),
+            new ManCommandPlugin(), new MarkovResponsePlugin(), new TitlePlugin(), new MarkovCollectorPlugin()));
     private static ExecutorService commandExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public static void main(String[] args) throws InterruptedException, SmackException, IOException {
