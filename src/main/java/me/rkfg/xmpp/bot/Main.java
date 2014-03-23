@@ -10,19 +10,38 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+<<<<<<< HEAD
 import me.rkfg.xmpp.bot.plugins.*;
+=======
+import me.rkfg.xmpp.bot.plugins.BehindComputerPlugin;
+import me.rkfg.xmpp.bot.plugins.GoogleCommandPlugin;
+import me.rkfg.xmpp.bot.plugins.ManCommandPlugin;
+import me.rkfg.xmpp.bot.plugins.MarkovCollectorPlugin;
+import me.rkfg.xmpp.bot.plugins.MarkovResponsePlugin;
+import me.rkfg.xmpp.bot.plugins.MessagePlugin;
+import me.rkfg.xmpp.bot.plugins.OpinionCommandPlugin;
+import me.rkfg.xmpp.bot.plugins.QalcCommandPlugin;
+import me.rkfg.xmpp.bot.plugins.StdinPlugin;
+import me.rkfg.xmpp.bot.plugins.TitlePlugin;
+import me.rkfg.xmpp.bot.plugins.WhoisCommandPlugin;
+>>>>>>> 404f6fc8c867d22bb998cf168b2f9311c6025ce0
 
 import me.rkfg.xmpp.bot.plugins.doto.DotoSchedulePlugin;
 import me.rkfg.xmpp.bot.plugins.doto.V4L3TFollowerPlugin;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jivesoftware.smack.AbstractConnectionListener;
 import org.jivesoftware.smack.Chat;
+import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.ChatManagerListener;
-import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.SmackConfiguration;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.TCPConnection;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.AndFilter;
@@ -35,7 +54,7 @@ import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.muc.DefaultParticipantStatusListener;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
-import org.jivesoftware.smackx.packet.Version;
+import org.jivesoftware.smackx.iqversion.packet.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,14 +66,20 @@ public class Main {
     private static Logger log = LoggerFactory.getLogger(Main.class);
     private static String nick;
     private static ChatAdapter mucAdapted;
-    private static SettingsManager sm = SettingsManager.getInstance();
+    public static SettingsManager sm = SettingsManager.getInstance();
     private static ConcurrentLinkedQueue<BotMessage> outgoingMsgs = new ConcurrentLinkedQueue<BotMessage>();
+<<<<<<< HEAD
     public static List<MessagePluginImpl> plugins = new LinkedList<MessagePluginImpl>(Arrays.asList(new OpinionCommandPlugin(),
             new WhoisCommandPlugin(), new GoogleCommandPlugin(), new ManCommandPlugin(), new TitlePlugin() , new V4L3TFollowerPlugin(), new DotoSchedulePlugin()
 ));
+=======
+    public static List<MessagePlugin> plugins = new LinkedList<MessagePlugin>(Arrays.asList(new StdinPlugin(), new BehindComputerPlugin(),
+            new QalcCommandPlugin(), new OpinionCommandPlugin(), new WhoisCommandPlugin(), new GoogleCommandPlugin(),
+            new ManCommandPlugin(), new TitlePlugin(), new V4L3TFollowerPlugin(), new DotoSchedulePlugin()));
+>>>>>>> 404f6fc8c867d22bb998cf168b2f9311c6025ce0
     private static ExecutorService commandExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, SmackException, IOException {
         log.info("Starting up...");
         HibernateUtil.initSessionFactory("hibernate.cfg.xml");
         sm.setFilename("settings.ini");
@@ -70,13 +95,14 @@ public class Main {
         HashMap<String, String> defaults = sm.getDefaults();
         defaults.put("nick", "Talho-san");
         defaults.put("login", "talho");
+
         defaults.put("resource", "jbot");
         nick = sm.getStringSetting("nick");
         for (MessagePlugin plugin : plugins) {
             plugin.init();
         }
 
-        final Connection connection = new XMPPConnection(sm.getStringSetting("server"));
+        final XMPPConnection connection = new TCPConnection(sm.getStringSetting("server"));
         try {
             connection.connect();
             connection.login(sm.getStringSetting("login"), sm.getStringSetting("password"), sm.getStringSetting("resource"));
@@ -85,23 +111,33 @@ public class Main {
             return;
         }
         final MultiUserChat muc = new MultiUserChat(connection, sm.getStringSetting("join"));
+
         final DiscussionHistory history = new DiscussionHistory();
         history.setMaxStanzas(0);
         connection.addConnectionListener(new AbstractConnectionListener() {
             @Override
             public void reconnectionSuccessful() {
                 try {
-                    muc.join(nick, "", history, SmackConfiguration.getPacketReplyTimeout());
+                    muc.join(nick, "", history, SmackConfiguration.getDefaultPacketReplyTimeout());
                 } catch (XMPPException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (NoResponseException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (NotConnectedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
         });
         try {
-            muc.join(nick, "", history, SmackConfiguration.getPacketReplyTimeout());
+            muc.join(nick, "", history, SmackConfiguration.getDefaultPacketReplyTimeout());
         } catch (XMPPException e) {
             log.warn("Joining error: ", e);
+        } catch (NoResponseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
         mucAdapted = new MUCAdapterImpl(muc);
 
@@ -130,7 +166,7 @@ public class Main {
             }
         });
 
-        connection.getChatManager().addChatListener(new ChatManagerListener() {
+        ChatManager.getInstanceFor(connection).addChatListener(new ChatManagerListener() {
 
             @Override
             public void chatCreated(Chat chat, boolean createdLocally) {
@@ -148,15 +184,16 @@ public class Main {
 
             @Override
             public void processPacket(Packet packet) {
-                Version version = new Version();
-                version.setOs("Nirvash OpenFirmware v7.1");
-                version.setName("Gekko-go console");
-                version.setVersion("14.7");
+                Version version = new Version("Gekko-go console", "14.7", "Nirvash OpenFirmware v7.1");
                 version.setFrom(packet.getTo());
                 version.setTo(packet.getFrom());
                 version.setType(Type.RESULT);
                 version.setPacketID(packet.getPacketID());
-                connection.sendPacket(version);
+                try {
+                    connection.sendPacket(version);
+                } catch (NotConnectedException e) {
+                    e.printStackTrace();
+                }
             }
         }, new AndFilter(new IQTypeFilter(Type.GET), new PacketTypeFilter(Version.class)));
         new Thread(new Runnable() {
@@ -174,6 +211,9 @@ public class Main {
                                 e.printStackTrace();
                             } catch (InterruptedException e) {
                                 Thread.currentThread().interrupt();
+                            } catch (NotConnectedException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
                             }
                         }
                     } else {
@@ -203,12 +243,15 @@ public class Main {
                 String text = message.getBody();
                 log.info("<{}>: {}", message.getFrom(), text);
                 for (MessagePlugin plugin : plugins) {
-                    Matcher matcher = plugin.getPattern().matcher(text);
-                    if (matcher.find()) {
-                        String result = plugin.process(message, matcher);
-                        if (result != null && !result.isEmpty()) {
-                            sendMessage(chat, StringEscapeUtils.unescapeHtml4(result));
-                            break;
+                    Pattern pattern = plugin.getPattern();
+                    if (pattern != null) {
+                        Matcher matcher = pattern.matcher(text);
+                        if (matcher.find()) {
+                            String result = plugin.process(message, matcher);
+                            if (result != null && !result.isEmpty()) {
+                                sendMessage(chat, StringEscapeUtils.unescapeHtml4(result));
+                                break;
+                            }
                         }
                     }
                 }

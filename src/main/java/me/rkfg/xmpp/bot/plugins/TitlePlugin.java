@@ -15,6 +15,9 @@ import org.slf4j.LoggerFactory;
 
 public class TitlePlugin extends MessagePluginImpl {
 
+    private static final String USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.117 Safari/537.36";
+    private static final int MAX_BODY_SIZE = 102400;
+    private static final int TIMEOUT = 10000;
     private Logger log = LoggerFactory.getLogger(getClass());
 
     @Override
@@ -32,11 +35,11 @@ public class TitlePlugin extends MessagePluginImpl {
             url = "http://" + IDN.toASCII(url.replaceAll("http://", ""));
         }
         try {
-            Document doc = Jsoup.connect(url).maxBodySize(102400).userAgent("Mozilla").cookie("auth", "token").get();
+            Document doc = Jsoup.connect(url).timeout(TIMEOUT).maxBodySize(MAX_BODY_SIZE).userAgent(USER_AGENT).get();
             String titleStr = doc.title();
             return String.format("Title: %s", titleStr);
         } catch (InterruptedIOException e) {
-            // timeout, doing nothing
+            log.warn("Timed out loading URL: {}", url);
         } catch (ClientProtocolException e) {
             //
         } catch (IOException e) {
