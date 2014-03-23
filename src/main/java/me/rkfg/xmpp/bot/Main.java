@@ -11,16 +11,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 
-import me.rkfg.xmpp.bot.plugins.GoogleCommandPlugin;
-import me.rkfg.xmpp.bot.plugins.ManCommandPlugin;
-import me.rkfg.xmpp.bot.plugins.MarkovCollectorPlugin;
-import me.rkfg.xmpp.bot.plugins.MarkovResponsePlugin;
-import me.rkfg.xmpp.bot.plugins.MessagePlugin;
-import me.rkfg.xmpp.bot.plugins.MessagePluginImpl;
-import me.rkfg.xmpp.bot.plugins.OpinionCommandPlugin;
-import me.rkfg.xmpp.bot.plugins.TitlePlugin;
-import me.rkfg.xmpp.bot.plugins.WhoisCommandPlugin;
+import me.rkfg.xmpp.bot.plugins.*;
 
+import me.rkfg.xmpp.bot.plugins.doto.DotoSchedulePlugin;
+import me.rkfg.xmpp.bot.plugins.doto.V4L3TFollowerPlugin;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jivesoftware.smack.AbstractConnectionListener;
 import org.jivesoftware.smack.Chat;
@@ -56,8 +50,8 @@ public class Main {
     private static SettingsManager sm = SettingsManager.getInstance();
     private static ConcurrentLinkedQueue<BotMessage> outgoingMsgs = new ConcurrentLinkedQueue<BotMessage>();
     public static List<MessagePluginImpl> plugins = new LinkedList<MessagePluginImpl>(Arrays.asList(new OpinionCommandPlugin(),
-            new WhoisCommandPlugin(), new GoogleCommandPlugin(), new ManCommandPlugin(), new MarkovResponsePlugin(), new TitlePlugin(),
-            new MarkovCollectorPlugin()));
+            new WhoisCommandPlugin(), new GoogleCommandPlugin(), new ManCommandPlugin(), new TitlePlugin() , new V4L3TFollowerPlugin(), new DotoSchedulePlugin()
+));
     private static ExecutorService commandExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public static void main(String[] args) throws InterruptedException {
