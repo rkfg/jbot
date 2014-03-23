@@ -12,9 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-<<<<<<< HEAD
 import me.rkfg.xmpp.bot.plugins.*;
-=======
 import me.rkfg.xmpp.bot.plugins.BehindComputerPlugin;
 import me.rkfg.xmpp.bot.plugins.GoogleCommandPlugin;
 import me.rkfg.xmpp.bot.plugins.ManCommandPlugin;
@@ -26,7 +24,6 @@ import me.rkfg.xmpp.bot.plugins.QalcCommandPlugin;
 import me.rkfg.xmpp.bot.plugins.StdinPlugin;
 import me.rkfg.xmpp.bot.plugins.TitlePlugin;
 import me.rkfg.xmpp.bot.plugins.WhoisCommandPlugin;
->>>>>>> 404f6fc8c867d22bb998cf168b2f9311c6025ce0
 
 import me.rkfg.xmpp.bot.plugins.doto.DotoSchedulePlugin;
 import me.rkfg.xmpp.bot.plugins.doto.V4L3TFollowerPlugin;
@@ -68,15 +65,10 @@ public class Main {
     private static ChatAdapter mucAdapted;
     public static SettingsManager sm = SettingsManager.getInstance();
     private static ConcurrentLinkedQueue<BotMessage> outgoingMsgs = new ConcurrentLinkedQueue<BotMessage>();
-<<<<<<< HEAD
     public static List<MessagePluginImpl> plugins = new LinkedList<MessagePluginImpl>(Arrays.asList(new OpinionCommandPlugin(),
             new WhoisCommandPlugin(), new GoogleCommandPlugin(), new ManCommandPlugin(), new TitlePlugin() , new V4L3TFollowerPlugin(), new DotoSchedulePlugin()
 ));
-=======
-    public static List<MessagePlugin> plugins = new LinkedList<MessagePlugin>(Arrays.asList(new StdinPlugin(), new BehindComputerPlugin(),
-            new QalcCommandPlugin(), new OpinionCommandPlugin(), new WhoisCommandPlugin(), new GoogleCommandPlugin(),
-            new ManCommandPlugin(), new TitlePlugin(), new V4L3TFollowerPlugin(), new DotoSchedulePlugin()));
->>>>>>> 404f6fc8c867d22bb998cf168b2f9311c6025ce0
+
     private static ExecutorService commandExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public static void main(String[] args) throws InterruptedException, SmackException, IOException {
