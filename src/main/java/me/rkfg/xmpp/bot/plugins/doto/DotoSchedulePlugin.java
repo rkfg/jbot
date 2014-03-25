@@ -166,7 +166,7 @@ public class DotoSchedulePlugin extends CommandPlugin
         m.put(UPCOMING_PARAM, 0);
         m.put(RECENT_PARAM, 0);
         m.put(QUERY_LEN_STR, QUERY_LEN);
-        String sss = _matcher.group(2);
+        String sss = _matcher.group(COMMAND_GROUP);
         String[] ss = sss.split("\\s+");
         boolean ok = false;
         for (String s: ss){
