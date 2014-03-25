@@ -116,7 +116,7 @@ public class V4L3TFollowerPlugin extends CommandPlugin
 
     @Override
     public String getManual() {
-        return "фолловнуть @twittername.\n" + "Пример: " + PREFIX + "t @gay";
+        return "фолловнуть @twittername.\n" + "Пример: " + PREFIX + "tw @gay";
     }
 }
 
