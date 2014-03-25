@@ -38,7 +38,7 @@ public class DotoSchedulePlugin extends CommandPlugin
     @Override
     public String processCommand(Message message, Matcher matcher) throws ClientAuthenticationException, LogicException
     {
-        String str = "";
+        StringBuilder str = new StringBuilder();
         HashMap<String, Integer> m =parseParams(matcher);
         Document doc;
         try
@@ -47,9 +47,9 @@ public class DotoSchedulePlugin extends CommandPlugin
         }
         catch(IOException e)
         {
-            str = "Эти псы что-то поломали";
+            str.append("Эти псы что-то поломали");
             e.printStackTrace();
-            return str;
+            return str.toString();
         }
         int num = m.get(QUERY_LEN_STR);
         Elements boxes = doc.select(".box");
@@ -59,19 +59,19 @@ public class DotoSchedulePlugin extends CommandPlugin
             Element q = qq.first();
             if(q.ownText().equals(LIVE_MATCHES) && m.get(LIVE_PARAM) > 0)
             {
-                str+= getAll(LIVE_MATCHES, e, num);
+                str.append(getAll(LIVE_MATCHES, e, num));
 
             }
             if(q.ownText().equals(UPCOMING_MATCHES) && m.get(UPCOMING_PARAM) > 0)
             {
-                str+= getAll(UPCOMING_MATCHES, e, num);
+                str.append(getAll(UPCOMING_MATCHES, e, num));
             }
             if(q.ownText().equals(RECENT_RESULTS) && m.get(RECENT_PARAM) > 0)
             {
-                str+= getAll(RECENT_RESULTS, e, num);
+                str.append(getAll(RECENT_RESULTS, e, num));
             }
         }
-        return str;
+        return str.toString();
     }
     @Override
     public List<String> getCommand() {
@@ -205,9 +205,7 @@ public class DotoSchedulePlugin extends CommandPlugin
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append('\n');
-        sb.append(title);
-        sb.append(":\n");
+        sb.append('\n').append(title).append(":\n");
 
         if (title.equals(RECENT_RESULTS) || title.equals(UPCOMING_MATCHES))
         {
@@ -218,23 +216,15 @@ public class DotoSchedulePlugin extends CommandPlugin
                     String s = comments.get(i).replace("Show", "");
                     comments.set(i, s);
                 }
-                sb.append("[");
-                sb.append(comments.get(i));
-                sb.append("]  ");
-                sb.append(names.get(i));
-                sb.append("  [");
-                sb.append(tournaments.get(i));
-                sb.append("]\n");
+                sb.append("[").append(comments.get(i)).append("]  ").append(names.get(i)).append("  [").append(tournaments.get(i))
+                        .append("]\n");
             }
         }
         else
         {
             for(int i = 0; i< names.size(); i++)
             {
-                sb.append(names.get(i));
-                sb.append("  [");
-                sb.append(tournaments.get(i));
-                sb.append("]\n");
+                sb.append(names.get(i)).append("  [").append(tournaments.get(i)).append("]\n");
             }
         }
         return sb.toString();
