@@ -2,7 +2,6 @@ package me.rkfg.xmpp.bot;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,21 +11,8 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import me.rkfg.xmpp.bot.plugins.*;
-import me.rkfg.xmpp.bot.plugins.BehindComputerPlugin;
-import me.rkfg.xmpp.bot.plugins.GoogleCommandPlugin;
-import me.rkfg.xmpp.bot.plugins.ManCommandPlugin;
-import me.rkfg.xmpp.bot.plugins.MarkovCollectorPlugin;
-import me.rkfg.xmpp.bot.plugins.MarkovResponsePlugin;
 import me.rkfg.xmpp.bot.plugins.MessagePlugin;
-import me.rkfg.xmpp.bot.plugins.OpinionCommandPlugin;
-import me.rkfg.xmpp.bot.plugins.QalcCommandPlugin;
-import me.rkfg.xmpp.bot.plugins.StdinPlugin;
-import me.rkfg.xmpp.bot.plugins.TitlePlugin;
-import me.rkfg.xmpp.bot.plugins.WhoisCommandPlugin;
 
-import me.rkfg.xmpp.bot.plugins.doto.DotoSchedulePlugin;
-import me.rkfg.xmpp.bot.plugins.doto.V4L3TFollowerPlugin;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jivesoftware.smack.AbstractConnectionListener;
 import org.jivesoftware.smack.Chat;
@@ -48,10 +34,10 @@ import org.jivesoftware.smack.packet.IQ.Type;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.util.StringUtils;
+import org.jivesoftware.smackx.iqversion.packet.Version;
 import org.jivesoftware.smackx.muc.DefaultParticipantStatusListener;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
-import org.jivesoftware.smackx.iqversion.packet.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,15 +46,13 @@ import ru.ppsrk.gwt.server.SettingsManager;
 
 public class Main {
 
+    private static final String PLUGINS_PACKAGE_NAME = "me.rkfg.xmpp.bot.plugins.";
     private static Logger log = LoggerFactory.getLogger(Main.class);
     private static String nick;
     private static ChatAdapter mucAdapted;
     private static SettingsManager sm = SettingsManager.getInstance();
     private static ConcurrentLinkedQueue<BotMessage> outgoingMsgs = new ConcurrentLinkedQueue<BotMessage>();
-    public static List<MessagePluginImpl> plugins = new LinkedList<MessagePluginImpl>(Arrays.asList(new OpinionCommandPlugin(),
-            new WhoisCommandPlugin(), new GoogleCommandPlugin(), new ManCommandPlugin(), new TitlePlugin() , new V4L3TFollowerPlugin(), new DotoSchedulePlugin()
-));
-
+    private static List<MessagePlugin> plugins = new LinkedList<MessagePlugin>();
     private static ExecutorService commandExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public static void main(String[] args) throws InterruptedException, SmackException, IOException {
@@ -87,12 +71,16 @@ public class Main {
         HashMap<String, String> defaults = sm.getDefaults();
         defaults.put("nick", "Talho-san");
         defaults.put("login", "talho");
-
         defaults.put("resource", "jbot");
+
         nick = sm.getStringSetting("nick");
+        String pluginClasses = sm.getStringSetting("plugins");
+        loadPlugins(pluginClasses);
+        log.info("Plugins loaded, initializing...");
         for (MessagePlugin plugin : plugins) {
             plugin.init();
         }
+        log.info("Plugins initializion complete.");
 
         final XMPPConnection connection = new TCPConnection(sm.getStringSetting("server"));
         try {
@@ -224,6 +212,23 @@ public class Main {
         }
     }
 
+    private static void loadPlugins(String pluginClassesNamesStr) {
+        String[] pluginClassesNames = pluginClassesNamesStr.split(",\\s?");
+        log.debug("Plugins found: {}", (Object) pluginClassesNames);
+        for (String pluginName : pluginClassesNames) {
+            try {
+                Class<? extends MessagePlugin> clazz = Class.forName(PLUGINS_PACKAGE_NAME + pluginName).asSubclass(MessagePlugin.class);
+                plugins.add(clazz.newInstance());
+            } catch (ClassNotFoundException e) {
+                log.warn("Couldn't load plugin {}: {}", pluginName, e);
+            } catch (InstantiationException e) {
+                log.warn("Couldn't load plugin {}: {}", pluginName, e);
+            } catch (IllegalAccessException e) {
+                log.warn("Couldn't load plugin {}: {}", pluginName, e);
+            }
+        }
+    }
+
     public static void processMessage(final ChatAdapter chat, final Message message) {
         commandExecutor.submit(new Runnable() {
 
@@ -267,5 +272,9 @@ public class Main {
 
     public static SettingsManager getSettingsManager() {
         return sm;
+    }
+
+    public static List<MessagePlugin> getPlugins() {
+        return plugins;
     }
 }

@@ -3,3 +3,6 @@ password=somepassword
 nick=Talho-san
 server=jabber.ru
 join=test@conference.jabber.ru
+plugins=OpinionCommandPlugin, BehindComputerPlugin, WhoisCommandPlugin, GoogleCommandPlugin, ManCommandPlugin, \
+TitlePlugin, doto.V4L3TFollowerPlugin, doto.DotoSchedulePlugin, QalcCommandPlugin, MarkovResponsePlugin, MarkovCollectorPlugin, \
+StdinPlugin

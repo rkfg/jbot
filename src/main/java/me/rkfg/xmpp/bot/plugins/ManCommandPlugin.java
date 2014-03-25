@@ -20,14 +20,14 @@ public class ManCommandPlugin extends CommandPlugin {
         String cmd = matcher.group(COMMAND_GROUP);
         if (cmd == null || cmd.isEmpty()) {
             List<String> commands = new LinkedList<String>();
-            for (MessagePlugin plugin : Main.plugins) {
+            for (MessagePlugin plugin : Main.getPlugins()) {
                 if (plugin instanceof CommandPlugin) {
                     commands.addAll(((CommandPlugin) plugin).getCommand());
                 }
             }
             return "доступные команды: " + SharedUtils.join(commands, ", ");
         } else {
-            for (MessagePlugin plugin : Main.plugins) {
+            for (MessagePlugin plugin : Main.getPlugins()) {
                 if (plugin instanceof CommandPlugin) {
                     if (((CommandPlugin) plugin).getCommand().contains(cmd)) {
                         return plugin.getManual();
