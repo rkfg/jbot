@@ -63,7 +63,7 @@ public class Main {
     private static Logger log = LoggerFactory.getLogger(Main.class);
     private static String nick;
     private static ChatAdapter mucAdapted;
-    public static SettingsManager sm = SettingsManager.getInstance();
+    private static SettingsManager sm = SettingsManager.getInstance();
     private static ConcurrentLinkedQueue<BotMessage> outgoingMsgs = new ConcurrentLinkedQueue<BotMessage>();
     public static List<MessagePluginImpl> plugins = new LinkedList<MessagePluginImpl>(Arrays.asList(new OpinionCommandPlugin(),
             new WhoisCommandPlugin(), new GoogleCommandPlugin(), new ManCommandPlugin(), new TitlePlugin() , new V4L3TFollowerPlugin(), new DotoSchedulePlugin()
@@ -263,5 +263,9 @@ public class Main {
         if (mucAdapted != null) {
             sendMessage(mucAdapted, message);
         }
+    }
+
+    public static SettingsManager getSettingsManager() {
+        return sm;
     }
 }

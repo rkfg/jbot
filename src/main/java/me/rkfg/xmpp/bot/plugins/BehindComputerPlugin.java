@@ -31,7 +31,7 @@ public class BehindComputerPlugin extends CommandPlugin {
         if (text.length() > 1024) {
             return "максимальная длина текста — 1024 символа.";
         }
-        String passwd = Main.sm.getStringSetting("bcpasswd");
+        String passwd = Main.getSettingsManager().getStringSetting("bcpasswd");
         try {
             HttpResponse resp = Utils.getHTTPClient().execute(
                     new HttpPost(new URIBuilder("http://behind.computer:8080/bc/post").setParameter("passwd", passwd)
