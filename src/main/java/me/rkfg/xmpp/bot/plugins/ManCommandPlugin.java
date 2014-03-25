@@ -17,7 +17,8 @@ public class ManCommandPlugin extends CommandPlugin {
 
     @Override
     public String processCommand(Message message, Matcher matcher) throws ClientAuthenticationException, LogicException {
-        if (matcher.group(3) == null || matcher.group(3).isEmpty()) {
+        String cmd = matcher.group(COMMAND_GROUP);
+        if (cmd == null || cmd.isEmpty()) {
             List<String> commands = new LinkedList<String>();
             for (MessagePlugin plugin : Main.plugins) {
                 if (plugin instanceof CommandPlugin) {
@@ -26,7 +27,6 @@ public class ManCommandPlugin extends CommandPlugin {
             }
             return "доступные команды: " + SharedUtils.join(commands, ", ");
         } else {
-            String cmd = matcher.group(3);
             for (MessagePlugin plugin : Main.plugins) {
                 if (plugin instanceof CommandPlugin) {
                     if (((CommandPlugin) plugin).getCommand().contains(cmd)) {

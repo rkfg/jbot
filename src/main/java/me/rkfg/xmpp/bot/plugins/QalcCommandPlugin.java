@@ -19,7 +19,7 @@ public class QalcCommandPlugin extends CommandPlugin {
     @Override
     public String processCommand(Message message, Matcher matcher) throws ClientAuthenticationException, LogicException {
         try {
-            Process processQalc = Runtime.getRuntime().exec(new String[] { "qalc", matcher.group(3) });
+            Process processQalc = Runtime.getRuntime().exec(new String[] { "qalc", matcher.group(COMMAND_GROUP) });
             int i;
             for (i = 0; i < TIMELIMIT; i++) {
                 try {

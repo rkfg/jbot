@@ -14,6 +14,8 @@ import ru.ppsrk.gwt.shared.SharedUtils;
 public abstract class CommandPlugin extends MessagePluginImpl {
 
     protected static final String PREFIX = "%";
+    protected static final int COMMAND_GROUP = 3;
+    protected static final int REDIRECT_GROUP = 5;
 
     @Override
     public Pattern getPattern() {
@@ -27,8 +29,8 @@ public abstract class CommandPlugin extends MessagePluginImpl {
         }
         try {
             String target = getNick(message);
-            if (matcher.group(5) != null) {
-                target = matcher.group(5);
+            if (matcher.group(REDIRECT_GROUP) != null) {
+                target = matcher.group(REDIRECT_GROUP);
             }
             return (message.getType() == Type.groupchat ? target + ", " : "") + processCommand(message, matcher);
         } catch (ClientAuthenticationException e) {

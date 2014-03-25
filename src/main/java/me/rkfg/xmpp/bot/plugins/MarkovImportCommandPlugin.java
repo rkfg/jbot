@@ -20,7 +20,7 @@ public class MarkovImportCommandPlugin extends CommandPlugin {
 
     @Override
     public String processCommand(Message message, final Matcher matcher) throws ClientAuthenticationException, LogicException {
-        File file = new File(matcher.group(3));
+        File file = new File(matcher.group(COMMAND_GROUP));
         final MarkovCollectorPlugin markovCollectorPlugin = new MarkovCollectorPlugin();
         int c = 0;
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());

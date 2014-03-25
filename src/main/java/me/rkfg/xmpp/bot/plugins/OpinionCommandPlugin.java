@@ -19,7 +19,7 @@ public class OpinionCommandPlugin extends CommandPlugin {
 
     @Override
     public String processCommand(Message message, Matcher matcher) throws ClientAuthenticationException, LogicException {
-        String args = matcher.group(3);
+        String args = matcher.group(COMMAND_GROUP);
         Matcher whois = Pattern.compile("(\"(.+?)\" = (.+))|((.+?) = (.+))").matcher(args);
         if (!whois.find()) {
             return "неверный формат команды.";

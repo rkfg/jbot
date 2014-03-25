@@ -19,7 +19,7 @@ public class WhoisCommandPlugin extends CommandPlugin {
 
     @Override
     public synchronized String processCommand(Message message, Matcher matcher) throws ClientAuthenticationException, LogicException {
-        final Matcher cmd = Pattern.compile("(a|n|o) (.+)").matcher(matcher.group(3));
+        final Matcher cmd = Pattern.compile("(a|n|o) (.+)").matcher(matcher.group(COMMAND_GROUP));
         if (!cmd.find()) {
             return "неверные параметры команды.";
         }
