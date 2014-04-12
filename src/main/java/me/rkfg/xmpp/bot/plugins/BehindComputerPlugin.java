@@ -26,7 +26,7 @@ public class BehindComputerPlugin extends CommandPlugin {
         if (!from.matches("^.+?@behind\\.computer/.*$")) {
             return "с этого адреса нельзя общаться с Закомповьем.";
         }
-        from = from.replaceAll("@behind\\.computer/.*$", "");
+        from = from.replaceAll("@behind\\.computer/.*$", "").replace("_", "-");
         String text = matcher.group(3);
         if (text.length() > 1024) {
             return "максимальная длина текста — 1024 символа.";
