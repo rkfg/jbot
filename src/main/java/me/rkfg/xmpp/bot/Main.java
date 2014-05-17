@@ -2,6 +2,8 @@ package me.rkfg.xmpp.bot;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,7 +51,7 @@ public class Main {
     private static final String PLUGINS_PACKAGE_NAME = "me.rkfg.xmpp.bot.plugins.";
     private static Logger log = LoggerFactory.getLogger(Main.class);
     private static String nick;
-    private static ChatAdapter mucAdapted;
+    private static List<ChatAdapter> mucsAdapted = new ArrayList<>();
     private static SettingsManager sm = SettingsManager.getInstance();
     private static ConcurrentLinkedQueue<BotMessage> outgoingMsgs = new ConcurrentLinkedQueue<BotMessage>();
     private static List<MessagePlugin> plugins = new LinkedList<MessagePlugin>();
@@ -90,62 +92,65 @@ public class Main {
             log.warn("Connection error: ", e);
             return;
         }
-        final MultiUserChat muc = new MultiUserChat(connection, sm.getStringSetting("join"));
+        String[] mucs = org.apache.commons.lang3.StringUtils.split(sm.getStringSetting("join"), ',');
+        for (String conf : mucs) {
+            final MultiUserChat muc = new MultiUserChat(connection, conf);
 
-        final DiscussionHistory history = new DiscussionHistory();
-        history.setMaxStanzas(0);
-        connection.addConnectionListener(new AbstractConnectionListener() {
-            @Override
-            public void reconnectionSuccessful() {
-                try {
-                    muc.join(nick, "", history, SmackConfiguration.getDefaultPacketReplyTimeout());
-                } catch (XMPPException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (NoResponseException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (NotConnectedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+            final DiscussionHistory history = new DiscussionHistory();
+            history.setMaxStanzas(0);
+            connection.addConnectionListener(new AbstractConnectionListener() {
+                @Override
+                public void reconnectionSuccessful() {
+                    try {
+                        muc.join(nick, "", history, SmackConfiguration.getDefaultPacketReplyTimeout());
+                    } catch (XMPPException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } catch (NoResponseException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } catch (NotConnectedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
                 }
+            });
+            try {
+                muc.join(nick, "", history, SmackConfiguration.getDefaultPacketReplyTimeout());
+            } catch (XMPPException e) {
+                log.warn("Joining error: ", e);
+            } catch (NoResponseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
-        });
-        try {
-            muc.join(nick, "", history, SmackConfiguration.getDefaultPacketReplyTimeout());
-        } catch (XMPPException e) {
-            log.warn("Joining error: ", e);
-        } catch (NoResponseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            final ChatAdapter mucAdapted = new MUCAdapterImpl(muc);
+            mucsAdapted.add(mucAdapted);
+
+            muc.addMessageListener(new PacketListener() {
+
+                @Override
+                public void processPacket(Packet packet) {
+                    processMessage(mucAdapted, (Message) packet);
+                }
+            });
+            muc.addParticipantStatusListener(new DefaultParticipantStatusListener() {
+                @Override
+                public void joined(String participant) {
+                    // try {
+                    // muc.sendMessage(String.format("%s, пошёл нахуй\nтупица.", StringUtils.parseResource(participant)));
+                    // } catch (XMPPException e) {
+                    // // TODO Auto-generated catch block
+                    // e.printStackTrace();
+                    // }
+                }
+
+                @Override
+                public void kicked(String participant, String actor, String reason) {
+                    sendMessage(mucAdapted, String.format("Ха-ха, загнали под шконарь %s! %s", StringUtils.parseResource(participant),
+                            !reason.isEmpty() ? "Мотивировали тем, что " + reason : "Без всякой мотивации."));
+                }
+            });
         }
-        mucAdapted = new MUCAdapterImpl(muc);
-
-        muc.addMessageListener(new PacketListener() {
-
-            @Override
-            public void processPacket(Packet packet) {
-                processMessage(mucAdapted, (Message) packet);
-            }
-        });
-        muc.addParticipantStatusListener(new DefaultParticipantStatusListener() {
-            @Override
-            public void joined(String participant) {
-                // try {
-                // muc.sendMessage(String.format("%s, пошёл нахуй\nтупица.", StringUtils.parseResource(participant)));
-                // } catch (XMPPException e) {
-                // // TODO Auto-generated catch block
-                // e.printStackTrace();
-                // }
-            }
-
-            @Override
-            public void kicked(String participant, String actor, String reason) {
-                sendMessage(mucAdapted, String.format("Ха-ха, загнали под шконарь %s! %s", StringUtils.parseResource(participant),
-                        !reason.isEmpty() ? "Мотивировали тем, что " + reason : "Без всякой мотивации."));
-            }
-        });
-
         ChatManager.getInstanceFor(connection).addChatListener(new ChatManagerListener() {
 
             @Override
@@ -265,8 +270,16 @@ public class Main {
     }
 
     public static void sendMUCMessage(String message) {
-        if (mucAdapted != null) {
-            sendMessage(mucAdapted, message);
+        sendMUCMessage(message, (Integer) null);
+    }
+
+    public static void sendMUCMessage(String message, Integer... toConfs) {
+        List<Integer> toConfsList = Arrays.asList(toConfs);
+        for (Integer i = 0; i < mucsAdapted.size(); i++) {
+            ChatAdapter adapter = mucsAdapted.get(i);
+            if ((toConfs[0] == null || toConfsList.contains(i)) && adapter != null) {
+                sendMessage(adapter, message);
+            }
         }
     }
 
