@@ -34,6 +34,7 @@ public class GoogleCommandPlugin extends CommandPlugin {
             while ((line = reader.readLine()) != null) {
                 builder.append(line);
             }
+            reader.close();
             JSONObject jsonObject = new JSONObject(builder.toString());
             if (jsonObject.getInt("responseStatus") != 200) {
                 String details = jsonObject.getString("responseDetails");
