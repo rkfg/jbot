@@ -10,7 +10,7 @@ import me.rkfg.xmpp.bot.domain.Opinion;
 import org.hibernate.Session;
 import org.jivesoftware.smack.packet.Message;
 
-import ru.ppsrk.gwt.client.ClientAuthenticationException;
+import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 import ru.ppsrk.gwt.server.HibernateCallback;
 import ru.ppsrk.gwt.server.HibernateUtil;
@@ -18,7 +18,7 @@ import ru.ppsrk.gwt.server.HibernateUtil;
 public class OpinionCommandPlugin extends CommandPlugin {
 
     @Override
-    public String processCommand(Message message, Matcher matcher) throws ClientAuthenticationException, LogicException {
+    public String processCommand(Message message, Matcher matcher) throws LogicException, ClientAuthException {
         String args = matcher.group(COMMAND_GROUP);
         Matcher whois = Pattern.compile("(\"(.+?)\" = (.+))|((.+?) = (.+))").matcher(args);
         if (!whois.find()) {
@@ -30,7 +30,7 @@ public class OpinionCommandPlugin extends CommandPlugin {
         HibernateUtil.exec(new HibernateCallback<Void>() {
 
             @Override
-            public Void run(Session session) throws LogicException, ClientAuthenticationException {
+            public Void run(Session session) throws LogicException, ClientAuthException {
                 session.createQuery("delete from Opinion where name = :name and author = :author").setString("name", name)
                         .setString("author", author).executeUpdate();
                 session.merge(new Opinion(author, name, opinion));

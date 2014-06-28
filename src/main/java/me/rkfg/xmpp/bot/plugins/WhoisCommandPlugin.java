@@ -10,7 +10,7 @@ import me.rkfg.xmpp.bot.domain.Opinion;
 import org.hibernate.Session;
 import org.jivesoftware.smack.packet.Message;
 
-import ru.ppsrk.gwt.client.ClientAuthenticationException;
+import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 import ru.ppsrk.gwt.server.HibernateCallback;
 import ru.ppsrk.gwt.server.HibernateUtil;
@@ -18,7 +18,7 @@ import ru.ppsrk.gwt.server.HibernateUtil;
 public class WhoisCommandPlugin extends CommandPlugin {
 
     @Override
-    public synchronized String processCommand(Message message, Matcher matcher) throws ClientAuthenticationException, LogicException {
+    public synchronized String processCommand(Message message, Matcher matcher) throws LogicException, ClientAuthException {
         final Matcher cmd = Pattern.compile("(a|n|o) (.+)").matcher(matcher.group(COMMAND_GROUP));
         if (!cmd.find()) {
             return "неверные параметры команды.";
@@ -26,7 +26,7 @@ public class WhoisCommandPlugin extends CommandPlugin {
         return HibernateUtil.exec(new HibernateCallback<String>() {
 
             @Override
-            public String run(Session session) throws LogicException, ClientAuthenticationException {
+            public String run(Session session) throws LogicException, ClientAuthException {
                 String paramName = "name";
                 String intro = "вот что говорят про %s";
                 String negative = "ничего не говорят про %s";

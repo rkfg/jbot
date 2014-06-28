@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 import org.hibernate.Session;
 import org.jivesoftware.smack.packet.Message;
 
-import ru.ppsrk.gwt.client.ClientAuthenticationException;
+import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 import ru.ppsrk.gwt.server.HibernateCallback;
 import ru.ppsrk.gwt.server.HibernateUtil;
@@ -18,11 +18,11 @@ public class DiversityCommandPlugin extends CommandPlugin {
     private static int PRECISION = 5;
 
     @Override
-    public String processCommand(Message message, final Matcher matcher) throws ClientAuthenticationException, LogicException {
+    public String processCommand(Message message, final Matcher matcher) throws LogicException, ClientAuthException {
         return HibernateUtil.exec(new HibernateCallback<String>() {
 
             @Override
-            public String run(Session session) throws LogicException, ClientAuthenticationException {
+            public String run(Session session) throws LogicException, ClientAuthException {
                 double prec_coeff = Math.pow(10, PRECISION);
                 try {
                     double power = Double.valueOf(matcher.group(2));

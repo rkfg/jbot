@@ -8,15 +8,15 @@ import me.rkfg.xmpp.bot.domain.Markov;
 import me.rkfg.xmpp.bot.domain.MarkovFirstWord;
 import me.rkfg.xmpp.bot.domain.MarkovFirstWordCount;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.NonUniqueResultException;
 import org.hibernate.Session;
 import org.jivesoftware.smack.packet.Message;
 
-import ru.ppsrk.gwt.client.ClientAuthenticationException;
+import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 import ru.ppsrk.gwt.server.HibernateCallback;
 import ru.ppsrk.gwt.server.HibernateUtil;
-import ru.ppsrk.gwt.shared.SharedUtils;
 
 public class MarkovCollectorPlugin extends MessagePluginImpl {
 
@@ -43,7 +43,7 @@ public class MarkovCollectorPlugin extends MessagePluginImpl {
             HibernateUtil.exec(new HibernateCallback<Void>() {
 
                 @Override
-                public Void run(Session session) throws LogicException, ClientAuthenticationException {
+                public Void run(Session session) throws LogicException, ClientAuthException {
                     String words[] = text.split("\\s+");
                     int c = 0;
                     int pos = 0;
@@ -52,12 +52,12 @@ public class MarkovCollectorPlugin extends MessagePluginImpl {
                     String lastWord = null;
                     do {
                         if (c + SEGMENT_WORDS < words.length) {
-                            segment = SharedUtils.join(Arrays.copyOfRange(words, c + 1, c + SEGMENT_WORDS), " ");
+                            segment = StringUtils.join(Arrays.copyOfRange(words, c + 1, c + SEGMENT_WORDS), " ");
                             firstWord = purify(words[c]);
                             lastWord = purify(words[c + SEGMENT_WORDS - 1]);
                         } else {
                             if (c + 1 < words.length) {
-                                segment = SharedUtils.join(Arrays.copyOfRange(words, c + 1, words.length), " ");
+                                segment = StringUtils.join(Arrays.copyOfRange(words, c + 1, words.length), " ");
                             } else {
                                 segment = "";
                             }
@@ -85,11 +85,9 @@ public class MarkovCollectorPlugin extends MessagePluginImpl {
                     return null;
                 }
             });
-        } catch (ClientAuthenticationException e) {
-            // TODO Auto-generated catch block
+        } catch (ClientAuthException e) {
             e.printStackTrace();
         } catch (LogicException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

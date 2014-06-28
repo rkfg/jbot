@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Message.Type;
 
-import ru.ppsrk.gwt.client.ClientAuthenticationException;
+import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
-import ru.ppsrk.gwt.shared.SharedUtils;
 
 public abstract class CommandPlugin extends MessagePluginImpl {
 
@@ -19,7 +19,7 @@ public abstract class CommandPlugin extends MessagePluginImpl {
 
     @Override
     public Pattern getPattern() {
-        return Pattern.compile("^" + PREFIX + "(" + SharedUtils.join(getCommand(), "|") + ")( +(.+?)( *> *(.+?) *)?$|$)", Pattern.DOTALL);
+        return Pattern.compile("^" + PREFIX + "(" + StringUtils.join(getCommand(), "|") + ")( +(.+?)( *> *(.+?) *)?$|$)", Pattern.DOTALL);
     }
 
     @Override
@@ -33,7 +33,8 @@ public abstract class CommandPlugin extends MessagePluginImpl {
                 target = matcher.group(REDIRECT_GROUP);
             }
             return (message.getType() == Type.groupchat ? target + ", " : "") + processCommand(message, matcher);
-        } catch (ClientAuthenticationException e) {
+        } catch (ClientAuthException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (LogicException e) {
             log.warn("LogicError while processing command: ", e);
@@ -41,7 +42,8 @@ public abstract class CommandPlugin extends MessagePluginImpl {
         return "ошибка обработки команды, подробности в логе.";
     }
 
-    public abstract String processCommand(Message message, Matcher matcher) throws ClientAuthenticationException, LogicException;
+    public abstract String processCommand(Message message, Matcher matcher) throws LogicException,
+            ClientAuthException;
 
     public abstract List<String> getCommand();
     

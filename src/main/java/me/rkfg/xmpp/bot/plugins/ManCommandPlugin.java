@@ -7,16 +7,16 @@ import java.util.regex.Matcher;
 
 import me.rkfg.xmpp.bot.Main;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jivesoftware.smack.packet.Message;
 
-import ru.ppsrk.gwt.client.ClientAuthenticationException;
+import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
-import ru.ppsrk.gwt.shared.SharedUtils;
 
 public class ManCommandPlugin extends CommandPlugin {
 
     @Override
-    public String processCommand(Message message, Matcher matcher) throws ClientAuthenticationException, LogicException {
+    public String processCommand(Message message, Matcher matcher) throws ClientAuthException, LogicException {
         String cmd = matcher.group(COMMAND_GROUP);
         if (cmd == null || cmd.isEmpty()) {
             List<String> commands = new LinkedList<String>();
@@ -25,7 +25,7 @@ public class ManCommandPlugin extends CommandPlugin {
                     commands.addAll(((CommandPlugin) plugin).getCommand());
                 }
             }
-            return "доступные команды: " + SharedUtils.join(commands, ", ");
+            return "доступные команды: " + StringUtils.join(commands, ", ");
         } else {
             for (MessagePlugin plugin : Main.getPlugins()) {
                 if (plugin instanceof CommandPlugin) {

@@ -17,7 +17,7 @@ import org.hibernate.NonUniqueResultException;
 import org.hibernate.Session;
 import org.jivesoftware.smack.packet.Message;
 
-import ru.ppsrk.gwt.client.ClientAuthenticationException;
+import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 import ru.ppsrk.gwt.server.HibernateCallback;
 import ru.ppsrk.gwt.server.HibernateUtil;
@@ -28,11 +28,11 @@ public class MarkovOptimizeCommandPlugin extends CommandPlugin {
     volatile HashMap<String, ReentrantLock> wordsInProcess = new HashMap<String, ReentrantLock>();
 
     @Override
-    public String processCommand(Message message, Matcher matcher) throws ClientAuthenticationException, LogicException {
+    public String processCommand(Message message, Matcher matcher) throws LogicException, ClientAuthException {
         Long[] minmax = HibernateUtil.exec(new HibernateCallback<Long[]>() {
 
             @Override
-            public Long[] run(Session session) throws LogicException, ClientAuthenticationException {
+            public Long[] run(Session session) throws LogicException, ClientAuthException {
                 session.createSQLQuery(
                         "SET REFERENTIAL_INTEGRITY FALSE; truncate table markovfirstword; truncate table markovfirstwordcount; SET REFERENTIAL_INTEGRITY TRUE;")
                         .executeUpdate();
@@ -53,7 +53,7 @@ public class MarkovOptimizeCommandPlugin extends CommandPlugin {
                         HibernateUtil.exec(new HibernateCallback<Void>() {
 
                             @Override
-                            public Void run(Session session) throws LogicException, ClientAuthenticationException {
+                            public Void run(Session session) throws LogicException, ClientAuthException {
                                 Markov markov = (Markov) session.get(Markov.class, cnt);
                                 if (markov == null) {
                                     return null;

@@ -17,11 +17,10 @@ import org.hibernate.Session;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.util.StringUtils;
 
-import ru.ppsrk.gwt.client.ClientAuthenticationException;
+import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 import ru.ppsrk.gwt.server.HibernateCallback;
 import ru.ppsrk.gwt.server.HibernateUtil;
-import ru.ppsrk.gwt.shared.SharedUtils;
 
 public class MarkovResponsePlugin extends MessagePluginImpl {
 
@@ -85,7 +84,7 @@ public class MarkovResponsePlugin extends MessagePluginImpl {
             return StringUtils.parseResource(message.getFrom()) + ", " + HibernateUtil.exec(new HibernateCallback<String>() {
 
                 @Override
-                public String run(Session session) throws LogicException, ClientAuthenticationException {
+                public String run(Session session) throws LogicException, ClientAuthException {
                     if (cooldown) {
                         return excuse();
                     }
@@ -134,10 +133,10 @@ public class MarkovResponsePlugin extends MessagePluginImpl {
                         }
                     }
                     answersTimes.offer(System.currentTimeMillis());
-                    return SharedUtils.join(result, " ");
+                    return org.apache.commons.lang3.StringUtils.join(result, " ");
                 }
             });
-        } catch (ClientAuthenticationException e) {
+        } catch (ClientAuthException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (LogicException e) {

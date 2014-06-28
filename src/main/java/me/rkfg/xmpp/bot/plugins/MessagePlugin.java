@@ -13,5 +13,5 @@ public interface MessagePlugin {
     public void init();
 
     public String getManual();
-    
+
 }
