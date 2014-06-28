@@ -100,13 +100,21 @@ public class MarkovResponsePlugin extends MessagePluginImpl {
                     Long min = (Long) minmax[0];
                     Long max = (Long) minmax[1];
                     Markov segment = null;
-                    do {
-                        segment = (Markov) session.createQuery("from Markov m where m.id = :mid")
-                                .setLong("mid", random.nextInt(max.intValue() - min.intValue()) + min).uniqueResult();
-                    } while (segment == null);
                     List<String> result = new LinkedList<String>();
-                    result.add(segment.getFirstWord());
-                    result.add(segment.getText());
+                    String[] userWords = org.apache.commons.lang3.StringUtils.split(matcher.group(1));
+                    for (int i = 0; i < 5; i++) {
+                        String word = MarkovCollectorPlugin.purify(userWords[random.nextInt(userWords.length)]);
+                        if (!word.isEmpty() && word.length() >= minLastWordLength) {
+                            segment = (Markov) session.createQuery("from Markov m where m.firstWord = :mfw").setString("mfw", word)
+                                    .setMaxResults(1).uniqueResult();
+                            if (segment != null) {
+                                break;
+                            }
+                        }
+                    }
+                    if (segment == null) {
+                        segment = getFirstSegment(session, min, max, result);
+                    }
                     int len = random.nextInt(softSegmentLimit - minSegments) + minSegments;
                     int leftToHard = hardSegmentLimit - len;
                     while (len-- > 0) {
@@ -132,6 +140,9 @@ public class MarkovResponsePlugin extends MessagePluginImpl {
                             len = 1;
                         }
                     }
+                    if (result.isEmpty()) {
+                        getFirstSegment(session, min, max, result);
+                    }
                     answersTimes.offer(System.currentTimeMillis());
                     return org.apache.commons.lang3.StringUtils.join(result, " ");
                 }
@@ -148,5 +159,16 @@ public class MarkovResponsePlugin extends MessagePluginImpl {
 
     protected String excuse() {
         return excuses[random.nextInt(excuses.length)];
+    }
+
+    private Markov getFirstSegment(Session session, Long min, Long max, List<String> result) {
+        Markov segment;
+        do {
+            segment = (Markov) session.createQuery("from Markov m where m.id = :mid")
+                    .setLong("mid", random.nextInt(max.intValue() - min.intValue()) + min).uniqueResult();
+        } while (segment == null);
+        result.add(segment.getFirstWord());
+        result.add(segment.getText());
+        return segment;
     }
 }

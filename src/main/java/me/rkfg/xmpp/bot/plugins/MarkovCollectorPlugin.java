@@ -92,7 +92,7 @@ public class MarkovCollectorPlugin extends MessagePluginImpl {
         }
     }
 
-    private String purify(String str) {
+    public static String purify(String str) {
         return str.toLowerCase().trim().replaceAll("[,.?!;:\"'`«»()\\[\\]{}]", "");
     }
 }
