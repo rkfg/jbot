@@ -107,7 +107,8 @@ public class MarkovResponsePlugin extends MessagePluginImpl {
                         if (!word.isEmpty() && word.length() >= minLastWordLength) {
                             segment = (Markov) session.createQuery("from Markov m where m.firstWord = :mfw").setString("mfw", word)
                                     .setMaxResults(1).uniqueResult();
-                            if (segment != null) {
+                            if (segment != null && !segment.getText().isEmpty()) {
+                                result.add(segment.getText());
                                 break;
                             }
                         }
