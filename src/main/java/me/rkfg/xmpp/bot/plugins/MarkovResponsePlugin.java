@@ -105,8 +105,7 @@ public class MarkovResponsePlugin extends MessagePluginImpl {
                     for (int i = 0; i < 5; i++) {
                         String word = MarkovCollectorPlugin.purify(userWords[random.nextInt(userWords.length)]);
                         if (!word.isEmpty() && word.length() >= minLastWordLength) {
-                            segment = (Markov) session.createQuery("from Markov m where m.firstWord = :mfw").setString("mfw", word)
-                                    .setMaxResults(1).uniqueResult();
+                            segment = getRandomSegmentByFirstWord(word, session);
                             if (segment != null && !segment.getText().isEmpty()) {
                                 result.add(segment.getText());
                                 break;
@@ -119,23 +118,11 @@ public class MarkovResponsePlugin extends MessagePluginImpl {
                     int len = random.nextInt(softSegmentLimit - minSegments) + minSegments;
                     int leftToHard = hardSegmentLimit - len;
                     while (len-- > 0) {
-                        MarkovFirstWordCount segmentsCount = (MarkovFirstWordCount) session
-                                .createQuery("from MarkovFirstWordCount where word = :fw").setString("fw", segment.getLastWord())
-                                .uniqueResult();
-                        if (segmentsCount == null) {
+                        segment = getRandomSegmentByFirstWord(segment.getLastWord(), session);
+                        if (segment == null) {
                             break;
-                        }
-                        int n = random.nextInt(segmentsCount.getCount().intValue());
-                        try {
-                            MarkovFirstWord markovFirstWord = (MarkovFirstWord) session
-                                    .createQuery("from MarkovFirstWord where word = :fw and number = :n").setEntity("fw", segmentsCount)
-                                    .setInteger("n", n).uniqueResult();
-                            segment = markovFirstWord.getMarkov();
-                            if (!segment.getText().isEmpty()) {
-                                result.add(segment.getText());
-                            }
-                        } catch (NonUniqueResultException e) {
-                            log.warn("Non-unique word in the index found: {}/{}.", segmentsCount.getWord(), n);
+                        } else {
+                            result.add(segment.getText());
                         }
                         if (len == 0 && segment.getLastWord().length() < minLastWordLength && leftToHard-- > 0) {
                             len = 1;
@@ -171,5 +158,25 @@ public class MarkovResponsePlugin extends MessagePluginImpl {
         result.add(segment.getFirstWord());
         result.add(segment.getText());
         return segment;
+    }
+
+    private Markov getRandomSegmentByFirstWord(String word, Session session) {
+        MarkovFirstWordCount segmentsCount = (MarkovFirstWordCount) session.createQuery("from MarkovFirstWordCount where word = :fw")
+                .setString("fw", word).uniqueResult();
+        if (segmentsCount != null) {
+            int n = random.nextInt(segmentsCount.getCount().intValue());
+            try {
+                MarkovFirstWord markovFirstWord = (MarkovFirstWord) session
+                        .createQuery("from MarkovFirstWord where word = :fw and number = :n").setEntity("fw", segmentsCount)
+                        .setInteger("n", n).uniqueResult();
+                Markov segment = markovFirstWord.getMarkov();
+                if (!segment.getText().isEmpty()) {
+                    return segment;
+                }
+            } catch (NonUniqueResultException e) {
+                log.warn("Non-unique word in the index found: {}/{}.", segmentsCount.getWord(), n);
+            }
+        }
+        return null;
     }
 }
