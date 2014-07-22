@@ -101,17 +101,12 @@ public class Main {
             connection.addConnectionListener(new AbstractConnectionListener() {
                 @Override
                 public void reconnectionSuccessful() {
-                    try {
-                        muc.join(nick, "", history, SmackConfiguration.getDefaultPacketReplyTimeout());
-                    } catch (XMPPException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    } catch (NoResponseException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    } catch (NotConnectedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                    while (!muc.isJoined()) {
+                        try {
+                            muc.join(nick, "", history, SmackConfiguration.getDefaultPacketReplyTimeout());
+                        } catch (Throwable e) {
+                            log.warn("While rejoining: {}", e);
+                        }
                     }
                 }
             });
