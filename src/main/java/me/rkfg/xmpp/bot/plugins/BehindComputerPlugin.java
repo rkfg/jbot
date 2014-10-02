@@ -3,16 +3,21 @@ package me.rkfg.xmpp.bot.plugins;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 
 import me.rkfg.xmpp.bot.Main;
 import me.rkfg.xmpp.bot.Utils;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.message.BasicNameValuePair;
 import org.jivesoftware.smack.packet.Message;
 
 import ru.ppsrk.gwt.client.ClientAuthenticationException;
@@ -33,9 +38,14 @@ public class BehindComputerPlugin extends CommandPlugin {
         }
         String passwd = Main.getSettingsManager().getStringSetting("bcpasswd");
         try {
-            HttpResponse resp = Utils.getHTTPClient().execute(
-                    new HttpPost(new URIBuilder("http://behind.computer:8080/bc/post").setParameter("passwd", passwd)
-                            .setParameter("from", from).setParameter("text", text).build()));
+            HttpPost req = new HttpPost(new URIBuilder("http://behind.computer/post").build());
+            List<NameValuePair> params = new LinkedList<NameValuePair>();
+            params.add(new BasicNameValuePair("passwd", passwd));
+            params.add(new BasicNameValuePair("from", from));
+            params.add(new BasicNameValuePair("text", text));
+            HttpEntity entity = new UrlEncodedFormEntity(params, "utf-8");
+            req.setEntity(entity);
+            HttpResponse resp = Utils.getHTTPClient().execute(req);
             if (resp.getStatusLine().getStatusCode() == 200) {
                 return "отправлено.";
             }
