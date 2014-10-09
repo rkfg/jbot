@@ -198,6 +198,7 @@ public class Main {
             }
         }, "Messages sender").start();
 
+        log.info("Sub req: {}", connection.getRoster().getSubscriptionMode());
         while (true) {
             Thread.sleep(1000);
         }
