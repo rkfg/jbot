@@ -5,18 +5,19 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
-public class MUCAdapterImpl implements ChatAdapter {
+public class MUCAdapterImpl extends LoggingChatAdapter {
     private MultiUserChat multiUserChat;
 
     public MUCAdapterImpl(MultiUserChat multiUserChat) {
+        super(multiUserChat.getRoom() + "/" + multiUserChat.getNickname());
         this.multiUserChat = multiUserChat;
     }
 
-    public void sendMessage(String message) throws XMPPException, NotConnectedException {
+    public void sendActualMessage(String message) throws XMPPException, NotConnectedException {
         multiUserChat.sendMessage(message);
     }
 
-    public void sendMessage(Message message) throws XMPPException, NotConnectedException {
+    public void sendActualMessage(Message message) throws XMPPException, NotConnectedException {
         multiUserChat.sendMessage(message);
     }
 }

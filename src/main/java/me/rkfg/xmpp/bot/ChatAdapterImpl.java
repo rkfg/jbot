@@ -5,18 +5,21 @@ import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 
-public class ChatAdapterImpl implements ChatAdapter {
+public class ChatAdapterImpl extends LoggingChatAdapter {
     private Chat chat;
 
     public ChatAdapterImpl(Chat chat) {
+        super(Main.getNick() + " ⇒ " + chat.getParticipant());
         this.chat = chat;
     }
 
-    public void sendMessage(String message) throws XMPPException, NotConnectedException {
+    @Override
+    public void sendActualMessage(String message) throws XMPPException, NotConnectedException {
         chat.sendMessage(message);
     }
 
-    public void sendMessage(Message message) throws XMPPException, NotConnectedException {
+    @Override
+    public void sendActualMessage(Message message) throws XMPPException, NotConnectedException {
         chat.sendMessage(message);
     }
 }
