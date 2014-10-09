@@ -101,12 +101,12 @@ public class Main {
             connection.addConnectionListener(new AbstractConnectionListener() {
                 @Override
                 public void reconnectionSuccessful() {
-                    while (!muc.isJoined()) {
-                        try {
-                            muc.join(nick, "", history, SmackConfiguration.getDefaultPacketReplyTimeout());
-                        } catch (Throwable e) {
-                            log.warn("While rejoining: {}", e);
-                        }
+                    log.warn("Reconnected, joining {}", muc.getRoom());
+                    try {
+                        muc.join(nick, "", history, SmackConfiguration.getDefaultPacketReplyTimeout());
+                        log.info("Joined {}", muc.getRoom());
+                    } catch (Throwable e) {
+                        log.warn("While rejoining: {}", e);
                     }
                 }
             });
