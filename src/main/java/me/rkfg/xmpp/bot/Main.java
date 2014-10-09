@@ -129,15 +129,6 @@ public class Main {
                 }
             });
             muc.addParticipantStatusListener(new DefaultParticipantStatusListener() {
-                @Override
-                public void joined(String participant) {
-                    // try {
-                    // muc.sendMessage(String.format("%s, пошёл нахуй\nтупица.", StringUtils.parseResource(participant)));
-                    // } catch (XMPPException e) {
-                    // // TODO Auto-generated catch block
-                    // e.printStackTrace();
-                    // }
-                }
 
                 @Override
                 public void kicked(String participant, String actor, String reason) {
