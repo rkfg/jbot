@@ -15,7 +15,6 @@ import me.rkfg.xmpp.bot.domain.MarkovFirstWordCount;
 import org.hibernate.NonUniqueResultException;
 import org.hibernate.Session;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.util.StringUtils;
 
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
@@ -81,7 +80,7 @@ public class MarkovResponsePlugin extends MessagePluginImpl {
     @Override
     public String process(final Message message, final Matcher matcher) {
         try {
-            return StringUtils.parseResource(message.getFrom()) + ", " + HibernateUtil.exec(new HibernateCallback<String>() {
+            return getAppeal(message) + HibernateUtil.exec(new HibernateCallback<String>() {
 
                 @Override
                 public String run(Session session) throws LogicException, ClientAuthException {

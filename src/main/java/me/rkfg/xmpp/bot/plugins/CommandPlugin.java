@@ -6,7 +6,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Message.Type;
 
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
@@ -32,7 +31,7 @@ public abstract class CommandPlugin extends MessagePluginImpl {
             if (matcher.group(REDIRECT_GROUP) != null) {
                 target = matcher.group(REDIRECT_GROUP);
             }
-            return (message.getType() == Type.groupchat ? target + ", " : "") + processCommand(message, matcher);
+            return getAppeal(message, target) + processCommand(message, matcher);
         } catch (ClientAuthException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
