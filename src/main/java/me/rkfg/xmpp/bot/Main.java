@@ -237,6 +237,9 @@ public class Main {
                 if (nick.equals(StringUtils.parseResource(message.getFrom()))) {
                     return;
                 }
+                if (message.getSubject() != null && !message.getSubject().isEmpty()) {
+                    return;
+                }
                 String text = message.getBody();
                 log.info("<{}>: {}", message.getFrom(), text);
                 for (MessagePlugin plugin : plugins) {
