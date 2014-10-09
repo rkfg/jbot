@@ -100,7 +100,7 @@ public class Main {
         connection.addConnectionListener(new AbstractConnectionListener() {
             @Override
             public void reconnectionSuccessful() {
-                log.warn("Reconnected, rejoining mucs: {}", mucs);
+                log.warn("Reconnected, rejoining mucs: {}", (Object[]) mucs);
                 try {
                     joinMUCs(connection, mucs);
                 } catch (NotConnectedException e) {
