@@ -26,6 +26,7 @@ import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.SmackException.NoResponseException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.TCPConnection;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.AndFilter;
@@ -34,7 +35,6 @@ import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.IQ.Type;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.iqversion.packet.Version;
 import org.jivesoftware.smackx.muc.DefaultParticipantStatusListener;
@@ -52,10 +52,12 @@ public class Main {
     private static Logger log = LoggerFactory.getLogger(Main.class);
     private static String nick;
     private static List<ChatAdapter> mucsAdapted = new ArrayList<>();
+    private static List<MultiUserChat> mucsList = new LinkedList<>();
     private static SettingsManager sm = SettingsManager.getInstance();
     private static ConcurrentLinkedQueue<BotMessage> outgoingMsgs = new ConcurrentLinkedQueue<BotMessage>();
     private static List<MessagePlugin> plugins = new LinkedList<MessagePlugin>();
     private static ExecutorService commandExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    private static DiscussionHistory history = new DiscussionHistory();
 
     public static void main(String[] args) throws InterruptedException, SmackException, IOException {
         log.info("Starting up...");
@@ -84,7 +86,7 @@ public class Main {
         }
         log.info("Plugins initializion complete.");
 
-        final XMPPConnection connection = new XMPPTCPConnection(sm.getStringSetting("server"));
+        final XMPPConnection connection = new TCPConnection(sm.getStringSetting("server"));
         try {
             connection.connect();
             connection.login(sm.getStringSetting("login"), sm.getStringSetting("password"), sm.getStringSetting("resource"));
@@ -92,51 +94,20 @@ public class Main {
             log.warn("Connection error: ", e);
             return;
         }
-        String[] mucs = org.apache.commons.lang3.StringUtils.split(sm.getStringSetting("join"), ',');
-        for (String conf : mucs) {
-            final MultiUserChat muc = new MultiUserChat(connection, conf);
-
-            final DiscussionHistory history = new DiscussionHistory();
-            history.setMaxStanzas(0);
-            connection.addConnectionListener(new AbstractConnectionListener() {
-                @Override
-                public void reconnectionSuccessful() {
-                    log.warn("Reconnected, joining {}", muc.getRoom());
-                    try {
-                        muc.join(nick, "", history, SmackConfiguration.getDefaultPacketReplyTimeout());
-                        log.info("Joined {}", muc.getRoom());
-                    } catch (Throwable e) {
-                        log.warn("While rejoining: {}", e);
-                    }
+        history.setMaxStanzas(0);
+        final String[] mucs = org.apache.commons.lang3.StringUtils.split(sm.getStringSetting("join"), ',');
+        joinMUCs(connection, mucs);
+        connection.addConnectionListener(new AbstractConnectionListener() {
+            @Override
+            public void reconnectionSuccessful() {
+                log.warn("Reconnected, rejoining mucs: {}", mucs);
+                try {
+                    joinMUCs(connection, mucs);
+                } catch (NotConnectedException e) {
+                    log.warn("Not connected while rejoining: ", e);
                 }
-            });
-            try {
-                muc.join(nick, "", history, SmackConfiguration.getDefaultPacketReplyTimeout());
-            } catch (XMPPException e) {
-                log.warn("Joining error: ", e);
-            } catch (NoResponseException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
             }
-            final ChatAdapter mucAdapted = new MUCAdapterImpl(muc);
-            mucsAdapted.add(mucAdapted);
-
-            muc.addMessageListener(new PacketListener() {
-
-                @Override
-                public void processPacket(Packet packet) {
-                    processMessage(mucAdapted, (Message) packet);
-                }
-            });
-            muc.addParticipantStatusListener(new DefaultParticipantStatusListener() {
-
-                @Override
-                public void kicked(String participant, String actor, String reason) {
-                    sendMessage(mucAdapted, String.format("Ха-ха, загнали под шконарь %s! %s", StringUtils.parseResource(participant),
-                            !reason.isEmpty() ? "Мотивировали тем, что " + reason : "Без всякой мотивации."));
-                }
-            });
-        }
+        });
         ChatManager.getInstanceFor(connection).addChatListener(new ChatManagerListener() {
 
             @Override
@@ -201,6 +172,45 @@ public class Main {
         log.info("Sub req: {}", connection.getRoster().getSubscriptionMode());
         while (true) {
             Thread.sleep(1000);
+        }
+    }
+
+    private static void joinMUCs(final XMPPConnection connection, String[] mucs) throws NotConnectedException {
+        for (MultiUserChat multiUserChat : mucsList) {
+            multiUserChat.leave();
+        }
+        mucsList.clear();
+        mucsAdapted.clear();
+        for (String conf : mucs) {
+            MultiUserChat muc = new MultiUserChat(connection, conf);
+            try {
+                muc.join(nick, "", history, SmackConfiguration.getDefaultPacketReplyTimeout());
+                mucsList.add(muc);
+                log.info("Joined {}", muc.getRoom());
+            } catch (XMPPException e) {
+                log.warn("Joining error: ", e);
+            } catch (NoResponseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            final ChatAdapter mucAdapted = new MUCAdapterImpl(muc);
+            mucsAdapted.add(mucAdapted);
+
+            muc.addMessageListener(new PacketListener() {
+
+                @Override
+                public void processPacket(Packet packet) {
+                    processMessage(mucAdapted, (Message) packet);
+                }
+            });
+            muc.addParticipantStatusListener(new DefaultParticipantStatusListener() {
+
+                @Override
+                public void kicked(String participant, String actor, String reason) {
+                    sendMessage(mucAdapted, String.format("Ха-ха, загнали под шконарь %s! %s", StringUtils.parseResource(participant),
+                            !reason.isEmpty() ? "Мотивировали тем, что " + reason : "Без всякой мотивации."));
+                }
+            });
         }
     }
 
