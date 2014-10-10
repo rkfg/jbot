@@ -1,6 +1,7 @@
 package me.rkfg.xmpp.bot.plugins.doto;
 
 import me.rkfg.xmpp.bot.plugins.CommandPlugin;
+import org.apache.commons.cli.*;
 import org.jivesoftware.smack.packet.Message;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -16,6 +17,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * User: violetta
@@ -33,13 +35,35 @@ public class DotoSchedulePlugin extends CommandPlugin
     private static final String LIVE_PARAM = "l";
     private static final String UPCOMING_PARAM = "u";
     private static final String RECENT_PARAM = "r";
+    Options opts;
+    String grepStr = "";
+    boolean grepSet =false;
+    public void init()
+    {
+        buildOptions();
+    }
+    void buildOptions()
+    {
+        Option live = OptionBuilder.create(LIVE_PARAM);
+        Option up = OptionBuilder.create(UPCOMING_PARAM);
+        Option rr = OptionBuilder.create(RECENT_PARAM);
 
+        Option n = OptionBuilder.hasArg().withArgName("nn").create("n");
+        Option grep = OptionBuilder.hasArg().withArgName("g").create("grep");
+
+        opts = new Options();
+        opts.addOption(live);
+        opts.addOption(up);
+        opts.addOption(rr);
+        opts.addOption(n);
+        opts.addOption(grep);
+    }
 
     @Override
     public String processCommand(Message message, Matcher matcher) throws ClientAuthenticationException, LogicException
     {
-        StringBuilder str = new StringBuilder();
-        HashMap<String, Integer> m =parseParams(matcher);
+        String str = "";
+        HashMap<String, Integer> m = parseParams(matcher);
         Document doc;
         try
         {
@@ -47,9 +71,9 @@ public class DotoSchedulePlugin extends CommandPlugin
         }
         catch(IOException e)
         {
-            str.append("Эти псы что-то поломали");
+            str = "Эти псы что-то поломали";
             e.printStackTrace();
-            return str.toString();
+            return str;
         }
         int num = m.get(QUERY_LEN_STR);
         Elements boxes = doc.select(".box");
@@ -59,19 +83,20 @@ public class DotoSchedulePlugin extends CommandPlugin
             Element q = qq.first();
             if(q.ownText().equals(LIVE_MATCHES) && m.get(LIVE_PARAM) > 0)
             {
-                str.append(getAll(LIVE_MATCHES, e, num));
+                str+= getAll(LIVE_MATCHES, e, num);
 
             }
             if(q.ownText().equals(UPCOMING_MATCHES) && m.get(UPCOMING_PARAM) > 0)
             {
-                str.append(getAll(UPCOMING_MATCHES, e, num));
+                str+= getAll(UPCOMING_MATCHES, e, num);
             }
             if(q.ownText().equals(RECENT_RESULTS) && m.get(RECENT_PARAM) > 0)
             {
-                str.append(getAll(RECENT_RESULTS, e, num));
+                str+= getAll(RECENT_RESULTS, e, num);
             }
         }
-        return str.toString();
+        grepSet = false;
+        return str;
     }
     @Override
     public List<String> getCommand() {
@@ -86,6 +111,7 @@ public class DotoSchedulePlugin extends CommandPlugin
                 LIVE_PARAM + " - live matches\n" +
                 UPCOMING_PARAM + " - upcoming matches (default)\n"+
                 RECENT_PARAM + " - recent matches\n" +
+                "--grep \"regex\" - filter results by regexp" +
                 "n - число строк (default: 3).\n"+
                 "Пример: " + PREFIX + "hats r 2";
     }
@@ -161,43 +187,63 @@ public class DotoSchedulePlugin extends CommandPlugin
     }
     private HashMap<String, Integer> parseParams(Matcher _matcher)
     {
+
         HashMap<String, Integer>  m = new HashMap<String, Integer>();
         m.put(LIVE_PARAM, 0);
         m.put(UPCOMING_PARAM, 0);
         m.put(RECENT_PARAM, 0);
         m.put(QUERY_LEN_STR, QUERY_LEN);
-        String sss = _matcher.group(COMMAND_GROUP);
-        String[] ss = sss.split("\\s+");
         boolean ok = false;
-        for (String s: ss){
-            if(s.equals(LIVE_PARAM) || s.equals(UPCOMING_PARAM) || s.equals(RECENT_PARAM))
-            {
-                m.put(s, 1);
-                ok = true;
-            }
-        }
-        if(isNumeric(ss[ss.length-1]))
-        {
-            m.put(QUERY_LEN_STR, Integer.parseInt(ss[ss.length-1]));
-        }
-        if(!ok)
-        {
-            m.put(UPCOMING_PARAM, 1);
-        }
-        return m;
-    }
-    //!WARNING. Autism.
-    private static boolean isNumeric(String str)
-    {
+        String sss = _matcher.group(2);
+
+        CommandLineParser clp = new GnuParser();
+        String []ss =  org.apache.tools.ant.types.Commandline.translateCommandline(sss);
         try
         {
-           Integer.parseInt(str);
+            CommandLine cl = clp.parse(opts, ss);
+            if(cl.hasOption(LIVE_PARAM))
+            {
+                m.put(LIVE_PARAM, 1);
+                ok = true;
+            }
+            if(cl.hasOption(UPCOMING_PARAM))
+            {
+                m.put(UPCOMING_PARAM, 1);
+                ok = true;
+            }
+            if(cl.hasOption(RECENT_PARAM))
+            {
+                m.put(RECENT_PARAM, 1);
+                ok = true;
+            }
+            if(cl.hasOption("n"))
+            {
+                Integer w;
+                try
+                {
+                    w = Integer.parseInt(cl.getOptionValue("n"));
+                }
+                catch(NumberFormatException e){w=QUERY_LEN;}
+
+                m.put(QUERY_LEN_STR, w);
+            }
+            if(cl.hasOption("grep"))
+            {
+                grepSet = true;
+                grepStr = cl.getOptionValue("grep");
+            }
+            if(!ok)
+            {
+                m.put(UPCOMING_PARAM, 1);
+            }
+
         }
-        catch(NumberFormatException nfe)
+        catch(ParseException e)
         {
-            return false;
+            e.printStackTrace();
         }
-        return true;
+
+        return m;
     }
     //Invariant: names.size() == comments.size() == tournaments.size()
     private String format(String title, ArrayList<String> names, ArrayList<String> comments, ArrayList<String> tournaments)
@@ -205,26 +251,63 @@ public class DotoSchedulePlugin extends CommandPlugin
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append('\n').append(title).append(":\n");
+        sb.append('\n');
+        sb.append(title);
+        sb.append(":\n");
 
         if (title.equals(RECENT_RESULTS) || title.equals(UPCOMING_MATCHES))
         {
+
             for(int i = 0; i< names.size(); i++)
             {
+                StringBuilder sbb = new StringBuilder();
                 if(title.equals(RECENT_RESULTS))
                 {
                     String s = comments.get(i).replace("Show", "");
                     comments.set(i, s);
                 }
-                sb.append("[").append(comments.get(i)).append("]  ").append(names.get(i)).append("  [").append(tournaments.get(i))
-                        .append("]\n");
+                sbb.append("[");
+                sbb.append(comments.get(i));
+                sbb.append("]  ");
+                sbb.append(names.get(i));
+                sbb.append("  [");
+                sbb.append(tournaments.get(i));
+                sbb.append("]\n");
+                String s = sbb.toString();
+                if(grepSet)
+                {
+                    System.out.println("Matching " + s + " to " + grepStr);
+                    Matcher m = Pattern.compile(grepStr).matcher(s);
+                    if(m.find())
+                    {
+                        sb.append(s);
+                    }
+                    continue;
+                }
+                sb.append(s);
             }
         }
         else
         {
             for(int i = 0; i< names.size(); i++)
             {
-                sb.append(names.get(i)).append("  [").append(tournaments.get(i)).append("]\n");
+                StringBuilder sbb = new StringBuilder();
+                sbb.append(names.get(i));
+                sbb.append("  [");
+                sbb.append(tournaments.get(i));
+                sbb.append("]\n");
+                String s = sbb.toString();
+                if(grepSet)
+                {
+                    System.out.println("Matching " + s + " to " + grepStr);
+                    Matcher m = Pattern.compile(grepStr).matcher(s);
+                    if(m.find())
+                    {
+                        sb.append(s);
+                    }
+                    continue;
+                }
+                sb.append(s);
             }
         }
         return sb.toString();
