@@ -249,10 +249,14 @@ public class Main {
                     if (pattern != null) {
                         Matcher matcher = pattern.matcher(text);
                         if (matcher.find()) {
-                            String result = plugin.process(message, matcher);
-                            if (result != null && !result.isEmpty()) {
-                                sendMessage(chat, StringEscapeUtils.unescapeHtml4(result));
-                                break;
+                            try {
+                                String result = plugin.process(message, matcher);
+                                if (result != null && !result.isEmpty()) {
+                                    sendMessage(chat, StringEscapeUtils.unescapeHtml4(result));
+                                    break;
+                                }
+                            } catch (Throwable e) {
+                                e.printStackTrace();
                             }
                         }
                     }
