@@ -177,13 +177,15 @@ public class Main {
 
     private static void joinMUCs(final XMPPConnection connection, String[] mucs) throws NotConnectedException {
         for (MultiUserChat multiUserChat : mucsList) {
+            log.info("Leaving previously joined {}", multiUserChat.getRoom());
             multiUserChat.leave();
         }
         mucsList.clear();
         mucsAdapted.clear();
         for (String conf : mucs) {
-            MultiUserChat muc = new MultiUserChat(connection, conf);
+            MultiUserChat muc = new MultiUserChat(connection, org.apache.commons.lang3.StringUtils.trim(conf));
             try {
+                log.info("Joining {}", muc.getRoom());
                 muc.join(nick, "", history, SmackConfiguration.getDefaultPacketReplyTimeout());
                 mucsList.add(muc);
                 log.info("Joined {}", muc.getRoom());
