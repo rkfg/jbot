@@ -61,7 +61,6 @@ public class Main {
 
     public static void main(String[] args) throws InterruptedException, SmackException, IOException {
         log.info("Starting up...");
-        HibernateUtil.initSessionFactory("hibernate.cfg.xml");
         sm.setFilename("settings.ini");
         try {
             sm.loadSettings();
@@ -76,6 +75,10 @@ public class Main {
         defaults.put("nick", "Talho-san");
         defaults.put("login", "talho");
         defaults.put("resource", "jbot");
+        defaults.put("usedb", "0");
+        if (sm.getIntegerSetting("usedb") != 0) {
+            HibernateUtil.initSessionFactory("hibernate.cfg.xml");
+        }
 
         nick = sm.getStringSetting("nick");
         String pluginClasses = sm.getStringSetting("plugins");

@@ -10,3 +10,4 @@ oauth_consumer_key=
 oauth_consumer_secret=
 oauth_access_token=
 oauth_access_token_secret=
+usedb=1
