@@ -185,6 +185,10 @@ public class V4L3TFollowerPlugin extends CommandPlugin
             s+=list(n);
         }
 
+        if(s =="")
+        {
+            return "Done";
+        }
         return s;
     }
 
@@ -271,7 +275,6 @@ public class V4L3TFollowerPlugin extends CommandPlugin
             {
                 if(cl.hasOption(option))
                 {
-                    System.out.println("OPTION: " + option + " found , value = " + cl.getOptionValue(option));
                     m.put(option, cl.getOptionValue(option));
                 }
             }
