@@ -11,6 +11,7 @@ import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.IQ.Type;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.iqversion.packet.Version;
 import org.jivesoftware.smackx.muc.DefaultParticipantStatusListener;
@@ -74,7 +75,7 @@ public class Main {
         }
         log.info("Plugins initializion complete.");
 
-        final XMPPConnection connection = new TCPConnection(sm.getStringSetting("server"));
+        final XMPPConnection connection = new XMPPTCPConnection(sm.getStringSetting("server"));
         try {
             connection.connect();
             connection.login(sm.getStringSetting("login"), sm.getStringSetting("password"), sm.getStringSetting("resource"));
