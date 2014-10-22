@@ -32,6 +32,10 @@ public class StdinPlugin implements MessagePlugin {
                 while (!Thread.interrupted()) {
                     try {
                         String line = bufferedReader.readLine();
+                        if (line == null) {
+                            // stdin is not connected
+                            break;
+                        }
                         Main.sendMUCMessage(line);
                     } catch (IOException e) {
                         e.printStackTrace();
