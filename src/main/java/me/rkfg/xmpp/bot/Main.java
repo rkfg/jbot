@@ -175,14 +175,19 @@ public class Main {
             try {
                 log.info("Joining {}", muc.getRoom());
                 muc.join(nick, "", history, SmackConfiguration.getDefaultPacketReplyTimeout());
-                mucsList.add(muc);
-                log.info("Joined {}", muc.getRoom());
             } catch (XMPPException e) {
                 log.warn("Joining error: ", e);
             } catch (NoResponseException e) {
-                // TODO Auto-generated catch block
+                /**Некоторые хуесосы-владельцы серверов не соблюдают XEP-0045 и респонс не посылают.
+                Реально бот заходит в конфу, но эксепшон всё равно валится.
+                Чтобы с ними бороться, надо либо секурити отключать, либо поддельный респонс делать где-то в кишках этого джойна.
+                А можно просто игнорировать это. (Энивей mucsAdapted разрастается, хотя не должен в этом случае, поэтому быдлокод сильно хуже не стал)
+                **/
                 e.printStackTrace();
             }
+            mucsList.add(muc);
+            log.info("Joined {}", muc.getRoom());
+
             final ChatAdapter mucAdapted = new MUCAdapterImpl(muc);
             mucsAdapted.add(mucAdapted);
 
@@ -266,7 +271,21 @@ public class Main {
     public static void sendMUCMessage(String message) {
         sendMUCMessage(message, (Integer) null);
     }
-
+    public static void sendMUCMessage(String message, String MUCName) {
+        for(Integer i = 0; i<mucsList.size(); i++)
+        {
+            MultiUserChat c = mucsList.get(i);
+            if(c.getRoom().equals(MUCName)) {
+                sendMUCMessage(message, i);
+                return;
+            }
+        }
+    }
+    public static void broadcastMUCMessage(String message) {
+        for(ChatAdapter c: mucsAdapted) {
+            sendMessage(c, message);
+        }
+    }
     public static void sendMUCMessage(String message, Integer... toConfs) {
         List<Integer> toConfsList = Arrays.asList(toConfs);
         for (Integer i = 0; i < mucsAdapted.size(); i++) {
