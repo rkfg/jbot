@@ -2,6 +2,7 @@ package me.rkfg.xmpp.bot.plugins;
 
 import me.rkfg.xmpp.bot.Main;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.util.StringUtils;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 
@@ -15,8 +16,8 @@ public class AnonEchoPlugin extends CommandPlugin
     public String processCommand(Message message, Matcher matcher) throws LogicException, ClientAuthException
     {
         String s = matcher.group(COMMAND_GROUP);
-        Main.sendMUCMessage(s);
-        return "Lan";
+        Main.sendMUCMessage(s, StringUtils.parseBareAddress(message.getFrom()));
+        return "Ok";
     }
 
     @Override

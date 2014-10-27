@@ -21,15 +21,17 @@ public class TimerPlugin extends CommandPlugin
     class TimerTaskE extends TimerTask{
 
         String msg = "";
-        TimerTaskE(String s)
+        String to = "";
+        TimerTaskE(String s, String to)
         {
             super();
             msg = s;
+            this.to = to;
         }
         @Override
         public void run()
         {
-            Main.sendMUCMessage(msg);
+            Main.sendMUCMessage(msg, to);
         }
     };
     @Override
@@ -80,7 +82,7 @@ public class TimerPlugin extends CommandPlugin
             {
                 throw new Exception("Время не может пойти взад!");
             }
-            TimerTask tt = new TimerTaskE(StringUtils.parseResource(message.getFrom())+": "+ msg);
+            TimerTask tt = new TimerTaskE(StringUtils.parseResource(message.getFrom())+": "+ msg, StringUtils.parseBareAddress(message.getFrom()));
             timer.schedule(tt, result*1000);
         }
         catch(Exception e){s+=e.getMessage();}
@@ -104,7 +106,7 @@ public class TimerPlugin extends CommandPlugin
                 DAY_OPTION + " - дни; "+REFIX + " -" + DAY_OPTION + " " + 30+"\n"+
                 HOUR_OPTION + " - часы; "+REFIX + " -" + HOUR_OPTION + " " + 10 +"\n"+
                 MIN_OPTION + " - минуты; "+REFIX+ " -"+MIN_OPTION+ " " +30 +"\n"+
-                SEC_OPTION + " - минуты; "+REFIX+ " -"+SEC_OPTION+ " " +42 +"\n"+
+                SEC_OPTION + " - секунды; "+REFIX+ " -"+SEC_OPTION+ " " +42 +"\n"+
                 MESSAGE_OPTION + " - запостить \"сообщение\"; "+REFIX + " -" +MESSAGE_OPTION +" \"Борщ готов!\"";
     }
     void buildOptions()
