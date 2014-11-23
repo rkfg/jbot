@@ -1,10 +1,29 @@
 package me.rkfg.xmpp.bot;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import me.rkfg.xmpp.bot.plugins.MessagePlugin;
+
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.jivesoftware.smack.*;
-import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.AbstractConnectionListener;
+import org.jivesoftware.smack.Chat;
+import org.jivesoftware.smack.ChatManager;
+import org.jivesoftware.smack.ChatManagerListener;
+import org.jivesoftware.smack.MessageListener;
+import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.IQTypeFilter;
 import org.jivesoftware.smack.filter.PacketTypeFilter;
@@ -14,36 +33,23 @@ import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.iqversion.packet.Version;
-import org.jivesoftware.smackx.muc.DefaultParticipantStatusListener;
-import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ru.ppsrk.gwt.server.HibernateUtil;
 import ru.ppsrk.gwt.server.SettingsManager;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 
 public class Main {
 
     private static final String PLUGINS_PACKAGE_NAME = "me.rkfg.xmpp.bot.plugins.";
     private static Logger log = LoggerFactory.getLogger(Main.class);
     private static String nick;
-    private static List<ChatAdapter> mucsAdapted = new ArrayList<>();
-    private static List<MultiUserChat> mucsList = new LinkedList<>();
+    private static MUCManager mucManager = new MUCManager();
     private static SettingsManager sm = SettingsManager.getInstance();
     private static ConcurrentLinkedQueue<BotMessage> outgoingMsgs = new ConcurrentLinkedQueue<BotMessage>();
     private static List<MessagePlugin> plugins = new LinkedList<MessagePlugin>();
     private static ExecutorService commandExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-    private static DiscussionHistory history = new DiscussionHistory();
 
     public static void main(String[] args) throws InterruptedException, SmackException, IOException {
         log.info("Starting up...");
@@ -83,13 +89,12 @@ public class Main {
             log.warn("Connection error: ", e);
             return;
         }
-        history.setMaxStanzas(0);
         final String[] mucs = org.apache.commons.lang3.StringUtils.split(sm.getStringSetting("join"), ',');
         joinMUCs(connection, mucs);
         connection.addConnectionListener(new AbstractConnectionListener() {
             @Override
             public void reconnectionSuccessful() {
-                log.warn("Reconnected, rejoining mucs: {}", (Object[]) mucs);
+                log.warn("Reconnected, rejoining mucs.", org.apache.commons.lang3.StringUtils.join((Object[]) mucs, ", "));
                 try {
                     joinMUCs(connection, mucs);
                 } catch (NotConnectedException e) {
@@ -165,48 +170,9 @@ public class Main {
     }
 
     private static void joinMUCs(final XMPPConnection connection, String[] mucs) throws NotConnectedException {
-        for (MultiUserChat multiUserChat : mucsList) {
-            log.info("Leaving previously joined {}", multiUserChat.getRoom());
-            multiUserChat.leave();
-        }
-        mucsList.clear();
-        mucsAdapted.clear();
+        mucManager.leave();
         for (String conf : mucs) {
-            MultiUserChat muc = new MultiUserChat(connection, org.apache.commons.lang3.StringUtils.trim(conf));
-            try {
-                log.info("Joining {}", muc.getRoom());
-                muc.join(nick, "", history, SmackConfiguration.getDefaultPacketReplyTimeout());
-            } catch (XMPPException e) {
-                log.warn("Joining error: ", e);
-            } catch (NoResponseException e) {
-                /**Некоторые хуесосы-владельцы серверов не соблюдают XEP-0045 и респонс не посылают.
-                Реально бот заходит в конфу, но эксепшон всё равно валится.
-                Чтобы с ними бороться, надо либо секурити отключать, либо поддельный респонс делать где-то в кишках этого джойна.
-                А можно просто игнорировать это. (Энивей mucsAdapted разрастается, хотя не должен в этом случае, поэтому быдлокод сильно хуже не стал)
-                **/
-                e.printStackTrace();
-            }
-            mucsList.add(muc);
-            log.info("Joined {}", muc.getRoom());
-
-            final ChatAdapter mucAdapted = new MUCAdapterImpl(muc);
-            mucsAdapted.add(mucAdapted);
-
-            muc.addMessageListener(new PacketListener() {
-
-                @Override
-                public void processPacket(Packet packet) {
-                    processMessage(mucAdapted, (Message) packet);
-                }
-            });
-            muc.addParticipantStatusListener(new DefaultParticipantStatusListener() {
-
-                @Override
-                public void kicked(String participant, String actor, String reason) {
-                    sendMessage(mucAdapted, String.format("Ха-ха, загнали под шконарь %s! %s", StringUtils.parseResource(participant),
-                            !reason.isEmpty() ? "Мотивировали тем, что " + reason : "Без всякой мотивации."));
-                }
-            });
+            mucManager.join(connection, conf, nick);
         }
     }
 
@@ -270,29 +236,16 @@ public class Main {
     }
 
     public static void sendMUCMessage(String message) {
-        sendMUCMessage(message, (Integer) null);
+        for (MUCParams mucParams : mucManager.listMUCParams()) {
+            sendMessage(mucParams.getMucAdapted(), message);
+        }
     }
+
     public static void sendMUCMessage(String message, String MUCName) {
-        for(Integer i = 0; i<mucsList.size(); i++)
-        {
-            MultiUserChat c = mucsList.get(i);
-            if(c.getRoom().equals(MUCName)) {
-                sendMUCMessage(message, i);
+        for (MultiUserChat multiUserChat : mucManager.listMUCs()) {
+            if (multiUserChat.getRoom().equals(MUCName)) {
+                sendMessage(mucManager.getMUCParams(multiUserChat).getMucAdapted(), message);
                 return;
-            }
-        }
-    }
-    public static void broadcastMUCMessage(String message) {
-        for(ChatAdapter c: mucsAdapted) {
-            sendMessage(c, message);
-        }
-    }
-    public static void sendMUCMessage(String message, Integer... toConfs) {
-        List<Integer> toConfsList = Arrays.asList(toConfs);
-        for (Integer i = 0; i < mucsAdapted.size(); i++) {
-            ChatAdapter adapter = mucsAdapted.get(i);
-            if ((toConfs[0] == null || toConfsList.contains(i)) && adapter != null) {
-                sendMessage(adapter, message);
             }
         }
     }
