@@ -80,17 +80,20 @@ public class DotoSchedulePlugin extends CommandPlugin
         for (Element e : boxes)
         {
             Elements qq = e.select("h2");
+            if (qq.size() == 0) {
+                qq = e.select("h1");
+            }
             Element q = qq.first();
-            if(q.ownText().equals(LIVE_MATCHES) && m.get(LIVE_PARAM) > 0)
+            if (q.ownText().contains(LIVE_MATCHES) && m.get(LIVE_PARAM) > 0)
             {
                 str+= getAll(LIVE_MATCHES, e, num);
 
             }
-            if(q.ownText().equals(UPCOMING_MATCHES) && m.get(UPCOMING_PARAM) > 0)
+            if (q.ownText().contains(UPCOMING_MATCHES) && m.get(UPCOMING_PARAM) > 0)
             {
                 str+= getAll(UPCOMING_MATCHES, e, num);
             }
-            if(q.ownText().equals(RECENT_RESULTS) && m.get(RECENT_PARAM) > 0)
+            if (q.ownText().contains(RECENT_RESULTS) && m.get(RECENT_PARAM) > 0)
             {
                 str+= getAll(RECENT_RESULTS, e, num);
             }
