@@ -28,6 +28,11 @@ public class GoodbyePlugin extends MessagePluginImpl {
             @Override
             public void run() {
                 Main.sendMUCMessage(Main.getSettingsManager().getStringSetting("goodbye_msg"));
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }));
     }
