@@ -5,9 +5,10 @@ server=jabber.ru
 join=test@conference.jabber.ru,anotherconf@conference.neko.im
 plugins=OpinionCommandPlugin, BehindComputerPlugin, WhoisCommandPlugin, GoogleCommandPlugin, ManCommandPlugin, \
 TitlePlugin, doto.V4L3TFollowerPlugin, doto.DotoSchedulePlugin, QalcCommandPlugin, MarkovResponsePlugin, MarkovCollectorPlugin, \
-StdinPlugin, AnonEchoPlugin, TimerPlugin
+StdinPlugin, AnonEchoPlugin, TimerPlugin, GoodbyePlugin
 oauth_consumer_key=
 oauth_consumer_secret=
 oauth_access_token=
 oauth_access_token_secret=
 usedb=1
+goodbye_msg=I'm outta here.
