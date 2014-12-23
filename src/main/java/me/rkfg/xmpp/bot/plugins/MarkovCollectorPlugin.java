@@ -45,6 +45,9 @@ public class MarkovCollectorPlugin extends MessagePluginImpl {
                 @Override
                 public Void run(Session session) throws LogicException, ClientAuthException {
                     String words[] = text.split("\\s+");
+                    if (words.length == 0) {
+                        return null;
+                    }
                     int c = 0;
                     int pos = 0;
                     String segment = null;
