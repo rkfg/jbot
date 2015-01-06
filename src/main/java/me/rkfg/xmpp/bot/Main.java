@@ -257,4 +257,8 @@ public class Main {
     public static List<MessagePlugin> getPlugins() {
         return plugins;
     }
+
+    public static MUCManager getMUCManager() {
+        return mucManager;
+    }
 }
