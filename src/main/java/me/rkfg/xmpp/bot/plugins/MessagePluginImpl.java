@@ -9,8 +9,12 @@ import org.slf4j.LoggerFactory;
 public abstract class MessagePluginImpl implements MessagePlugin {
     protected Logger log = LoggerFactory.getLogger(getClass());
 
-    protected String getNick(Message message) {
+    protected final String getNick(Message message) {
         return StringUtils.parseResource(message.getFrom());
+    }
+
+    protected final String getBareAddress(Message message) {
+        return StringUtils.parseBareAddress(message.getFrom());
     }
 
     protected boolean isMessageFromUser(Message message) {
