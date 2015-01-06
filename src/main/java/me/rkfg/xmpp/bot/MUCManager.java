@@ -4,26 +4,29 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.SmackConfiguration;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.SmackException.NoResponseException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.muc.DefaultParticipantStatusListener;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.muc.Occupant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MUCManager {
     private static Logger log = LoggerFactory.getLogger(Main.class);
     private static DiscussionHistory history = new DiscussionHistory();
-    private Map<MultiUserChat, MUCParams> mucsList = new HashMap<MultiUserChat, MUCParams>();
+    private Map<MultiUserChat, MUCParams> mucsList = new ConcurrentHashMap<MultiUserChat, MUCParams>();
+    private Map<String, MultiUserChat> mucsJIDs = new ConcurrentHashMap<String, MultiUserChat>();
 
     public MUCManager() {
         history.setMaxStanzas(0);
@@ -37,12 +40,34 @@ public class MUCManager {
         return mucsList.get(multiUserChat);
     }
 
-    public void put(MultiUserChat muc, MUCParams mucParams) {
-        mucsList.put(muc, mucParams);
-    }
-
     public Collection<MUCParams> listMUCParams() {
         return mucsList.values();
+    }
+
+    public Occupant getMUCOccupant(String fullMUCJID) {
+        String room = StringUtils.parseBareAddress(fullMUCJID);
+        return mucsJIDs.get(room).getOccupant(fullMUCJID);
+    }
+
+    // crutchy way to extract the occupants map, no direct access available
+    /**
+     * 
+     * @param roomJID
+     *            MUC JID to get occupants of.
+     * @return map of JID (if JIDs are visible) or nick (otherwise) to occupant object.
+     */
+    public Map<String, Occupant> listMUCOccupantsByJID(String roomJID) {
+        Map<String, Occupant> occupants = new HashMap<String, Occupant>();
+        MultiUserChat multiUserChat = mucsJIDs.get(roomJID);
+        for (String occupantName : multiUserChat.getOccupants()) {
+            Occupant occupant = multiUserChat.getOccupant(occupantName);
+            if (occupant.getJid() != null) {
+                occupants.put(occupant.getJid(), occupant);
+            } else {
+                occupants.put(occupant.getNick(), occupant);
+            }
+        }
+        return occupants;
     }
 
     public void leave() throws NotConnectedException {
@@ -55,6 +80,7 @@ public class MUCManager {
             multiUserChat.removeParticipantStatusListener(mucParams.getParticipantStatusListener());
         }
         mucsList.clear();
+        mucsJIDs.clear();
     }
 
     public void join(XMPPConnection connection, String conf, String nick) throws NotConnectedException {
@@ -98,9 +124,9 @@ public class MUCManager {
         };
         muc.addParticipantStatusListener(participantStatusListener);
         mucParams.setParticipantStatusListener(participantStatusListener);
-        put(muc, mucParams);
+        mucsList.put(muc, mucParams);
+        mucsJIDs.put(muc.getRoom(), muc);
         log.info("Joined {}", muc.getRoom());
-
     }
 
 }
