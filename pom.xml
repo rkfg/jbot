@@ -95,6 +95,7 @@
 	</build>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<smackVersion>4.0.6</smackVersion>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -106,17 +107,17 @@
 		<dependency>
 			<groupId>org.igniterealtime.smack</groupId>
 			<artifactId>smack-core</artifactId>
-			<version>4.0.4</version>
+			<version>${smackVersion}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.igniterealtime.smack</groupId>
 			<artifactId>smack-tcp</artifactId>
-			<version>4.0.4</version>
+			<version>${smackVersion}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.igniterealtime.smack</groupId>
 			<artifactId>smack-extensions</artifactId>
-			<version>4.0.4</version>
+			<version>${smackVersion}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
