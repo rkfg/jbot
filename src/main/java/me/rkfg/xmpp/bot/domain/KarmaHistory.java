@@ -3,7 +3,9 @@ package me.rkfg.xmpp.bot.domain;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -11,6 +13,7 @@ import ru.ppsrk.gwt.domain.BasicDomain;
 
 @SuppressWarnings("serial")
 @Entity
+@Table(indexes = { @Index(columnList = "blockTimestamp") })
 public class KarmaHistory extends BasicDomain {
     @Temporal(TemporalType.TIMESTAMP)
     Date date;
@@ -18,6 +21,16 @@ public class KarmaHistory extends BasicDomain {
     @ManyToOne
     Karma karma;
     Long change;
+
+    public KarmaHistory() {
+    }
+
+    public KarmaHistory(Date date, Long blockTimestamp, Karma karma, Long change) {
+        this.date = date;
+        this.blockTimestamp = blockTimestamp;
+        this.karma = karma;
+        this.change = change;
+    }
 
     public Date getDate() {
         return date;
