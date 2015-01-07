@@ -92,21 +92,24 @@ public class KarmaPlugin extends CommandPlugin {
             @Override
             public String run(Session session) throws LogicException, ClientAuthException {
                 List<Karma> karmas;
-                String byJID = matcher.group(COMMAND_GROUP);
-                if (byJID != null) {
-                    karmas = session.createQuery("from Karma k where k.jid like :jid").setString("jid", byJID + "%").list();
-                } else {
-                    karmas = session.createQuery("from Karma k order by k.karma").list();
+                String filterNick = matcher.group(COMMAND_GROUP);
+                if (filterNick != null) {
+                    filterNick = filterNick.trim().toLowerCase();
                 }
+                karmas = session.createQuery("from Karma k order by k.karma").list();
                 StringBuilder sb = new StringBuilder("Карма участников:\n");
                 Map<String, Occupant> occupants = Main.getMUCManager().listMUCOccupantsByJID(getBareAddress(message));
                 for (Karma karma : karmas) {
                     String name = karma.getJid();
                     Occupant jidOccupant = occupants.get(name);
+                    String nick = null;
                     if (jidOccupant != null) {
-                        name += " (aka " + jidOccupant.getNick() + ")";
+                        nick = jidOccupant.getNick();
+                        name += " (aka " + antiHighlight(nick) + ")";
                     }
-                    sb.append(name + ": " + karma.getKarma()).append("\n");
+                    if (filterNick == null || (nick != null && nick.toLowerCase().contains(filterNick))) {
+                        sb.append(name + ": " + karma.getKarma()).append("\n");
+                    }
                 }
                 return sb.toString();
             }
