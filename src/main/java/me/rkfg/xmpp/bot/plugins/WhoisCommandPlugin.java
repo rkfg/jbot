@@ -51,7 +51,8 @@ public class WhoisCommandPlugin extends CommandPlugin {
                 StringBuilder result = new StringBuilder();
                 result.append(String.format(intro, paramValue)).append('\n');
                 for (Opinion opinion : opinions) {
-                    result.append(String.format("%s: «%s — %s»\n", opinion.getAuthor(), opinion.getName(), opinion.getOpinion()));
+                    result.append(String.format("%s: «%s — %s»\n", antiHighlight(opinion.getAuthor()), antiHighlight(opinion.getName()),
+                            opinion.getOpinion()));
                 }
                 return result.toString();
             }
