@@ -34,7 +34,7 @@ public class KarmaPlugin extends CommandPlugin {
         SettingsManager settingsManager = Main.getSettingsManager();
         karmaAddress = settingsManager.getStringSetting("karmaAddress");
         nxtapi = new NXTAPI(settingsManager.getStringSetting("nxtAPIAddress"), karmaAddress, settingsManager.getStringSetting("karmaPass"));
-        new Timer("karma timer").schedule(new TimerTask() {
+        new Timer("karma timer", true).schedule(new TimerTask() {
 
             @Override
             public void run() {
