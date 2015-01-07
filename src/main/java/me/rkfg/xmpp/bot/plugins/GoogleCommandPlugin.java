@@ -1,8 +1,6 @@
 package me.rkfg.xmpp.bot.plugins;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Arrays;
@@ -28,14 +26,7 @@ public class GoogleCommandPlugin extends CommandPlugin {
         try {
             HttpResponse response = client.execute(new HttpGet(String.format(
                     "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=%s&hl=ru", URLEncoder.encode(matcher.group(COMMAND_GROUP), "utf-8"))));
-            StringBuilder builder = new StringBuilder();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                builder.append(line);
-            }
-            reader.close();
-            JSONObject jsonObject = new JSONObject(builder.toString());
+            JSONObject jsonObject = new JSONObject(Utils.readHttpResponse(response));
             if (jsonObject.getInt("responseStatus") != 200) {
                 String details = jsonObject.getString("responseDetails");
                 if (details != null) {

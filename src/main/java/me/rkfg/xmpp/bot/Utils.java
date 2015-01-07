@@ -1,5 +1,10 @@
 package me.rkfg.xmpp.bot;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -18,4 +23,16 @@ public class Utils {
     public static HttpClient getHTTPClient() {
         return getHTTPClient(TIMEOUT);
     }
+
+    public static String readHttpResponse(HttpResponse response) throws IOException {
+        StringBuilder builder = new StringBuilder();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            builder.append(line);
+        }
+        reader.close();
+        return builder.toString();
+    }
+
 }
