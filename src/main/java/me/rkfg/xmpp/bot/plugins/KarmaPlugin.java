@@ -55,12 +55,12 @@ public class KarmaPlugin extends CommandPlugin {
                                 String jid = nxtapi.getMessage(transaction.getTxid()).toLowerCase();
                                 if (jid.length() > 1) {
                                     boolean add = true;
-                                    if (jid.charAt(0) == '-') {
+                                    if (jid.startsWith("- ")) {
                                         add = false;
-                                        jid = jid.substring(1);
+                                        jid = jid.substring(2);
                                     }
-                                    if (jid.charAt(0) == '+') {
-                                        jid = jid.substring(1);
+                                    if (jid.startsWith("+ ")) {
+                                        jid = jid.substring(2);
                                     }
                                     if (jid.contains("@") && jid.contains(".") && !jid.contains(" ")) {
                                         Karma karma = (Karma) session.createQuery("from Karma k where k.jid = :jid").setString("jid", jid)
@@ -124,6 +124,7 @@ public class KarmaPlugin extends CommandPlugin {
                 + "Если не указывать JID, выводятся все известные аккаунты с кармой.\n"
                 + "Для изменения кармы отправьте X NXT (где X — целое) на адрес " + karmaAddress
                 + ", к платежу приложите сообщение с JID, для которого хотите увеличить карму на X пунктов. "
-                + "Для уменьшения кармы поставьте вплотную перед JID знак минуса.\n" + "Пример: " + PREFIX + "k admin";
+                + "Для уменьшения кармы поставьте перед JID знак минуса через пробел (например: - admin@domain.com).\n" + "Пример: "
+                + PREFIX + "k admin";
     }
 }
