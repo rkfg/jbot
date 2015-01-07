@@ -12,3 +12,8 @@ oauth_access_token=
 oauth_access_token_secret=
 usedb=1
 goodbye_msg=I'm outta here.
+nxtAPIAddress=http://127.0.0.1:7876
+# change to your address
+karmaAddress=NXT-QX83-7KX9-7P29-5GHFL
+# change to your passphrase
+karmaPass=shall truth women know step split forward swell history cloud trade learn
