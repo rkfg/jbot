@@ -62,7 +62,7 @@ public class MUCManager {
         for (String occupantName : multiUserChat.getOccupants()) {
             Occupant occupant = multiUserChat.getOccupant(occupantName);
             if (occupant.getJid() != null) {
-                occupants.put(occupant.getJid(), occupant);
+                occupants.put(StringUtils.parseBareAddress(occupant.getJid()), occupant);
             } else {
                 occupants.put(occupant.getNick(), occupant);
             }
