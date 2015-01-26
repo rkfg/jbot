@@ -22,10 +22,14 @@ public class GoogleCommandPlugin extends CommandPlugin {
 
     @Override
     public String processCommand(Message message, Matcher matcher) {
+        return searchString(matcher.group(COMMAND_GROUP));
+    }
+
+    protected String searchString(String str) {
         HttpClient client = Utils.getHTTPClient();
         try {
             HttpResponse response = client.execute(new HttpGet(String.format(
-                    "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=%s&hl=ru", URLEncoder.encode(matcher.group(COMMAND_GROUP), "utf-8"))));
+                    "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=%s&hl=ru", URLEncoder.encode(str, "utf-8"))));
             JSONObject jsonObject = new JSONObject(Utils.readHttpResponse(response));
             if (jsonObject.getInt("responseStatus") != 200) {
                 String details = jsonObject.getString("responseDetails");
