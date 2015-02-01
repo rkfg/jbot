@@ -132,7 +132,7 @@
 		<dependency>
 			<groupId>ru.ppsrk.gwt</groupId>
 			<artifactId>gwtutil</artifactId>
-			<version>1.0.3</version>
+			<version>1.0.4</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>gwt-servlet</artifactId>
