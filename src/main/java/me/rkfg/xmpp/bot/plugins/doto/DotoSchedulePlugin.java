@@ -109,14 +109,14 @@ public class DotoSchedulePlugin extends CommandPlugin
     @Override
     public String getManual()
     {
-        return "Получить списки матчей с какого-то говносайтика.\n" +
-                "Параметры: \n" +
+        return "gosugamers.net parsing plugin.\n" +
+                "Parameters: \n" +
                 LIVE_PARAM + " - live matches\n" +
                 UPCOMING_PARAM + " - upcoming matches (default)\n"+
                 RECENT_PARAM + " - recent matches\n" +
-                "--grep \"regex\" - filter results by regexp" +
-                "n - число строк (default: 3).\n"+
-                "Пример: " + PREFIX + "hats r 2";
+                "-grep \"regex\" - filter results by regexp" +
+                "n - number of matches in output (default: 3).\n"+
+                "Example: " + PREFIX + "hats -r -n 2";
     }
     private ArrayList<String> getTournamentNames(Element main, int n)
     {
@@ -190,7 +190,6 @@ public class DotoSchedulePlugin extends CommandPlugin
     }
     private HashMap<String, Integer> parseParams(Matcher _matcher)
     {
-
         HashMap<String, Integer>  m = new HashMap<String, Integer>();
         m.put(LIVE_PARAM, 0);
         m.put(UPCOMING_PARAM, 0);
@@ -279,7 +278,6 @@ public class DotoSchedulePlugin extends CommandPlugin
                 String s = sbb.toString();
                 if(grepSet)
                 {
-                    System.out.println("Matching " + s + " to " + grepStr);
                     Matcher m = Pattern.compile(grepStr).matcher(s);
                     if(m.find())
                     {
@@ -302,7 +300,6 @@ public class DotoSchedulePlugin extends CommandPlugin
                 String s = sbb.toString();
                 if(grepSet)
                 {
-                    System.out.println("Matching " + s + " to " + grepStr);
                     Matcher m = Pattern.compile(grepStr).matcher(s);
                     if(m.find())
                     {
@@ -315,6 +312,7 @@ public class DotoSchedulePlugin extends CommandPlugin
         }
         return sb.toString();
     }
+
     private String getAll(String id, Element e, int n)
     {
         return format(id, getGames(e, n), getComments(e, n), getTournamentNames(e, n));
