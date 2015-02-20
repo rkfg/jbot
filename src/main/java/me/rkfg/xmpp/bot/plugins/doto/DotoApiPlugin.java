@@ -379,18 +379,23 @@ public class DotoApiPlugin extends CommandPlugin
         LiveGames liveGames = om.readValue(jsonApiAnswerStr, LiveGames.class);
         List<Game> games = liveGames.getResult().getGames();
 
-        for(int i = 0; i < games.size() && i < num; i++)
+        int count=0;
+        for(int i = 0; i < games.size() && count < num; i++)
         {
             Game game = games.get(i);
             try
             {
                 String gameInfo = handleGame(game, commandLine);
-                if(!grepSet || Pattern.compile(commandLine.getOptionValue(GREP_PARAM)).matcher(gameInfo).find())
+                if((!grepSet || Pattern.compile(commandLine.getOptionValue(GREP_PARAM)).matcher(gameInfo).find()) && gameInfo.length()!=0)
                 {
                     resultString += "\n" + gameInfo;
+                    count++;
                 }
             }
-            catch(NullPointerException e) {}   //Thanks, Gabe!
+            catch(NullPointerException e)
+            {
+                 e.printStackTrace();
+            }   //Thanks, Gabe!
             i++;
         }
         return resultString;
