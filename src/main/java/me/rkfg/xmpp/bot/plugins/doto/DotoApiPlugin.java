@@ -382,11 +382,15 @@ public class DotoApiPlugin extends CommandPlugin
         for(int i = 0; i < games.size() && i < num; i++)
         {
             Game game = games.get(i);
-            String gameInfo = handleGame(game, commandLine);
-            if(!grepSet || Pattern.compile(commandLine.getOptionValue(GREP_PARAM)).matcher(gameInfo).find())
+            try
             {
-                resultString += "\n" + gameInfo;
+                String gameInfo = handleGame(game, commandLine);
+                if(!grepSet || Pattern.compile(commandLine.getOptionValue(GREP_PARAM)).matcher(gameInfo).find())
+                {
+                    resultString += "\n" + gameInfo;
+                }
             }
+            catch(NullPointerException e) {}   //Thanks, Gabe!
             i++;
         }
         return resultString;
