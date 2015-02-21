@@ -17,7 +17,10 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,16 +40,17 @@ public class DotoApiPlugin extends CommandPlugin
 
     private static final String STEAM_API_KEY_STRING = "steam_api_key";
     private static final int QUERY_LEN = 3;
-    private static final String QUERY_LEN_STR = "qls";
+    private static final String QUERY_LEN_PARAM = "n";
     private static final String LIVE_MATCHES = "Live Matches";
 
-    private static final int LEAGUE_TIER = 3;
+    private static final int LOWEST_LEAGUE_TIER = 3;
 
     private static final String VERBOSE_PARAM = "v";
     private static final String SHORT_PARAM = "s";
     private static final String PICKS_PARAM = "p";
     private static final String BANS_PARAM = "b";
     private static final String TIER_SELECT_PARAM = "t";
+    private static final String GREP_PARAM = "g";
 
     private static final boolean NUMERIC_TOWERS = true;
 
@@ -70,20 +74,30 @@ public class DotoApiPlugin extends CommandPlugin
         opts.addOption(OptionBuilder.create(SHORT_PARAM));
         opts.addOption(OptionBuilder.create(PICKS_PARAM));
         opts.addOption(OptionBuilder.create(BANS_PARAM));
-        opts.addOption(OptionBuilder.hasArg().withArgName("nn").create("n"));
-        opts.addOption(OptionBuilder.hasArg().withArgName("g").create("grep"));
-        opts.addOption(OptionBuilder.hasArg().withArgName("tt").create(TIER_SELECT_PARAM));
+        opts.addOption(OptionBuilder.hasArg().create(QUERY_LEN_PARAM));
+        opts.addOption(OptionBuilder.hasArg().create(GREP_PARAM));
+        opts.addOption(OptionBuilder.hasArg().create(TIER_SELECT_PARAM));
     }
+    private CommandLine parseParams(Matcher _matcher) throws ParseException
+    {
+        String commandParams = _matcher.group(2);
+        CommandLineParser clp = new PosixParser();
 
+        return clp.parse(opts, org.apache.tools.ant.types.Commandline.translateCommandline(commandParams));
+    }
     @Override
     public String processCommand(Message message, Matcher matcher) throws ClientAuthenticationException, LogicException
     {
-        String str = LIVE_MATCHES + "\n";
-        List<Object> tuple = parseParams(matcher);
-        HashMap<String, Integer> m = (HashMap<String, Integer>) tuple.get(0);
-        String grepStr = (String) tuple.get(1);
-        int num = m.get(QUERY_LEN_STR);
-        str += getLiveLeagueGames(num, m, grepStr);
+        String str = LIVE_MATCHES;
+        try
+        {
+            str += getLiveLeagueGames(parseParams(matcher));
+        }
+        catch(Exception e)
+        {
+            str = e.getLocalizedMessage();
+            e.printStackTrace();
+        }
         return str;
     }
 
@@ -104,7 +118,7 @@ public class DotoApiPlugin extends CommandPlugin
 
     private Map<Integer, String> getHeroes()
     {
-        Map<Integer, String> m = new HashMap<Integer, String>();
+        Map<Integer, String> m = new HashMap<>();
         try
         {
             JSONObject jo = new JSONObject(sendGet(getHeroesUri()));
@@ -217,87 +231,6 @@ public class DotoApiPlugin extends CommandPlugin
         return "❮" + s + "❯";
 
     }
-
-    private List<Object> parseParams(Matcher _matcher)
-    {
-        String grepStr = null;
-        HashMap<String, Integer> m = new HashMap<>();
-        m.put(VERBOSE_PARAM, 0);
-        m.put(SHORT_PARAM, 0);
-        m.put(PICKS_PARAM, 0);
-        m.put(BANS_PARAM, 0);
-        m.put(QUERY_LEN_STR, QUERY_LEN);
-        m.put(TIER_SELECT_PARAM, LEAGUE_TIER);
-        boolean ok = false;
-        String sss = _matcher.group(2);
-
-        CommandLineParser clp = new GnuParser();
-        String[] ss = org.apache.tools.ant.types.Commandline.translateCommandline(sss);
-        try
-        {
-            CommandLine cl = clp.parse(opts, ss);
-            if(cl.hasOption(VERBOSE_PARAM))
-            {
-                m.put(VERBOSE_PARAM, 1);
-                ok = true;
-            }
-            if(cl.hasOption(PICKS_PARAM))
-            {
-                m.put(PICKS_PARAM, 1);
-                ok = true;
-            }
-            if(cl.hasOption(BANS_PARAM))
-            {
-                m.put(BANS_PARAM, 1);
-            }
-            if(cl.hasOption("n"))
-            {
-                Integer w;
-                try
-                {
-                    w = Integer.parseInt(cl.getOptionValue("n"));
-                }
-                catch(NumberFormatException e)
-                {
-                    w = QUERY_LEN;
-                }
-
-                m.put(QUERY_LEN_STR, w);
-            }
-            if(cl.hasOption(TIER_SELECT_PARAM))
-            {
-                Integer w;
-                try
-                {
-                    w = Integer.parseInt(cl.getOptionValue(TIER_SELECT_PARAM));
-                }
-                catch(NumberFormatException e)
-                {
-                    w = LEAGUE_TIER;
-                }
-
-                m.put(TIER_SELECT_PARAM, w);
-            }
-            if(cl.hasOption("grep"))
-            {
-                grepStr = cl.getOptionValue("grep");
-            }
-            if(!ok)
-            {
-                m.put(SHORT_PARAM, 1);
-            }
-        }
-        catch(ParseException e)
-        {
-            e.printStackTrace();
-        }
-
-        ArrayList<Object> tuple = new ArrayList<>();
-        tuple.add(m);
-        tuple.add(grepStr);
-        return tuple;
-    }
-
     private String twoDigitString(int number)
     {
         if(number==0)
@@ -375,10 +308,19 @@ public class DotoApiPlugin extends CommandPlugin
         return drawTowerState(team.getTowerState(), isdire);
     }
 
-    private String handleGame(Game game, HashMap<String, Integer> opts)
+    private String handleGame(Game game, CommandLine commandLine)
     {
-        String s = "";
-        if(game.getLeagueTier() < opts.get(TIER_SELECT_PARAM))
+        String resultString = "";
+        int tier = LOWEST_LEAGUE_TIER;
+        if (commandLine.hasOption(TIER_SELECT_PARAM))
+        {
+            try
+            {
+                tier = Integer.parseInt(commandLine.getOptionValue(TIER_SELECT_PARAM));
+            }
+            catch(NumberFormatException e){}
+        }
+        if(game.getLeagueTier() < tier)
         {
             return "";
         }
@@ -397,69 +339,71 @@ public class DotoApiPlugin extends CommandPlugin
         Team radiant = scoreboard.getRadiant();
         Team dire = scoreboard.getDire();
 
-        s += "«" + radiant_team_name + "» vs «" + dire_team_name + "» [" + duration + "] [" + radiant.getScore() + ":" + dire.getScore() + "] ";
-        if(opts.get(VERBOSE_PARAM)==1)
+        resultString += String.format("«%s» vs «%s» [%s] [%d:%d]", radiant_team_name, dire_team_name, duration, radiant.getScore(), dire.getScore());
+        if(commandLine.hasOption(VERBOSE_PARAM))
         {
-            s += "[$" + getSumNetWorth(radiant) + " : $" + getSumNetWorth(dire) +
-                    "] [" + getTowerState(radiant, false) + " % " + getTowerState(dire, true) + "]";
+            resultString += String.format("[$%d : $%d] [%s / %s]", getSumNetWorth(radiant), getSumNetWorth(dire), getTowerState(radiant, false), getTowerState(dire, true));
         }
-        if(opts.get(PICKS_PARAM)==1)
+        if(commandLine.hasOption(PICKS_PARAM))
         {
-            s += "\n[" + getPicks(radiant) + "] vs [" + getPicks(dire) + "]";
+            resultString += String.format("\n[%s] vs [%s]", getPicks(radiant), getPicks(dire));
         }
-        if(opts.get(BANS_PARAM)==1)
+        if(commandLine.hasOption(BANS_PARAM))
         {
-            s += "\n[" + getBans(radiant) + "] and [" + getBans(dire) + "]";
+            resultString += String.format("\n[%s] vs [%s]", getBans(radiant),getBans(dire));
         }
-        return s + "\n";
+        return resultString;
     }
 
-    private String getLiveLeagueGames(int num, HashMap<String, Integer> opts, String pattern)
+    private String getLiveLeagueGames(CommandLine commandLine) throws Exception
     {
-        String sss = "";
-        try
+        String resultString = "";
+
+        boolean grepSet = commandLine.hasOption(GREP_PARAM);
+        int num = QUERY_LEN;
+        if (commandLine.hasOption(QUERY_LEN_PARAM))
         {
-            String s = sendGet(getLiveLeagueGamesUri());
-
-            ObjectMapper om = new ObjectMapper();
-            om.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            om.setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES);
-
-            LiveGames r = om.readValue(s, LiveGames.class);
-            List<Game> games = r.getResult().getGames();
-
-            for(int i = 0; i < num; )
+            try
             {
-                if (games.size() <= i)
+                num = Integer.parseInt(commandLine.getOptionValue(QUERY_LEN_PARAM));
+            }
+            catch(NumberFormatException e){}
+        }
+
+        String jsonApiAnswerStr = sendGet(getLiveLeagueGamesUri());
+
+        ObjectMapper om = new ObjectMapper();
+        om.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        om.setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES);
+
+        LiveGames liveGames = om.readValue(jsonApiAnswerStr, LiveGames.class);
+        List<Game> games = liveGames.getResult().getGames();
+
+        int count=0;
+        for(int i = 0; i < games.size() && count < num; i++)
+        {
+            Game game = games.get(i);
+            try
+            {
+                String gameInfo = handleGame(game, commandLine);
+                if((!grepSet || Pattern.compile(commandLine.getOptionValue(GREP_PARAM)).matcher(gameInfo).find()) && gameInfo.length()!=0)
                 {
-                    break;
-                }
-                Game game = games.get(i);
-                String str = handleGame(game, opts);
-                if(pattern != null)
-                {
-                    if(Pattern.compile(pattern).matcher(str).find())
-                    {
-                        sss += str;
-                        i++;
-                    }
-                }
-                else
-                {
-                    sss += str;
-                    i++;
+                    resultString += "\n" + gameInfo;
+                    count++;
                 }
             }
+            catch(NullPointerException e)
+            {
+                 e.printStackTrace();
+            }   //Thanks, Gabe!
+            i++;
         }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-        return sss;
+        return resultString;
     }
 
     private String sendGet(String url) throws Exception
     {
+
         String inputLine;
         StringBuffer response = new StringBuffer();
 
