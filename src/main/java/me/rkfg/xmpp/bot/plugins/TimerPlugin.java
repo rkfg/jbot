@@ -86,7 +86,7 @@ public class TimerPlugin extends CommandPlugin
             timer.schedule(tt, result*1000);
         }
         catch(Exception e){s+=e.getMessage();}
-        if(s=="")
+        if (s.isEmpty())
         {
             return "Ok";
         }

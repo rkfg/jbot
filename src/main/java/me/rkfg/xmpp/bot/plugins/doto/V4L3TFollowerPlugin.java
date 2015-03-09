@@ -185,7 +185,7 @@ public class V4L3TFollowerPlugin extends CommandPlugin
             s+=list(n);
         }
 
-        if(s =="")
+        if (s.isEmpty())
         {
             return "Done";
         }
