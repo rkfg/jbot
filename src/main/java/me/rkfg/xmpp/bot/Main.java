@@ -2,7 +2,6 @@ package me.rkfg.xmpp.bot;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -63,11 +62,10 @@ public class Main {
             log.warn("settings.ini can't be read!", e);
             return;
         }
-        HashMap<String, String> defaults = sm.getDefaults();
-        defaults.put("nick", "Talho-san");
-        defaults.put("login", "talho");
-        defaults.put("resource", "jbot");
-        defaults.put("usedb", "0");
+        sm.setDefault("nick", "Talho-san");
+        sm.setDefault("login", "talho");
+        sm.setDefault("resource", "jbot");
+        sm.setDefault("usedb", "0");
         if (sm.getIntegerSetting("usedb") != 0) {
             HibernateUtil.initSessionFactory("hibernate.cfg.xml");
         }

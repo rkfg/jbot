@@ -22,7 +22,7 @@ public class GoodbyePlugin extends MessagePluginImpl {
     @Override
     public void init() {
         super.init();
-        Main.getSettingsManager().getDefaults().put("goodbye_msg", "Я всё.");
+        Main.getSettingsManager().setDefault("goodbye_msg", "Я всё.");
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
 
             @Override
