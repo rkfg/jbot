@@ -14,8 +14,10 @@ import ru.ppsrk.gwt.client.ClientAuthenticationException;
 import ru.ppsrk.gwt.client.LogicException;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -31,7 +33,6 @@ import java.util.regex.Pattern;
  */
 public class DotoApiPlugin extends CommandPlugin
 {
-    private final static int BETA = 205790;
     private final static int LIVE = 570;
     private final static String INTERFACE_PREFIX = "IDOTA2Match_";
     private final static String HERO_PREFIX = "IEconDOTA2_";
@@ -78,27 +79,117 @@ public class DotoApiPlugin extends CommandPlugin
         opts.addOption(OptionBuilder.hasArg().create(GREP_PARAM));
         opts.addOption(OptionBuilder.hasArg().create(TIER_SELECT_PARAM));
     }
-    private CommandLine parseParams(Matcher _matcher) throws ParseException
-    {
-        String commandParams = _matcher.group(2);
-        CommandLineParser clp = new PosixParser();
 
-        return clp.parse(opts, org.apache.tools.ant.types.Commandline.translateCommandline(commandParams));
-    }
     @Override
     public String processCommand(Message message, Matcher matcher) throws ClientAuthenticationException, LogicException
     {
-        String str = LIVE_MATCHES;
+        String response = LIVE_MATCHES;
         try
         {
-            str += getLiveLeagueGames(parseParams(matcher));
+            response += getLiveLeagueGames(parseParams(matcher));
         }
-        catch(Exception e)
+        catch(InvalidInputException e)
         {
-            str = e.getLocalizedMessage();
+            response = e.getLocalizedMessage();
             e.printStackTrace();
         }
-        return str;
+        return response;
+    }
+    private String getLiveLeagueGames(CommandLine commandLine) throws InvalidInputException
+    {
+        String resultString = "";
+
+        boolean grepSet = commandLine.hasOption(GREP_PARAM);
+        int num = getNumParam(QUERY_LEN, QUERY_LEN_PARAM,commandLine);
+
+        List<Game> games = getGames();
+
+        int count=0;
+        for(int i = 0; i < games.size() && count < num; i++)
+        {
+            Game game = games.get(i);
+
+            String gameInfo = handleGame(game, commandLine);
+            if((!grepSet || Pattern.compile(commandLine.getOptionValue(GREP_PARAM)).matcher(gameInfo).find()) && gameInfo.length() != 0)
+            {
+                resultString += "\n" + gameInfo;
+                count++;
+            }
+            i++;
+        }
+        return resultString;
+    }
+    private List<Game> getGames() throws InvalidInputException
+    {
+        String jsonApiAnswerStr = sendGet(getLiveLeagueGamesUri());
+
+        ObjectMapper om = new ObjectMapper();
+        om.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        om.setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES);
+
+        LiveGames liveGames;
+        try
+        {
+            liveGames = om.readValue(jsonApiAnswerStr, LiveGames.class);
+        }
+        catch(IOException e)
+        {
+            throw new InvalidInputException(e);
+        }
+        return liveGames.getResult().getGames();
+    }
+
+    private int getNumParam(int defaultValue, String optionName, CommandLine commandLine)
+    {
+        int num  = defaultValue;
+        if (commandLine.hasOption(optionName))
+        {
+            try
+            {
+                num = Integer.parseInt(commandLine.getOptionValue(optionName));
+            }
+            catch(NumberFormatException e){}
+        }
+        return num;
+    }
+
+    private String handleGame(Game game, CommandLine commandLine)
+    {
+        String resultString = "";
+        int tier = getNumParam(LOWEST_LEAGUE_TIER, TIER_SELECT_PARAM, commandLine) ;
+
+        if(game.getLeagueTier() < tier || !game.isValid())
+        {
+            return "";
+        }
+        String radiant_team_name = "Noname";
+        if(game.getRadiantTeam() != null)
+            radiant_team_name = game.getRadiantTeam().getTeamName();
+
+        String dire_team_name = "Noname";
+        if(game.getDireTeam() != null)
+            dire_team_name = game.getDireTeam().getTeamName();
+
+        Scoreboard scoreboard = game.getScoreboard();
+        String duration = getDurationString(scoreboard.getDuration().intValue());
+
+        Team radiant = scoreboard.getRadiant();
+        Team dire = scoreboard.getDire();
+
+        resultString += String.format("«%s» vs «%s» [%s] [%d:%d]", radiant_team_name, dire_team_name, duration, radiant.getScore(), dire.getScore());
+        if(commandLine.hasOption(VERBOSE_PARAM))
+        {
+            resultString += String.format("[$%d : $%d] [%s / %s]", getSumNetWorth(radiant), getSumNetWorth(dire), getTowerState(radiant, false), getTowerState(dire, true));
+        }
+        if(commandLine.hasOption(PICKS_PARAM))
+        {
+            resultString += String.format("\n[%s] vs [%s]", getPicks(radiant), getPicks(dire));
+        }
+        if(commandLine.hasOption(BANS_PARAM))
+        {
+            resultString += String.format("\n[%s] vs [%s]", getBans(radiant),getBans(dire));
+        }
+        return resultString;
     }
 
     private String getLiveLeagueGamesUri()
@@ -106,131 +197,6 @@ public class DotoApiPlugin extends CommandPlugin
         return API_BASE_PATH + INTERFACE_PREFIX + LIVE + "/GetLiveLeagueGames/" + API_VERSION + "/?key=" + apikey;
     }
 
-    private String getLeagueListingUri()
-    {
-        return API_BASE_PATH + INTERFACE_PREFIX + LIVE + "/GetLeagueListing/" + API_VERSION + "/?key=" + apikey;
-    }
-
-    private String getHeroesUri()
-    {
-        return API_BASE_PATH + HERO_PREFIX + LIVE + "/GetHeroes/" + API_VERSION + "/?key=" + apikey;
-    }
-
-    private Map<Integer, String> getHeroes()
-    {
-        Map<Integer, String> m = new HashMap<>();
-        try
-        {
-            JSONObject jo = new JSONObject(sendGet(getHeroesUri()));
-            JSONArray heroes = jo.getJSONObject("result").getJSONArray("heroes");
-            for(int i = 0; i < heroes.length(); i++)
-            {
-                JSONObject hero = heroes.getJSONObject(i);
-                m.put(hero.getInt("id"), hero.getString("name").replaceFirst("npc_dota_hero_(.*)", "$1"));
-            }
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-        return m;
-    }
-
-    private void makeTierRepresentation()
-    {
-        String ONE_TOWER = "┃";
-        String TWO_TOWERS = "╏";
-        String THREE_TOWERS = "┇";
-        tierMap = new HashMap<>();
-        tierMap.put(0b111, THREE_TOWERS);
-        tierMap.put(0b101, TWO_TOWERS);
-        tierMap.put(0b110, TWO_TOWERS);
-        tierMap.put(0b011, TWO_TOWERS);
-        tierMap.put(0b001, ONE_TOWER);
-        tierMap.put(0b010, ONE_TOWER);
-        tierMap.put(0b100, ONE_TOWER);
-        tierMap.put(0b000, "");
-    }
-
-    private String getTierRepresentation(int value)
-    {
-        return tierMap.get(value);
-    }
-
-    private String getBarracksPairState(int b)
-    {
-        String s = "";
-        String BARRACK_MISSING = "-";
-        String RANGED_BARRACK = "R";
-        String MELEE_BARRACK = "M";
-
-        int ranged = b & 0b10;
-        int melee = b & 0b1;
-
-        if(ranged==0)
-        {
-            s += BARRACK_MISSING;
-        }
-        else
-        {
-            s += RANGED_BARRACK;
-        }
-        if(melee==0)
-        {
-            s += BARRACK_MISSING;
-        }
-        else
-        {
-            s += MELEE_BARRACK;
-        }
-        return s;
-    }
-
-    private String drawTowerStateLinear(int state, int barracks)
-    {
-        String s = "";
-        int top = (state & 1) + (state >> 1 & 1) + (state >> 2 & 1);
-        int mid = (state >> 3 & 1) + (state >> 4 & 1) + (state >> 5 & 1);
-        int bot = (state >> 6 & 1) + (state >> 7 & 1) + (state >> 8 & 1);
-        int t4 = state >> 9;
-        if(top > 0 || mid > 0 || bot > 0)
-            s += top + "" + mid + bot;
-        if(bot==0)
-        {
-            s += getBarracksPairState(barracks & 0b11);
-        }
-        if(mid==0)
-        {
-            s += getBarracksPairState(barracks & 0b1100 >> 2);
-        }
-        if(top==0)
-        {
-            s += getBarracksPairState(barracks & 0b110000 >> 4);
-        }
-        if(bot==0 || top==0 || mid==0)
-        {
-            s += (t4 & 0b1) + ((t4 & 0b10) >> 1);
-        }
-        return s;
-    }
-
-    private String drawTowerState(int state, boolean dire)
-    {
-
-        int t1 = (state & 0b1) | (((state & 0b1000) >> 3) << 1) | (((state & 0b00001000000) >> 6) << 2);
-        int t2 = ((state & 0b10) >> 1) | (((state & 0b10000) >> 4) << 1) | (((state & 0b00010000000) >> 7) << 2);
-        int t3 = ((state & 0b100) >> 2) | (((state & 0b100000) >> 5) << 1) | (((state & 0b00100000000) >> 8) << 2);
-        int t4 = state >> 9;
-
-        String s = "❤" + getTierRepresentation(t4) + getTierRepresentation(t3) +
-                getTierRepresentation(t2) + getTierRepresentation(t1);
-        if(dire)
-        {
-            s = new StringBuilder(s).reverse().toString();
-        }
-        return "❮" + s + "❯";
-
-    }
     private String twoDigitString(int number)
     {
         if(number==0)
@@ -287,6 +253,31 @@ public class DotoApiPlugin extends CommandPlugin
         return s.substring(0, s.length() - 2);
     }
 
+    private Map<Integer, String> getHeroes()
+    {
+        Map<Integer, String> m = new HashMap<>();
+        try
+        {
+            JSONObject jo = new JSONObject(sendGet(getHeroesUri()));
+            JSONArray heroes = jo.getJSONObject("result").getJSONArray("heroes");
+            for(int i = 0; i < heroes.length(); i++)
+            {
+                JSONObject hero = heroes.getJSONObject(i);
+                m.put(hero.getInt("id"), hero.getString("name").replaceFirst("npc_dota_hero_(.*)", "$1"));
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+        return m;
+    }
+
+    private String getHeroesUri()
+    {
+        return API_BASE_PATH + HERO_PREFIX + LIVE + "/GetHeroes/" + API_VERSION + "/?key=" + apikey;
+    }
+
     private int getSumNetWorth(Team team)
     {
         int sumNetWorth = 0;
@@ -307,120 +298,151 @@ public class DotoApiPlugin extends CommandPlugin
         }
         return drawTowerState(team.getTowerState(), isdire);
     }
-
-    private String handleGame(Game game, CommandLine commandLine)
+    private String drawTowerState(int state, boolean dire)
     {
-        String resultString = "";
-        int tier = LOWEST_LEAGUE_TIER;
-        if (commandLine.hasOption(TIER_SELECT_PARAM))
-        {
-            try
-            {
-                tier = Integer.parseInt(commandLine.getOptionValue(TIER_SELECT_PARAM));
-            }
-            catch(NumberFormatException e){}
-        }
-        if(game.getLeagueTier() < tier)
-        {
-            return "";
-        }
 
-        String radiant_team_name = "Noname";
-        if(null!=game.getRadiantTeam())
-            radiant_team_name = game.getRadiantTeam().getTeamName();
+        int t1 = (state & 0b1) | (((state & 0b1000) >> 3) << 1) | (((state & 0b00001000000) >> 6) << 2);
+        int t2 = ((state & 0b10) >> 1) | (((state & 0b10000) >> 4) << 1) | (((state & 0b00010000000) >> 7) << 2);
+        int t3 = ((state & 0b100) >> 2) | (((state & 0b100000) >> 5) << 1) | (((state & 0b00100000000) >> 8) << 2);
+        int t4 = state >> 9;
 
-        String dire_team_name = "Noname";
-        if(null!=game.getDireTeam())
-            dire_team_name = game.getDireTeam().getTeamName();
-
-        Scoreboard scoreboard = game.getScoreboard();
-        String duration = getDurationString(scoreboard.getDuration().intValue());
-
-        Team radiant = scoreboard.getRadiant();
-        Team dire = scoreboard.getDire();
-
-        resultString += String.format("«%s» vs «%s» [%s] [%d:%d]", radiant_team_name, dire_team_name, duration, radiant.getScore(), dire.getScore());
-        if(commandLine.hasOption(VERBOSE_PARAM))
+        String s = "❤" + getTierRepresentation(t4) + getTierRepresentation(t3) +
+                getTierRepresentation(t2) + getTierRepresentation(t1);
+        if(dire)
         {
-            resultString += String.format("[$%d : $%d] [%s / %s]", getSumNetWorth(radiant), getSumNetWorth(dire), getTowerState(radiant, false), getTowerState(dire, true));
+            s = new StringBuilder(s).reverse().toString();
         }
-        if(commandLine.hasOption(PICKS_PARAM))
-        {
-            resultString += String.format("\n[%s] vs [%s]", getPicks(radiant), getPicks(dire));
-        }
-        if(commandLine.hasOption(BANS_PARAM))
-        {
-            resultString += String.format("\n[%s] vs [%s]", getBans(radiant),getBans(dire));
-        }
-        return resultString;
+        return "❮" + s + "❯";
+
     }
 
-    private String getLiveLeagueGames(CommandLine commandLine) throws Exception
+    private String getTierRepresentation(int value)
     {
-        String resultString = "";
-
-        boolean grepSet = commandLine.hasOption(GREP_PARAM);
-        int num = QUERY_LEN;
-        if (commandLine.hasOption(QUERY_LEN_PARAM))
-        {
-            try
-            {
-                num = Integer.parseInt(commandLine.getOptionValue(QUERY_LEN_PARAM));
-            }
-            catch(NumberFormatException e){}
-        }
-
-        String jsonApiAnswerStr = sendGet(getLiveLeagueGamesUri());
-
-        ObjectMapper om = new ObjectMapper();
-        om.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        om.setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES);
-
-        LiveGames liveGames = om.readValue(jsonApiAnswerStr, LiveGames.class);
-        List<Game> games = liveGames.getResult().getGames();
-
-        int count=0;
-        for(int i = 0; i < games.size() && count < num; i++)
-        {
-            Game game = games.get(i);
-            try
-            {
-                String gameInfo = handleGame(game, commandLine);
-                if((!grepSet || Pattern.compile(commandLine.getOptionValue(GREP_PARAM)).matcher(gameInfo).find()) && gameInfo.length()!=0)
-                {
-                    resultString += "\n" + gameInfo;
-                    count++;
-                }
-            }
-            catch(NullPointerException e)
-            {
-                 e.printStackTrace();
-            }   //Thanks, Gabe!
-            i++;
-        }
-        return resultString;
+        return tierMap.get(value);
     }
 
-    private String sendGet(String url) throws Exception
+    private void makeTierRepresentation()
     {
+        String ONE_TOWER = "┃";
+        String TWO_TOWERS = "╏";
+        String THREE_TOWERS = "┇";
+        tierMap = new HashMap<>();
+        tierMap.put(0b111, THREE_TOWERS);
+        tierMap.put(0b101, TWO_TOWERS);
+        tierMap.put(0b110, TWO_TOWERS);
+        tierMap.put(0b011, TWO_TOWERS);
+        tierMap.put(0b001, ONE_TOWER);
+        tierMap.put(0b010, ONE_TOWER);
+        tierMap.put(0b100, ONE_TOWER);
+        tierMap.put(0b000, "");
+    }
 
+    private String drawTowerStateLinear(int state, int barracks)
+    {
+        String s = "";
+        int top = (state & 1) + (state >> 1 & 1) + (state >> 2 & 1);
+        int mid = (state >> 3 & 1) + (state >> 4 & 1) + (state >> 5 & 1);
+        int bot = (state >> 6 & 1) + (state >> 7 & 1) + (state >> 8 & 1);
+        int t4 = state >> 9;
+        if(top > 0 || mid > 0 || bot > 0)
+            s += top + "" + mid + bot;
+        if(bot==0)
+        {
+            s += getBarracksPairState(barracks & 0b11);
+        }
+        if(mid==0)
+        {
+            s += getBarracksPairState(barracks & 0b1100 >> 2);
+        }
+        if(top==0)
+        {
+            s += getBarracksPairState(barracks & 0b110000 >> 4);
+        }
+        if(bot==0 || top==0 || mid==0)
+        {
+            s += (t4 & 0b1) + ((t4 & 0b10) >> 1);
+        }
+        return s;
+    }
+
+    private String getBarracksPairState(int b)
+    {
+        String s = "";
+        String BARRACK_MISSING = "-";
+        String RANGED_BARRACK = "R";
+        String MELEE_BARRACK = "M";
+
+        int ranged = b & 0b10;
+        int melee = b & 0b1;
+
+        if(ranged==0)
+        {
+            s += BARRACK_MISSING;
+        }
+        else
+        {
+            s += RANGED_BARRACK;
+        }
+        if(melee==0)
+        {
+            s += BARRACK_MISSING;
+        }
+        else
+        {
+            s += MELEE_BARRACK;
+        }
+        return s;
+    }
+
+    private String sendGet(String url) throws InvalidInputException
+    {
         String inputLine;
         StringBuffer response = new StringBuffer();
 
-        URL obj = new URL(url);
-        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-        con.setRequestMethod("GET");
-        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-
-        while((inputLine = in.readLine())!=null)
+        URL obj;
+        try
         {
-            response.append(inputLine);
+            obj = new URL(url);
         }
-        in.close();
+        catch(MalformedURLException e)
+        {
+            throw new InvalidInputException(e);
+        }
+        try
+        {
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+            con.setRequestMethod("GET");
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+
+            while((inputLine = in.readLine())!=null)
+            {
+                response.append(inputLine);
+            }
+            in.close();
+        }
+        catch(IOException e)
+        {
+            throw new InvalidInputException(e);
+        }
+
         return response.toString();
     }
-
+    private CommandLine parseParams(Matcher _matcher) throws InvalidInputException
+    {
+        String commandParams = _matcher.group(2);
+        CommandLineParser clp = new PosixParser();
+        CommandLine commandLine;
+        try
+        {
+            commandLine = clp.parse(opts, org.apache.tools.ant.types.Commandline.translateCommandline(commandParams));
+        }
+        catch(ParseException e)
+        {
+            throw new InvalidInputException(e);
+        }
+        return commandLine;
+    }
     @Override
     public String getManual()
     {
@@ -433,12 +455,19 @@ public class DotoApiPlugin extends CommandPlugin
                 BANS_PARAM + "- bans\n" +
                 TIER_SELECT_PARAM + "- minimal acceptable tier of match (default: 3)\n"+
                 "-grep \"regex\" - filter results by regexp\n" +
-                "Example: " + PREFIX + "doto -v -grep Hell";
+                "Example: " + PREFIX + "doto -v -g Hell";
     }
 
     @Override
     public List<String> getCommand()
     {
         return Arrays.asList("doto");
+    }
+    private class InvalidInputException extends Exception
+    {
+        InvalidInputException(Exception e)
+        {
+            super(e);
+        }
     }
 }

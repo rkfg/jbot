@@ -39,9 +39,11 @@ public class DotoSchedulePlugin extends CommandPlugin
     private static final String SHOW_STREAMS_OPTION = "s";
 
     Options opts;
+
     public void init()
     {
         buildOptions();
+
     }
     void buildOptions()
     {
@@ -49,9 +51,9 @@ public class DotoSchedulePlugin extends CommandPlugin
         Option grep = OptionBuilder.hasArg().create(GREP_OPTION);
 
         opts = new Options();
-        opts.addOption(OptionBuilder.create(UPCOMING_PARAM));
-        opts.addOption(OptionBuilder.create(LIVE_PARAM));
-        opts.addOption(OptionBuilder.create(RECENT_PARAM));
+        opts.addOption(OptionBuilder.withDescription(UPCOMING_MATCHES).create(UPCOMING_PARAM));
+        opts.addOption(OptionBuilder.withDescription(LIVE_MATCHES).create(LIVE_PARAM));
+        opts.addOption(OptionBuilder.withDescription(RECENT_RESULTS).create(RECENT_PARAM));
         opts.addOption(OptionBuilder.create(SHOW_STREAMS_OPTION));
         opts.addOption(n);
         opts.addOption(grep);
@@ -68,140 +70,231 @@ public class DotoSchedulePlugin extends CommandPlugin
             commandLine = parseParams(matcher);
             doc = getDocument(DOTO_BASEURL);
         }
-        catch(Exception e)
+        catch(InvalidInputException e)
         {
             str = e.getLocalizedMessage();
             e.printStackTrace();
             return str;
         }
-
-        Elements boxes = doc.select(".box");
-        for (Element gameTypeFrame : boxes)
-        {
-            Elements frameTitle = gameTypeFrame.select("h2");
-            if (frameTitle.size() == 0) {
-                frameTitle = gameTypeFrame.select("h1");
-            }
-            Element q = frameTitle.first();
-            if (q.ownText().contains(LIVE_MATCHES) && commandLine.hasOption(LIVE_PARAM))
-            {
-                str+= getAll(LIVE_MATCHES, gameTypeFrame, commandLine);
-            }
-            if (q.ownText().contains(UPCOMING_MATCHES) && commandLine.hasOption(UPCOMING_PARAM))
-            {
-                str+= getAll(UPCOMING_MATCHES, gameTypeFrame, commandLine);
-            }
-            if (q.ownText().contains(RECENT_RESULTS) && commandLine.hasOption(RECENT_PARAM))
-            {
-                str+= getAll(RECENT_RESULTS, gameTypeFrame, commandLine);
-            }
-        }
+        str = handleBasePage(doc, commandLine);
         return str;
     }
-    @Override
-    public List<String> getCommand() {
-        return Arrays.asList("sch", "hats");
+    private String handleBasePage(Document rootPage, CommandLine commandLine)
+    {
+        String result = "";
+        Elements boxes = rootPage.select(".box");
+        for (Element gameTypeFrame : boxes)
+        {
+            Elements frameHeader = gameTypeFrame.select("h2");
+            if (frameHeader.size() == 0) {
+                frameHeader = gameTypeFrame.select("h1");
+            }
+            String frameTitle = frameHeader.first().ownText();
+
+            String[] params = {LIVE_PARAM, UPCOMING_PARAM, RECENT_PARAM};
+            for (String param: params)
+            {
+                String description = opts.getOption(param).getDescription();
+
+                if(frameTitle.contains(description) && commandLine.hasOption(param))
+                {
+                    result += format(description, gameTypeFrame, commandLine);
+                }
+            }
+        }
+        return result;
+    }
+    private String format(String title,  Element matchList, CommandLine cl)
+    {
+        ArrayList<String> names = getTournamentNames(matchList);
+        ArrayList<String> games = getGames(matchList);
+        ArrayList<String> comments = getMatchComments(title, matchList, cl);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append('\n');
+        sb.append(title);
+        sb.append(":");
+
+        int num = getNumParam(cl);
+        for(int i = 0; i < names.size() && i< num; i++)
+        {
+            String matchDescription;
+            if (title.equals(LIVE_MATCHES))
+            {
+                matchDescription = String.format("\n%s [%s]", games.get(i), names.get(i));
+
+                if(cl.hasOption(SHOW_STREAMS_OPTION))
+                {
+                    matchDescription += " " + comments.get(i);
+                }
+            }
+            else
+            {
+                matchDescription = String.format("\n[%s] %s [%s]", comments.get(i), games.get(i), names.get(i));
+            }
+            if(!cl.hasOption(GREP_OPTION) || Pattern.compile(cl.getOptionValue(GREP_OPTION)).matcher(matchDescription).find())
+            {
+                sb.append(matchDescription);
+            }
+        }
+        return sb.toString();
     }
 
-    @Override
-    public String getManual()
+    private int getNumParam(CommandLine commandLine)
     {
-        return "gosugamers.net parsing plugin.\n" +
-                "Parameters: \n" +
-                LIVE_PARAM + " - live matches\n" +
-                UPCOMING_PARAM + " - upcoming matches (default)\n"+
-                RECENT_PARAM + " - recent matches\n" +
-                GREP_OPTION + " \"regex\" - filter results by regexp" +
-                SHOW_STREAMS_OPTION + " - show live stream links"+
-                "n - number of matches in output (default: 3).\n"+
-                "Example: " + PREFIX + "hats -r -n 2";
+        int num  = QUERY_LEN;
+        if (commandLine.hasOption(QUERY_LEN_PARAM))
+        {
+            try
+            {
+                num = Integer.parseInt(commandLine.getOptionValue(QUERY_LEN_PARAM));
+            }
+            catch(NumberFormatException e){}
+        }
+        return num;
     }
+
+    private ArrayList<String> getGames(Element g)
+    {
+        ArrayList<String> list = new ArrayList<>();
+        for (String game: getCSSClassOwnText(g, ".match"))
+        {
+            game = game.replaceAll("\\(\\d+%\\)", "");
+            list.add(game);
+        }
+        return list;
+    }
+
     private ArrayList<String> getTournamentNames(Element main)
     {
-        ArrayList<String>  tNames= new ArrayList<String>();
+        ArrayList<String>  tNames= new ArrayList<>();
         Elements tournaments = main.select(".tournament");
-        for(Element t: tournaments)
+        for(Element tournament: tournaments)
         {
-            String s = t.select(".tooltip-right").first().attr("title");
-            Element w = Jsoup.parse(s).select("span").first();
-            tNames.add(w.ownText());
+            String s = tournament.select(".tooltip-right").first().attr("title");
+            Element tournamentNameWrapper = Jsoup.parse(s).select("span").first();
+            tNames.add(tournamentNameWrapper.ownText());
         }
         return tNames;
     }
-    private ArrayList<String> getCSSClass(Element g, String c)
+
+    private ArrayList<String> getMatchComments(String title,  Element matchList, CommandLine cl)
     {
-        ArrayList<String> ag = new ArrayList<String>();
-        Elements comments = g.select(c);
-        for (Element match: comments)
+        ArrayList<String> comments;
+        if (title.equals(LIVE_MATCHES) && cl.hasOption(SHOW_STREAMS_OPTION))
         {
-            ag.add(findText(match));
+            return getStreamUrlsForEachMatch(matchList);
         }
-        return ag;
+
+        comments = getComments(matchList);
+        if(title.equals(RECENT_RESULTS))
+        {
+            cleanupRecentResultsComments(comments);
+        }
+        removeRedundantSpaces(comments);
+        return comments;
     }
-    private ArrayList<String> getStreamUrl(Element matchTable)
+
+    private void cleanupRecentResultsComments(ArrayList<String> comments)
+    {
+        for(int i = 0; i< comments.size(); i++)
+        {
+            comments.set(i, comments.get(i).replace("Show", ""));
+        }
+    }
+    private void removeRedundantSpaces(ArrayList<String> comments)
+    {
+        for(int i = 0; i< comments.size(); i++)
+        {
+            comments.set(i, comments.get(i).trim());
+        }
+    }
+    private ArrayList<String> getComments(Element g)
+    {
+        return getCSSClassOwnText(g, ".type-specific");
+    }
+
+    private ArrayList<String> getStreamUrlsForEachMatch(Element matchTable)
     {
         ArrayList<String> links = new ArrayList<>();
         Elements matches = matchTable.select(".match");
         for (Element match: matches)
         {
-            String link = match.attr("href");
-            try
+            String matchURL = match.attr("href");
+            Elements streamTabs = getStreamTabsFromMatchPage(BASEURL + matchURL);
+            String matchURLs = "";
+            for(Element streamTab : streamTabs)
             {
-                Document doc = getDocument(BASEURL + link);
-                Elements streamTabs = doc.select(".match-games-streams .stream-tab-content");
-                Elements langs = doc.select(".match-games-streams .lang");
-                String streamString = "";
-                for (int i =0; i< streamTabs.size();i++)
-                {
-                    Element streamTab = streamTabs.get(i);
-                    String streamTabString = streamTab.toString();
-                    String lang  = langs.get(i).text();
-                    String streamURL ="";
-                    if (streamTabString.contains("twitch"))
-                    {
-                         Elements flashVars = streamTab.select("[name=flashvars]");
-                         String flashVarsStr = flashVars.toString();
-                         Pattern pattern = Pattern.compile(".*channel=(.*?)&.*");
-                         Matcher m = pattern.matcher(flashVarsStr);
-                         m.matches();
-                         streamURL = "http://twitch.tv/" + m.group(1);
-                    }
-                    else
-                    {
-                        Elements r = streamTab.select("iframe");
-                        streamURL = r.attr("src");
-                    }
-                    streamString += String.format ("\n[%s] %s ", lang, streamURL);
-                }
-                links.add(streamString);
-
+                String streamURLs = makeStreamURL(streamTab);
+                matchURLs = matchURLs + "\n" + streamURLs;
             }
-            catch(IOException e)
-            {
-                e.printStackTrace();
-            }
+            links.add(matchURLs);
         }
         return links;
     }
-    private ArrayList<String> getComments(Element g)
+
+    private Elements getStreamTabsFromMatchPage(String matchURL)
     {
-        return getCSSClass(g, ".type-specific");
-    }
-    private ArrayList<String> getGames(Element g)
-    {
-        ArrayList<String> list = new ArrayList<>();
-        for (String game: getCSSClass(g, ".match"))
+        Elements streamTabs;
+        try
         {
-           game = game.replaceAll("\\(\\d+%\\)", "");
-           list.add(game);
+            Document doc = getDocument(matchURL);
+            streamTabs = doc.select(".matches-streams .match-stream-tab");
         }
-        return list;
+        catch(InvalidInputException e)
+        {
+            e.printStackTrace();
+            streamTabs = new Elements();
+        }
+        return streamTabs;
     }
 
-    private String findText(Element e)
+    private String makeStreamURL(Element streamTab)
+    {
+        String streamTabText = streamTab.text();
+
+        String lang  = streamTab.select(".button").text();
+        String streamURL = findStreamURL(streamTabText);
+
+        return String.format ("[%s] %s ", lang, streamURL);
+    }
+
+    private String findStreamURL(String text)
+    {
+        String prefix = "";
+        Pattern pattern;
+        if (text.contains("twitch"))
+        {
+            pattern = Pattern.compile(".*\\?channel=(.*?)\".*", Pattern.DOTALL);
+            prefix =  "http://twitch.tv/";
+        }
+        else
+        {
+            pattern = Pattern.compile(".*src=\"(.*?)\".*");
+        }
+        Matcher m = pattern.matcher(text);
+        if(m.matches())
+        {
+            return prefix + m.group(1);
+        }
+        return "";
+    }
+
+    private ArrayList<String> getCSSClassOwnText(Element element, String className)
+    {
+        ArrayList<String> al = new ArrayList<>();
+        Elements elements = element.select(className);
+        for (Element match: elements)
+        {
+            al.add(findText(match));
+        }
+        return al;
+    }
+
+    private String findText(Element element)
     {
         String result = "";
-        Elements children = e.children();
+        Elements children = element.children();
         if(children.size()>0)
         {
             for(Element child : children)
@@ -217,75 +310,64 @@ public class DotoSchedulePlugin extends CommandPlugin
         return result;
     }
 
-    private Document getDocument(String url) throws IOException
+    @Override
+    public List<String> getCommand() {
+        return Arrays.asList("sch", "hats");
+    }
+
+    @Override
+    public String getManual()
+    {
+        return "gosugamers.net parsing plugin.\n" +
+                "Parameters: \n" +
+                LIVE_PARAM + " - live matches\n" +
+                UPCOMING_PARAM + " - upcoming matches (default)\n"+
+                RECENT_PARAM + " - recent matches\n" +
+                GREP_OPTION + " \"regex\" - filter results by regexp\n" +
+                SHOW_STREAMS_OPTION + " - show live stream links\n"+
+                "n - number of matches in output (default: 3).\n"+
+                "Example: " + PREFIX + "hats -lur -n 2";
+    }
+
+    private Document getDocument(String url) throws InvalidInputException
     {
         Connection c =  Jsoup.connect(url);
         c.userAgent("Mozilla/5.0 (X11; Linux x86_64; rv:35.0) Gecko/20100101 Firefox/35.0");
         c.timeout(10000);
-        return c.get();
+        Document doc;
+        try
+        {
+            doc = c.get();
+        }
+        catch(IOException e)
+        {
+            throw new InvalidInputException(e);
+        }
+        return doc;
     }
-    private CommandLine parseParams(Matcher _matcher) throws ParseException
+
+    private CommandLine parseParams(Matcher _matcher) throws InvalidInputException
     {
         String commandParams = _matcher.group(2);
         CommandLineParser clp = new PosixParser();
-
-        return clp.parse(opts, org.apache.tools.ant.types.Commandline.translateCommandline(commandParams));
+        CommandLine commandLine;
+        try
+        {
+            commandLine = clp.parse(opts, org.apache.tools.ant.types.Commandline.translateCommandline(commandParams));
+        }
+        catch(ParseException e)
+        {
+            throw new InvalidInputException(e);
+        }
+        return commandLine;
     }
 
-    private String format(String title, ArrayList<String> names, ArrayList<String> comments, ArrayList<String> tournaments, CommandLine cl)
+    private class InvalidInputException extends Exception
     {
-        StringBuilder sb = new StringBuilder();
-        boolean grepSet = cl.hasOption(GREP_OPTION);
-        int num = QUERY_LEN;
-        if (cl.hasOption(QUERY_LEN_PARAM))
+        InvalidInputException(Exception e)
         {
-              try
-              {
-                  num = Integer.parseInt(cl.getOptionValue(QUERY_LEN_PARAM));
-              }
-              catch(NumberFormatException e){}
+            super(e);
         }
-        sb.append('\n');
-        sb.append(title);
-        sb.append(":");
-
-        for(int i = 0; i < names.size() && i< num; i++)
-        {
-            if(title.equals(RECENT_RESULTS))
-            {
-                String s = comments.get(i).replace("Show", "");
-                comments.set(i, s);
-            }
-            String s;
-            if(title.equals(LIVE_MATCHES) && cl.hasOption(SHOW_STREAMS_OPTION))
-            {
-                s = String.format("\n%s [%s] %s", names.get(i), tournaments.get(i), comments.get(i));
-            }
-            else if (title.equals(LIVE_MATCHES))
-            {
-                s = String.format("\n%s [%s]", names.get(i), tournaments.get(i));
-            }
-            else
-            {
-                s = String.format("\n[%s] %s [%s]", comments.get(i), names.get(i), tournaments.get(i));
-            }
-            if(!grepSet || Pattern.compile(cl.getOptionValue(GREP_OPTION)).matcher(s).find())
-            {
-                sb.append(s);
-            }
-        }
-
-        return sb.toString();
     }
-
-    private String getAll(String id, Element e, CommandLine cl)
-    {
-        if (id.equals(LIVE_MATCHES) && cl.hasOption(SHOW_STREAMS_OPTION))
-        {
-            return format(id, getGames(e), getStreamUrl(e), getTournamentNames(e), cl);
-        }
-        return format(id, getGames(e), getComments(e), getTournamentNames(e), cl);
-    }
-
 }
 
