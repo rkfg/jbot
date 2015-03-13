@@ -178,5 +178,9 @@ public class Game {
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
     }
+    public boolean isValid()
+    {
+        return scoreboard != null && scoreboard.isValid();
+    }
 
 }

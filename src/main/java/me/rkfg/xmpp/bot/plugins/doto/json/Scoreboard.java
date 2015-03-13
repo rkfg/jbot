@@ -76,5 +76,10 @@ public class Scoreboard {
         this.additionalProperties.put(name, value);
     }
 
+    public boolean isValid()
+    {
+        return radiant!=null && dire != null;
+    }
+
 }
 
