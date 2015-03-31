@@ -9,7 +9,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,7 +31,7 @@ public class TitlePlugin extends MessagePluginImpl {
     private static final int TIMEOUT = 10000;
     private Logger log = LoggerFactory.getLogger(getClass());
 
-    private List<String> imageMime = Arrays.asList("image/png", "image/jpg", "image/jpeg", "image/gif", "image/bmp");
+    private Set<String> imageMime = new HashSet<>(Arrays.asList("image/png", "image/jpg", "image/jpeg", "image/gif", "image/bmp"));
 
     @Override
     public Pattern getPattern() {
