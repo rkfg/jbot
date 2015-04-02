@@ -33,6 +33,7 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.iqversion.packet.Version;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.ping.PingFailedListener;
 import org.jivesoftware.smackx.ping.PingManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -163,7 +164,15 @@ public class Main {
         }, "Messages sender").start();
 
         log.info("Sub req: {}", connection.getRoster().getSubscriptionMode());
-        PingManager.getInstanceFor(connection).setPingInterval(60);
+        final PingManager pingManager = PingManager.getInstanceFor(connection);
+        pingManager.setPingInterval(60);
+        pingManager.registerPingFailedListener(new PingFailedListener() {
+
+            @Override
+            public void pingFailed() {
+                pingManager.setPingInterval(60);
+            }
+        });
         while (true) {
             Thread.sleep(1000);
         }
