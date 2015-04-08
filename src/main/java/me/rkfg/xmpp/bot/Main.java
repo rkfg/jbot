@@ -50,7 +50,7 @@ public class Main {
     private static SettingsManager sm = SettingsManager.getInstance();
     private static ConcurrentLinkedQueue<BotMessage> outgoingMsgs = new ConcurrentLinkedQueue<BotMessage>();
     private static List<MessagePlugin> plugins = new LinkedList<MessagePlugin>();
-    private static ExecutorService commandExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    private static ExecutorService commandExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 4);
 
     public static void main(String[] args) throws InterruptedException, SmackException, IOException {
         log.info("Starting up...");
@@ -165,12 +165,12 @@ public class Main {
 
         log.info("Sub req: {}", connection.getRoster().getSubscriptionMode());
         final PingManager pingManager = PingManager.getInstanceFor(connection);
-        pingManager.setPingInterval(60);
+        pingManager.setPingInterval(10);
         pingManager.registerPingFailedListener(new PingFailedListener() {
 
             @Override
             public void pingFailed() {
-                pingManager.setPingInterval(60);
+                pingManager.setPingInterval(10);
             }
         });
         while (true) {
