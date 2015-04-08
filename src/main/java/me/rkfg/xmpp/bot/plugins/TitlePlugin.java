@@ -59,13 +59,18 @@ public class TitlePlugin extends MessagePluginImpl {
             if (imageMime.contains(e.getMimeType())) {
                 log.info("Image found in URL: {}", e.getUrl());
                 try {
-                    int contentLength = new URL(e.getUrl()).openConnection().getContentLength();
+                    URLConnection connection = new URL(e.getUrl()).openConnection();
+                    connection.setConnectTimeout(5000);
+                    connection.setReadTimeout(20000);
+                    int contentLength = connection.getContentLength();
                     if (contentLength > 5120000) {
                         log.warn("Content is too big ({})!", contentLength);
                         return null;
                     }
                     URLConnection conn = new URL("http://127.0.0.1:5010/classify_url?imageurl=" + URLEncoder.encode(e.getUrl(), "UTF-8"))
                             .openConnection();
+                    conn.setConnectTimeout(5000);
+                    conn.setReadTimeout(20000);
                     BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                     StringBuilder sb = new StringBuilder();
                     String line;
