@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
@@ -48,7 +47,7 @@ public class Main {
     private static String nick;
     private static MUCManager mucManager = new MUCManager();
     private static SettingsManager sm = SettingsManager.getInstance();
-    private static ConcurrentLinkedQueue<BotMessage> outgoingMsgs = new ConcurrentLinkedQueue<BotMessage>();
+    private static ExecutorService outgoingMsgsExecutor = Executors.newSingleThreadExecutor();
     private static List<MessagePlugin> plugins = new LinkedList<MessagePlugin>();
     private static ExecutorService commandExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 4);
 
@@ -132,37 +131,6 @@ public class Main {
                 }
             }
         }, new AndFilter(new IQTypeFilter(Type.GET), new PacketTypeFilter(Version.class)));
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                while (true) {
-                    if (outgoingMsgs.size() > 0) {
-                        BotMessage msg = outgoingMsgs.poll();
-                        if (msg != null) {
-                            try {
-                                msg.getChat().sendMessage(msg.getMessage());
-                                Thread.sleep(1000);
-                            } catch (XMPPException e) {
-                                e.printStackTrace();
-                            } catch (InterruptedException e) {
-                                Thread.currentThread().interrupt();
-                            } catch (NotConnectedException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
-                        }
-                    } else {
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                        }
-                    }
-                }
-            }
-        }, "Messages sender").start();
-
         log.info("Sub req: {}", connection.getRoster().getSubscriptionMode());
         final PingManager pingManager = PingManager.getInstanceFor(connection);
         pingManager.setPingInterval(10);
@@ -236,8 +204,23 @@ public class Main {
         });
     }
 
-    public static void sendMessage(ChatAdapter chatAdapter, String message) {
-        outgoingMsgs.offer(new BotMessage(chatAdapter, message));
+    public static void sendMessage(final ChatAdapter chatAdapter, final String message) {
+        outgoingMsgsExecutor.execute(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    chatAdapter.sendMessage(message);
+                    Thread.sleep(1000);
+                } catch (XMPPException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                } catch (NotConnectedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     public static String getNick() {
