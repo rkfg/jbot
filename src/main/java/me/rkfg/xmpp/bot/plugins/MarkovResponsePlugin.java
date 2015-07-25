@@ -101,9 +101,16 @@ public class MarkovResponsePlugin extends MessagePluginImpl {
                     Markov segment = null;
                     List<String> result = new LinkedList<String>();
                     String[] userWords = org.apache.commons.lang3.StringUtils.split(matcher.group(1));
+                    int userWordLength = 0;
+                    // find the longest word in the user input
+                    for (String word : userWords) {
+                        userWordLength = Math.max(userWordLength, MarkovCollectorPlugin.purify(word).length());
+                    }
+                    // user minLastWordLength if user's longest word is longer or that lognest word otherwise
+                    userWordLength = Math.min(userWordLength, minLastWordLength);
                     for (int i = 0; i < 5; i++) {
                         String word = MarkovCollectorPlugin.purify(userWords[random.nextInt(userWords.length)]);
-                        if (!word.isEmpty() && word.length() >= minLastWordLength) {
+                        if (!word.isEmpty() && word.length() >= userWordLength) {
                             segment = getRandomSegmentByFirstWord(word, session);
                             if (segment != null && !segment.getText().isEmpty()) {
                                 result.add(segment.getText());
