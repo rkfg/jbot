@@ -23,10 +23,10 @@ import java.util.regex.Matcher;
  */
 public class V4L3TFollowerPlugin extends CommandPlugin
 {
-    private static final String OAUTH_CONSUMER_KEY =  "oauth_consumer_key";
-    private static final String OAUTH_CONSUMER_SECRET = "oauth_consumer_secret";
-    private static final String OAUTH_ACCESS_TOKEN = "oauth_access_token";
-    private static final String OAUTH_ACCESS_TOKEN_SECRET = "oauth_access_token_secret";
+    private static final String OAUTH_CONSUMER_KEY =  "twitter_oauth_consumer_key";
+    private static final String OAUTH_CONSUMER_SECRET = "twitter_oauth_consumer_secret";
+    private static final String OAUTH_ACCESS_TOKEN = "twitter_oauth_access_token";
+    private static final String OAUTH_ACCESS_TOKEN_SECRET = "twitter_oauth_access_token_secret";
         
     private static final String FOLLOW_PARAM = "f";
     private static final String MESSAGE_POST_PARAM = "m";

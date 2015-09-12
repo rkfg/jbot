@@ -1,9 +1,10 @@
 package me.rkfg.xmpp.bot.plugins.doto;
 
 import me.rkfg.xmpp.bot.Main;
-import me.rkfg.xmpp.bot.plugins.CommandPlugin;
 import me.rkfg.xmpp.bot.plugins.doto.json.*;
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.PropertyNamingStrategy;
@@ -31,7 +32,7 @@ import java.util.regex.Pattern;
  * Date: 2/1/15
  * Time: 6:51 PM
  */
-public class DotoApiPlugin extends CommandPlugin
+public class DotoApiPlugin extends DotoCommandPlugin
 {
     private final static int LIVE = 570;
     private final static String INTERFACE_PREFIX = "IDOTA2Match_";
@@ -86,7 +87,7 @@ public class DotoApiPlugin extends CommandPlugin
         String response = LIVE_MATCHES;
         try
         {
-            response += getLiveLeagueGames(parseParams(matcher));
+            response += getLiveLeagueGames(parseParams(opts, matcher));
         }
         catch(InvalidInputException e)
         {
@@ -428,21 +429,7 @@ public class DotoApiPlugin extends CommandPlugin
 
         return response.toString();
     }
-    private CommandLine parseParams(Matcher _matcher) throws InvalidInputException
-    {
-        String commandParams = _matcher.group(2);
-        CommandLineParser clp = new PosixParser();
-        CommandLine commandLine;
-        try
-        {
-            commandLine = clp.parse(opts, org.apache.tools.ant.types.Commandline.translateCommandline(commandParams));
-        }
-        catch(ParseException e)
-        {
-            throw new InvalidInputException(e);
-        }
-        return commandLine;
-    }
+
     @Override
     public String getManual()
     {
@@ -462,12 +449,5 @@ public class DotoApiPlugin extends CommandPlugin
     public List<String> getCommand()
     {
         return Arrays.asList("doto");
-    }
-    private class InvalidInputException extends Exception
-    {
-        InvalidInputException(Exception e)
-        {
-            super(e);
-        }
     }
 }

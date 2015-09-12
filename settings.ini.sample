@@ -4,12 +4,12 @@ nick=Talho-san
 server=jabber.ru
 join=test@conference.jabber.ru,anotherconf@conference.neko.im
 plugins=OpinionCommandPlugin, BehindComputerPlugin, WhoisCommandPlugin, GoogleCommandPlugin, ManCommandPlugin, \
-TitlePlugin, doto.V4L3TFollowerPlugin, doto.DotoSchedulePlugin, QalcCommandPlugin, MarkovResponsePlugin, MarkovCollectorPlugin, \
-StdinPlugin, AnonEchoPlugin, TimerPlugin, GoodbyePlugin
-oauth_consumer_key=
-oauth_consumer_secret=
-oauth_access_token=
-oauth_access_token_secret=
+TitlePlugin, QalcCommandPlugin, MarkovResponsePlugin, MarkovCollectorPlugin, StdinPlugin, AnonEchoPlugin, \
+TimerPlugin, GoodbyePlugin, doto.TwitchTwitcher, doto.V4L3TFollowerPlugin, doto.DotoSchedulePlugin
+twitter_oauth_consumer_key=
+twitter_oauth_consumer_secret=
+twitter_oauth_access_token=
+twitter_oauth_access_token_secret=
 usedb=1
 goodbye_msg=I'm outta here.
 nxtAPIAddress=http://127.0.0.1:7876
@@ -18,3 +18,6 @@ karmaAddress=NXT-QX83-7KX9-7P29-5GHFL
 # change to your passphrase
 karmaPass=shall truth women know step split forward swell history cloud trade learn
 steam_api_key=
+twitch_client_id=
+twitch_subscriptions=
+
