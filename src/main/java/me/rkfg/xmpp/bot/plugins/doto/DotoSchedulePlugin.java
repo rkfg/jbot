@@ -1,7 +1,9 @@
 package me.rkfg.xmpp.bot.plugins.doto;
 
-import me.rkfg.xmpp.bot.plugins.CommandPlugin;
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
 import org.jivesoftware.smack.packet.Message;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -23,7 +25,7 @@ import java.util.regex.Pattern;
  * Date: 3/20/14
  * Time: 8:47 PM
  */
-public class DotoSchedulePlugin extends CommandPlugin
+public class DotoSchedulePlugin extends DotoCommandPlugin
 {
     private static final String DOTO_BASEURL = "http://www.gosugamers.net/dota2/gosubet";
     private static final String BASEURL = "http://www.gosugamers.net";
@@ -67,7 +69,7 @@ public class DotoSchedulePlugin extends CommandPlugin
         Document doc;
         try
         {
-            commandLine = parseParams(matcher);
+            commandLine = parseParams(opts, matcher);
             doc = getDocument(DOTO_BASEURL);
         }
         catch(InvalidInputException e)
@@ -346,28 +348,5 @@ public class DotoSchedulePlugin extends CommandPlugin
         return doc;
     }
 
-    private CommandLine parseParams(Matcher _matcher) throws InvalidInputException
-    {
-        String commandParams = _matcher.group(2);
-        CommandLineParser clp = new PosixParser();
-        CommandLine commandLine;
-        try
-        {
-            commandLine = clp.parse(opts, org.apache.tools.ant.types.Commandline.translateCommandline(commandParams));
-        }
-        catch(ParseException e)
-        {
-            throw new InvalidInputException(e);
-        }
-        return commandLine;
-    }
-
-    private class InvalidInputException extends Exception
-    {
-        InvalidInputException(Exception e)
-        {
-            super(e);
-        }
-    }
 }
 
