@@ -18,7 +18,8 @@ public abstract class CommandPlugin extends MessagePluginImpl {
 
     @Override
     public Pattern getPattern() {
-        return Pattern.compile("^" + PREFIX + "(" + StringUtils.join(getCommand(), "|") + ")( +(.+?)( *> *(.+?) *)?$|$)", Pattern.DOTALL);
+        return Pattern.compile("^" + PREFIX + "(" + StringUtils.join(getCommand(), "|") + ")( +(.+?)( *> *(.+?) *)?$|$)",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     }
 
     @Override
@@ -41,11 +42,10 @@ public abstract class CommandPlugin extends MessagePluginImpl {
         return "ошибка обработки команды, подробности в логе.";
     }
 
-    public abstract String processCommand(Message message, Matcher matcher) throws LogicException,
-            ClientAuthException;
+    public abstract String processCommand(Message message, Matcher matcher) throws LogicException, ClientAuthException;
 
     public abstract List<String> getCommand();
-    
+
     @Override
     public String getManual() {
         return "справка по команде отсутствует.";
