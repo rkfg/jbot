@@ -9,8 +9,16 @@ import org.slf4j.LoggerFactory;
 public abstract class MessagePluginImpl implements MessagePlugin {
     protected Logger log = LoggerFactory.getLogger(getClass());
 
+    protected final String getNick(String from) {
+        return StringUtils.parseResource(from);
+    }
+
     protected final String getNick(Message message) {
         return StringUtils.parseResource(message.getFrom());
+    }
+
+    protected final String getBareAddress(String from) {
+        return StringUtils.parseBareAddress(from);
     }
 
     protected final String getBareAddress(Message message) {
@@ -22,11 +30,15 @@ public abstract class MessagePluginImpl implements MessagePlugin {
     }
 
     protected String getAppeal(Message message, String target) {
-        return message.getType() == Type.groupchat ? target + ", " : "";
+        return isFromGroupchat(message) ? target + ", " : "";
+    }
+
+    protected boolean isFromGroupchat(Message message) {
+        return message.getType() == Type.groupchat;
     }
 
     protected String getAppeal(Message message) {
-        return getAppeal(message, StringUtils.parseResource(message.getFrom()));
+        return getAppeal(message, getNick(message));
     }
 
     @Override

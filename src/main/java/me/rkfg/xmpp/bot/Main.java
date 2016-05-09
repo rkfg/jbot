@@ -50,6 +50,7 @@ public class Main {
     private static ExecutorService outgoingMsgsExecutor = Executors.newSingleThreadExecutor();
     private static List<MessagePlugin> plugins = new LinkedList<MessagePlugin>();
     private static ExecutorService commandExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 4);
+    private static XMPPConnection connection;
 
     public static void main(String[] args) throws InterruptedException, SmackException, IOException {
         log.info("Starting up...");
@@ -80,7 +81,7 @@ public class Main {
         }
         log.info("Plugins initializion complete.");
 
-        final XMPPConnection connection = new XMPPTCPConnection(sm.getStringSetting("server"));
+        connection = new XMPPTCPConnection(sm.getStringSetting("server"));
         try {
             connection.connect();
             connection.login(sm.getStringSetting("login"), sm.getStringSetting("password"), sm.getStringSetting("resource"));
@@ -101,7 +102,7 @@ public class Main {
                 }
             }
         });
-        ChatManager.getInstanceFor(connection).addChatListener(new ChatManagerListener() {
+        getChatManagerInstance().addChatListener(new ChatManagerListener() {
 
             @Override
             public void chatCreated(Chat chat, boolean createdLocally) {
@@ -144,6 +145,10 @@ public class Main {
         while (true) {
             Thread.sleep(1000);
         }
+    }
+
+    public static ChatManager getChatManagerInstance() {
+        return ChatManager.getInstanceFor(connection);
     }
 
     private static void joinMUCs(final XMPPConnection connection, String[] mucs) throws NotConnectedException {
