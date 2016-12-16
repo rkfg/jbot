@@ -48,7 +48,8 @@ public class TitlePlugin extends MessagePluginImpl {
             url = "http://" + IDN.toASCII(url.replaceAll("http://", ""));
         }
         try {
-            Document doc = Jsoup.connect(url).timeout(TIMEOUT).maxBodySize(MAX_BODY_SIZE).userAgent(USER_AGENT).get();
+            Document doc = Jsoup.connect(url).timeout(TIMEOUT).maxBodySize(MAX_BODY_SIZE).userAgent(USER_AGENT)
+                    .header("Accept-Language", "ru,en").get();
             String titleStr = doc.title();
             return String.format("Title: %s", titleStr);
         } catch (InterruptedIOException e) {
