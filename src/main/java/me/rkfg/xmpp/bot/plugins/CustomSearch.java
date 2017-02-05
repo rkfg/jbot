@@ -22,7 +22,7 @@ import org.jsoup.nodes.Element;
 
 /**
  *
- * @author hedlx
+ * @author skfg
  */
 
 public class CustomSearch extends CommandPlugin {
