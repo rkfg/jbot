@@ -25,7 +25,7 @@ import org.jsoup.nodes.Element;
  * @author skfg
  */
 
-public class CustomSearch extends CommandPlugin {
+public class CustomSearchPlugin extends CommandPlugin {
        
     @Override
     public String processCommand(Message message, Matcher matcher) {
@@ -39,7 +39,7 @@ public class CustomSearch extends CommandPlugin {
             s = getResultHTML(str);
 
                     } catch (IOException | ParserConfigurationException ex) {
-            Logger.getLogger(CustomSearch.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CustomSearchPlugin.class.getName()).log(Level.SEVERE, null, ex);
         }
         return s;
     }
