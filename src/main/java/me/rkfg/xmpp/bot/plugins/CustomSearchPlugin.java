@@ -25,7 +25,7 @@ import org.jsoup.nodes.Element;
  * @author skfg (xmpp:asukafag@behind.computer)
  */
 
-public class CustomSearch extends CommandPlugin {
+public class CustomSearchPlugin extends CommandPlugin {
     
     static boolean DEBUG = false;    
     
@@ -44,7 +44,7 @@ public class CustomSearch extends CommandPlugin {
         } 
         catch (IOException | ParserConfigurationException ex)
         {
-            Logger.getLogger(CustomSearch.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CustomSearchPlugin.class.getName()).log(Level.SEVERE, null, ex);
         }
         return s;
     }
