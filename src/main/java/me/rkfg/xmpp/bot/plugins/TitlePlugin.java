@@ -2,6 +2,7 @@ package me.rkfg.xmpp.bot.plugins;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.net.URLDecoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,7 +34,7 @@ public class TitlePlugin extends MessagePluginImpl {
             Document doc = Jsoup.connect(url).timeout(TIMEOUT).maxBodySize(MAX_BODY_SIZE).userAgent(DEFAULT_UA)
                     .header("Accept-Language", "ru,en").get();
             String titleStr = doc.title();
-            return String.format("Title: %s", titleStr);
+            return String.format("Title: %s", URLDecoder.decode(titleStr, "UTF-8"));
         } catch (InterruptedIOException e) {
             log.warn("Timed out loading URL: {}", url);
         } catch (ClientProtocolException e) {
