@@ -22,47 +22,76 @@ import org.jsoup.nodes.Element;
 
 /**
  *
- * @author skfg
+ * @author skfg (xmpp:asukafag@behind.computer)
  */
 
 public class CustomSearchPlugin extends CommandPlugin {
-       
+    
+    static boolean DEBUG = false;    
+    
     @Override
     public String processCommand(Message message, Matcher matcher) {
         return searchString(matcher.group(COMMAND_GROUP));
     }
     
     protected String searchString(String str) {
+        
         String s = null;
         
-        try {
+        try 
+        {
             s = getResultHTML(str);
-
-                    } catch (IOException | ParserConfigurationException ex) {
+        } 
+        catch (IOException | ParserConfigurationException ex)
+        {
             Logger.getLogger(CustomSearchPlugin.class.getName()).log(Level.SEVERE, null, ex);
         }
         return s;
     }
      
-    protected String getResultHTML(String str) throws IOException, ParserConfigurationException
+    protected String getResultHTML(String str) throws IOException, ParserConfigurationException, NullPointerException
     {
         String urlStr = String.format("https://duckduckgo.com/html/?q=%s", str);
-        log.info("DuckDuckGo search string: {}", urlStr);
-        
+        /* some debug info */
+        if (DEBUG)
+        {
+            log.info("DuckDuckGo search string: {}", urlStr);
+        }
         Document html = Jsoup.connect(urlStr).userAgent(DEFAULT_UA).get();
         Document doc = Jsoup.parse(html.toString(), "UTF-8");
-
-        Element title = doc.select("a.result__a").first();
-        Element text = doc.select("a.result__snippet").first();
-        Element link = doc.select("a.result__url").first();
-                
-        log.info(title.text());
-        log.info(text.text());
-        log.info(link.text());
         
-        String res = String.format("%s\n%s\nhttp://%s\n", title.text(), text.text(), link.text()); // possible failure with https links (obviously)
+        String res;
+        
+        try
+        {
+            if (str == null)
+            {
+                res = "чё?";
+                return res;
+            }
+            else
+            {
+                Element title = doc.select("a.result__a").first();
+                Element text = doc.select("a.result__snippet").first();
+                Element link = doc.select("a.result__url").first();
 
-        return res;
+                /* some debug info */
+                if (DEBUG)
+                {
+                    log.info(title.text());
+                    log.info(text.text());
+                    log.info(link.attr("href"));
+                } 
+                res = String.format("%s\n%s\n%s", title.text(), text.text(), link.attr("href"));
+
+                return res;
+            }
+        } catch (NullPointerException ex)
+        {
+            log.error(ex.getMessage());
+            res = "ничего не найдено!";
+            return res;
+        }
     }
     
     @Override
