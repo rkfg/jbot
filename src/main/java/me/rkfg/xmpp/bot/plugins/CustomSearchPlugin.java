@@ -6,6 +6,7 @@
 package me.rkfg.xmpp.bot.plugins;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -82,7 +83,7 @@ public class CustomSearchPlugin extends CommandPlugin {
                     log.info(text.text());
                     log.info(link.attr("href"));
                 } 
-                res = String.format("%s\n%s\n%s", title.text(), text.text(), link.attr("href"));
+                res = String.format("%s\n%s\n%s", title.text(), text.text(), URLDecoder.decode(link.attr("href"),"UTF-8"));
 
                 return res;
             }
