@@ -7,7 +7,6 @@ package me.rkfg.xmpp.bot.plugins;
 
 import java.io.IOException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
