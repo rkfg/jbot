@@ -23,6 +23,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.TextNode;
 import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,7 @@ import static org.jsoup.helper.HttpConnection.DEFAULT_UA;
 
 /**
  * Fetches random stories from different websites.
- * At the moment supported websites are: killmepls.ru, ibash.org.ru.
+ * At the moment supported websites are: killmepls.ru, ibash.org.ru, anekdot.ru, svalko.org.
  *
  * @author Kona-chan
  * @version 0.1.0
@@ -62,6 +63,18 @@ public final class CoolStoryPlugin extends CommandPlugin {
                 "Получить случайную историю с сайта ibash.org.ru.",
                 "http://ibash.org.ru/random.php",
                 "div.quotbody"
+        ),
+        ANEKDOTRU(
+                new String[] { "aru", "ару" },
+                "Получить случайный анекдот с сайта anekdot.ru.",
+                "https://www.anekdot.ru/random/anekdot/",
+                "div.content > div > div + div > div.text"
+        ),
+        SVALKO(
+                new String[] { "sv", "св" },
+                "Получить случайный пост с сайта svalko.org",
+                "http://svalko.org/random.html",
+                "div#content > div.single > div.text"
         );
 
         private final String[] commands;
@@ -102,6 +115,8 @@ public final class CoolStoryPlugin extends CommandPlugin {
     private static final Website[] WEBSITES = new Website[] {
             Website.KILLMEPLS,
             Website.IBASH,
+            Website.ANEKDOTRU,
+            Website.SVALKO,
     };
 
     private static final boolean CONFIG_REROLL_LONG_STORIES = true;
@@ -171,6 +186,9 @@ public final class CoolStoryPlugin extends CommandPlugin {
             }
 
             story.select("div").remove();
+            story.select("img").forEach(
+                    img -> img.replaceWith(new TextNode(img.attr("src"), ""))
+            );
             story.select("br").after("\\n");
             story.select("p").before("\\n\\n");
             final String storyHtml = story.html().replaceAll("\\\\n", "\n");
@@ -179,8 +197,6 @@ public final class CoolStoryPlugin extends CommandPlugin {
                     new Document.OutputSettings().prettyPrint(false)).trim();
             resultLength = result.length();
             resultLines = countLines(result);
-
-            logger.info("Story: {}\nLength: {}", result, resultLength);
 
         } while (CONFIG_REROLL_LONG_STORIES
                 && (resultLength > CONFIG_MAX_STORY_LENGTH || resultLines > CONFIG_MAX_STORY_LINES)
