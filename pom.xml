@@ -71,7 +71,7 @@
 								<preCp>anything</preCp>
 							</classPath>
 							<jre>
-								<minVersion>1.6.0</minVersion>
+								<minVersion>1.8.0</minVersion>
 								<jdkPreference>preferJre</jdkPreference>
 								<maxHeapSize>100</maxHeapSize>
 							</jre>
