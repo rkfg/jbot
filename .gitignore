@@ -2,3 +2,5 @@
 /data
 /settings.ini
 .idea
+/.settings/
+/.classpath
