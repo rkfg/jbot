@@ -23,6 +23,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.TextNode;
 import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,7 +43,7 @@ import static org.jsoup.helper.HttpConnection.DEFAULT_UA;
 
 /**
  * Fetches random stories from different websites.
- * At the moment supported websites are: killmepls.ru, ibash.org.ru.
+ * At the moment supported websites are: killmepls.ru, ibash.org.ru, anekdot.ru, svalko.org.
  *
  * @author Kona-chan
  * @version 0.1.0
@@ -61,6 +63,18 @@ public final class CoolStoryPlugin extends CommandPlugin {
                 "Получить случайную историю с сайта ibash.org.ru.",
                 "http://ibash.org.ru/random.php",
                 "div.quotbody"
+        ),
+        ANEKDOTRU(
+                new String[] { "aru", "ару" },
+                "Получить случайный анекдот с сайта anekdot.ru.",
+                "https://www.anekdot.ru/random/anekdot/",
+                "div.content > div > div + div > div.text"
+        ),
+        SVALKO(
+                new String[] { "sv", "св" },
+                "Получить случайный пост с сайта svalko.org",
+                "http://svalko.org/random.html",
+                "div#content > div.single > div.text"
         );
 
         private final String[] commands;
@@ -98,11 +112,22 @@ public final class CoolStoryPlugin extends CommandPlugin {
 
     }
 
-    private static final Website[] WEBSITES = new Website[] { Website.KILLMEPLS, Website.IBASH };
+    private static final Website[] WEBSITES = new Website[] {
+            Website.KILLMEPLS,
+            Website.IBASH,
+            Website.ANEKDOTRU,
+            Website.SVALKO,
+    };
+
+    private static final boolean CONFIG_REROLL_LONG_STORIES = true;
+    private static final int CONFIG_MAX_STORY_LENGTH = 4096;
+    private static final int CONFIG_MAX_STORY_LINES = 5;
+    private static final int CONFIG_MAX_ROLLS = 5;
 
     private static final String HELP_AVAILABLE_COMMANDS = "доступные команды:";
 
-    private static final String ERROR_PARSING = "не удалось распарсить страницу с историей.";
+    private static final String ERROR_WEBSITE_NOT_SUPPORTED = "сайт в данный момент не поддерживается.";
+    private static final String ERROR_COULD_NOT_PARSE = "не могу распарсить ответ от сервера.";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -130,7 +155,7 @@ public final class CoolStoryPlugin extends CommandPlugin {
                     .filter(w -> ArrayUtils.contains(w.getCommands(), command))
                     .findFirst();
             if (!website.isPresent()) {
-                return null;
+                return ERROR_WEBSITE_NOT_SUPPORTED;
             }
 
             return fetchStory(website.get());
@@ -142,19 +167,51 @@ public final class CoolStoryPlugin extends CommandPlugin {
     }
 
     private String fetchStory(Website website) throws IOException {
-        final Document doc = Jsoup.connect(website.getUrlString()).userAgent(DEFAULT_UA).get();
-        doc.outputSettings(new Document.OutputSettings().prettyPrint(false));
+        int roll = 0;
+        String result;
+        int resultLength;
+        int resultLines;
 
-        final Element story = doc.select(website.getCssQuery()).first();
-        if (story == null) {
-            return ERROR_PARSING;
+        //noinspection ConstantConditions
+        do {
+            roll++;
+
+            final Document doc = Jsoup.connect(website.getUrlString()).userAgent(DEFAULT_UA).get();
+            doc.outputSettings(new Document.OutputSettings().prettyPrint(false));
+            logger.info("Fetched a story from {}", doc.location());
+
+            final Element story = doc.select(website.getCssQuery()).first();
+            if (story == null) {
+                return ERROR_COULD_NOT_PARSE;
+            }
+
+            story.select("div").remove();
+            story.select("img").forEach(
+                    img -> img.replaceWith(new TextNode(img.attr("src"), ""))
+            );
+            story.select("br").after("\\n");
+            story.select("p").before("\\n\\n");
+            final String storyHtml = story.html().replaceAll("\\\\n", "\n");
+
+            result = Jsoup.clean(storyHtml, "", Whitelist.none(),
+                    new Document.OutputSettings().prettyPrint(false)).trim();
+            resultLength = result.length();
+            resultLines = countLines(result);
+
+        } while (CONFIG_REROLL_LONG_STORIES
+                && (resultLength > CONFIG_MAX_STORY_LENGTH || resultLines > CONFIG_MAX_STORY_LINES)
+                && roll <= CONFIG_MAX_ROLLS);
+
+        return result;
+    }
+
+    private int countLines(String string) {
+        final Matcher matcher = Pattern.compile("(\r\n)|(\r)|(\n)").matcher(string);
+        int lines = 0;
+        while (matcher.find()) {
+            lines++;
         }
-
-        story.select("br").after("\\n");
-        story.select("p").before("\\n\\n");
-        final String storyHtml = story.html().replaceAll("\\\\n", "\n");
-        return Jsoup.clean(storyHtml, "", Whitelist.none(),
-                new Document.OutputSettings().prettyPrint(false));
+        return lines;
     }
 
 }
