@@ -23,6 +23,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.ppsrk.gwt.client.ClientAuthException;
@@ -31,7 +32,10 @@ import ru.ppsrk.gwt.client.LogicException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.jsoup.helper.HttpConnection.DEFAULT_UA;
 
@@ -44,57 +48,113 @@ import static org.jsoup.helper.HttpConnection.DEFAULT_UA;
  */
 public final class CoolStoryPlugin extends CommandPlugin {
 
-    private static final String[] KILLMEPLS_COMMANDS = new String[] { "kmp", "кмп" };
-    private static final String[] IBASH_COMMANDS = new String[] { "ib", "иб" };
-    private static final String[] ENABLED_COMMANDS = ArrayUtils.addAll(KILLMEPLS_COMMANDS, IBASH_COMMANDS);
+    private enum Website {
 
-    private static final String KILLMEPLS_URL = "http://killmepls.ru/random/";
-    private static final String KILLMEPLS_CSS_QUERY = "div#stories > div.row + div.row > div";
+        KILLMEPLS(
+                new String[] { "kmp", "кмп" },
+                "Получить случайную историю с сайта killmepls.ru.",
+                "http://killmepls.ru/random/",
+                "div#stories > div.row + div.row > div"
+        ),
+        IBASH(
+                new String[] { "ib", "иб" },
+                "Получить случайную историю с сайта ibash.org.ru.",
+                "http://ibash.org.ru/random.php",
+                "div.quotbody"
+        );
 
-    private static final String IBASH_URL = "http://ibash.org.ru/random.php";
-    private static final String IBASH_CSS_QUERY = "div.quotbody";
+        private final String[] commands;
+        private final String help;
+        private final String urlString;
+        private final String cssQuery;
+
+        Website(String[] commands, String help, String urlString, String cssQuery) {
+            this.commands = commands;
+            this.help = help;
+            this.urlString = urlString;
+            this.cssQuery = cssQuery;
+        }
+
+        private String[] getCommands() {
+            return commands;
+        }
+
+        private String getHelp() {
+            return Stream.of(
+                    Arrays.stream(commands)
+                            .map(c -> PREFIX + c)
+                            .collect(Collectors.joining(", ")),
+                    "\t" + help
+            ).collect(Collectors.joining("\n"));
+        }
+
+        private String getUrlString() {
+            return urlString;
+        }
+
+        private String getCssQuery() {
+            return cssQuery;
+        }
+
+    }
+
+    private static final Website[] WEBSITES = new Website[] { Website.KILLMEPLS, Website.IBASH };
+
+    private static final String HELP_AVAILABLE_COMMANDS = "доступные команды:";
+
+    private static final String ERROR_PARSING = "не удалось распарсить страницу с историей.";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    @Override
+    public List<String> getCommand() {
+        return Arrays.stream(WEBSITES)
+                .flatMap(w -> Arrays.stream(w.getCommands()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getManual() {
+        return Stream.concat(
+                Stream.of(HELP_AVAILABLE_COMMANDS),
+                Arrays.stream(WEBSITES).map(Website::getHelp)
+        ).collect(Collectors.joining("\n"));
+    }
 
     @Override
     public String processCommand(Message message, Matcher matcher) throws LogicException, ClientAuthException {
         try {
             final String command = matcher.group(1);
-            if (ArrayUtils.contains(KILLMEPLS_COMMANDS, command)) {
-                return fetchKillMePlsStory();
+
+            final Optional<Website> website = Arrays.stream(WEBSITES)
+                    .filter(w -> ArrayUtils.contains(w.getCommands(), command))
+                    .findFirst();
+            if (!website.isPresent()) {
+                return null;
             }
-            if (ArrayUtils.contains(IBASH_COMMANDS, command)) {
-                return fetchiBashStory();
-            }
-            return null;
+
+            return fetchStory(website.get());
+
         } catch (Exception e) {
             logger.error("{}", e);
             return null;
         }
     }
 
-    @Override
-    public List<String> getCommand() {
-        return Arrays.asList(ENABLED_COMMANDS);
-    }
+    private String fetchStory(Website website) throws IOException {
+        final Document doc = Jsoup.connect(website.getUrlString()).userAgent(DEFAULT_UA).get();
+        doc.outputSettings(new Document.OutputSettings().prettyPrint(false));
 
-    private String fetchStory(String urlString, String cssQuery) throws IOException {
-        final Document doc = Jsoup.connect(urlString).userAgent(DEFAULT_UA).get();
-
-        final Element story = doc.select(cssQuery).first();
+        final Element story = doc.select(website.getCssQuery()).first();
         if (story == null) {
-            return "не удалось распарсить страницу с историей.";
+            return ERROR_PARSING;
         }
 
-        return story.text();
-    }
-
-    private String fetchKillMePlsStory() throws IOException {
-        return fetchStory(KILLMEPLS_URL, KILLMEPLS_CSS_QUERY);
-    }
-
-    private String fetchiBashStory() throws IOException {
-        return fetchStory(IBASH_URL, IBASH_CSS_QUERY);
+        story.select("br").after("\\n");
+        story.select("p").before("\\n\\n");
+        final String storyHtml = story.html().replaceAll("\\\\n", "\n");
+        return Jsoup.clean(storyHtml, "", Whitelist.none(),
+                new Document.OutputSettings().prettyPrint(false));
     }
 
 }
