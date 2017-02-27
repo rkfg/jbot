@@ -152,7 +152,7 @@ public final class CoolStoryPlugin extends CommandPlugin {
             final String command = matcher.group(1);
 
             final Optional<Website> website = Arrays.stream(WEBSITES)
-                    .filter(w -> ArrayUtils.contains(w.getCommands(), command))
+                    .filter(w -> ArrayUtils.contains(w.getCommands(), command.toLowerCase()))
                     .findFirst();
             if (!website.isPresent()) {
                 return ERROR_WEBSITE_NOT_SUPPORTED;
