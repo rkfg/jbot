@@ -18,12 +18,6 @@
 
 package me.rkfg.xmpp.bot.plugins;
 
-import org.jivesoftware.smack.packet.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ru.ppsrk.gwt.client.ClientAuthException;
-import ru.ppsrk.gwt.client.LogicException;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -31,6 +25,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import org.jivesoftware.smack.packet.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ru.ppsrk.gwt.client.ClientAuthException;
+import ru.ppsrk.gwt.client.LogicException;
 
 /**
  * Generates random numbers in a given interval and rolls the dice.

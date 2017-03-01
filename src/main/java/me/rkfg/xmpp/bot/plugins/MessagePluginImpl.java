@@ -2,7 +2,7 @@ package me.rkfg.xmpp.bot.plugins;
 
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Message.Type;
-import org.jivesoftware.smack.util.StringUtils;
+import org.jxmpp.util.XmppStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,19 +10,19 @@ public abstract class MessagePluginImpl implements MessagePlugin {
     protected Logger log = LoggerFactory.getLogger(getClass());
 
     protected final String getNick(String from) {
-        return StringUtils.parseResource(from);
+        return XmppStringUtils.parseResource(from);
     }
 
     protected final String getNick(Message message) {
-        return StringUtils.parseResource(message.getFrom());
+        return XmppStringUtils.parseResource(message.getFrom());
     }
 
     protected final String getBareAddress(String from) {
-        return StringUtils.parseBareAddress(from);
+        return XmppStringUtils.parseBareJid(from);
     }
 
     protected final String getBareAddress(Message message) {
-        return StringUtils.parseBareAddress(message.getFrom());
+        return XmppStringUtils.parseBareJid(message.getFrom());
     }
 
     protected boolean isMessageFromUser(Message message) {

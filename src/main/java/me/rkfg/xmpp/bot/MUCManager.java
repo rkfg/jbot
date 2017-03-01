@@ -6,19 +6,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.SmackException.NoResponseException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.muc.DefaultParticipantStatusListener;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.muc.MultiUserChatManager;
 import org.jivesoftware.smackx.muc.Occupant;
+import org.jxmpp.util.XmppStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +45,7 @@ public class MUCManager {
     }
 
     public Occupant getMUCOccupant(String fullMUCJID) {
-        String room = StringUtils.parseBareAddress(fullMUCJID);
+        String room = XmppStringUtils.parseBareJid(fullMUCJID);
         return mucsJIDs.get(room).getOccupant(fullMUCJID);
     }
 
@@ -62,7 +62,7 @@ public class MUCManager {
         for (String occupantName : multiUserChat.getOccupants()) {
             Occupant occupant = multiUserChat.getOccupant(occupantName);
             if (occupant.getJid() != null) {
-                occupants.put(StringUtils.parseBareAddress(occupant.getJid()), occupant);
+                occupants.put(XmppStringUtils.parseBareJid(occupant.getJid()), occupant);
             } else {
                 occupants.put(occupant.getNick(), occupant);
             }
@@ -84,7 +84,8 @@ public class MUCManager {
     }
 
     public void join(XMPPConnection connection, String conf, String nick) throws NotConnectedException {
-        MultiUserChat muc = new MultiUserChat(connection, org.apache.commons.lang3.StringUtils.trim(conf));
+        MultiUserChat muc = MultiUserChatManager.getInstanceFor(connection)
+                .getMultiUserChat(org.apache.commons.lang3.StringUtils.trim(conf));
         try {
             log.info("Joining {}", muc.getRoom());
             muc.join(nick, "", history, SmackConfiguration.getDefaultPacketReplyTimeout());
@@ -105,11 +106,11 @@ public class MUCManager {
         final ChatAdapter mucAdapted = new MUCAdapterImpl(muc);
         mucParams.setMucAdapted(mucAdapted);
 
-        PacketListener messageListener = new PacketListener() {
-
+        MessageListener messageListener = new MessageListener() {
+            
             @Override
-            public void processPacket(Packet packet) {
-                Main.processMessage(mucAdapted, (Message) packet);
+            public void processMessage(Message message) {
+                Main.processMessage(mucAdapted, message);
             }
         };
         muc.addMessageListener(messageListener);
@@ -118,7 +119,7 @@ public class MUCManager {
 
             @Override
             public void kicked(String participant, String actor, String reason) {
-                Main.sendMessage(mucAdapted, String.format("Ха-ха, загнали под шконарь %s! %s", StringUtils.parseResource(participant),
+                Main.sendMessage(mucAdapted, String.format("Ха-ха, загнали под шконарь %s! %s", XmppStringUtils.parseResource(participant),
                         !reason.isEmpty() ? "Мотивировали тем, что " + reason : "Без всякой мотивации."));
             }
         };

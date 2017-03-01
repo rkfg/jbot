@@ -1,12 +1,22 @@
 package me.rkfg.xmpp.bot.plugins;
 
-import me.rkfg.xmpp.bot.Main;
-import org.apache.commons.cli.*;
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.util.StringUtils;
-
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.jivesoftware.smack.packet.Message;
+import org.jxmpp.util.XmppStringUtils;
+
+import me.rkfg.xmpp.bot.Main;
 
 public class TimerPlugin extends CommandPlugin
 {
@@ -82,7 +92,7 @@ public class TimerPlugin extends CommandPlugin
             {
                 throw new Exception("Время не может пойти взад!");
             }
-            TimerTask tt = new TimerTaskE(StringUtils.parseResource(message.getFrom())+": "+ msg, StringUtils.parseBareAddress(message.getFrom()));
+            TimerTask tt = new TimerTaskE(XmppStringUtils.parseResource(message.getFrom())+": "+ msg, XmppStringUtils.parseBareJid(message.getFrom()));
             timer.schedule(tt, result*1000);
         }
         catch(Exception e){s+=e.getMessage();}

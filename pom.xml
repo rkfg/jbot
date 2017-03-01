@@ -95,7 +95,7 @@
 	</build>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<smackVersion>4.0.6</smackVersion>
+		<smackVersion>4.1.9</smackVersion>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -119,6 +119,11 @@
 			<artifactId>smack-extensions</artifactId>
 			<version>${smackVersion}</version>
 		</dependency>
+        <dependency>
+            <groupId>org.igniterealtime.smack</groupId>
+            <artifactId>smack-java7</artifactId>
+            <version>${smackVersion}</version>
+        </dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
@@ -206,7 +211,7 @@
 			<artifactId>streamobserver</artifactId>
 			<version>1.0.2</version>
 		</dependency>
-    </dependencies>
+	</dependencies>
 	<repositories>
 		<repository>
 			<id>rkfg_maven</id>

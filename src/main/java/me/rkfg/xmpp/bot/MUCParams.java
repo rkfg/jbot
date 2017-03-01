@@ -1,18 +1,18 @@
 package me.rkfg.xmpp.bot;
 
-import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smackx.muc.ParticipantStatusListener;
 
 public class MUCParams {
-    private PacketListener messageListener;
+    private MessageListener messageListener;
     private ParticipantStatusListener participantStatusListener;
     private ChatAdapter mucAdapted;
 
-    public PacketListener getMessageListener() {
+    public MessageListener getMessageListener() {
         return messageListener;
     }
 
-    public void setMessageListener(PacketListener messageListener) {
+    public void setMessageListener(MessageListener messageListener) {
         this.messageListener = messageListener;
     }
 

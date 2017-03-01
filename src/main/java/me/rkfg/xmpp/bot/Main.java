@@ -9,34 +9,34 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import me.rkfg.xmpp.bot.plugins.MessagePlugin;
-
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jivesoftware.smack.AbstractConnectionListener;
-import org.jivesoftware.smack.Chat;
-import org.jivesoftware.smack.ChatManager;
-import org.jivesoftware.smack.ChatManagerListener;
-import org.jivesoftware.smack.MessageListener;
-import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.chat.Chat;
+import org.jivesoftware.smack.chat.ChatManager;
+import org.jivesoftware.smack.chat.ChatManagerListener;
+import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.IQTypeFilter;
-import org.jivesoftware.smack.filter.PacketTypeFilter;
+import org.jivesoftware.smack.filter.StanzaTypeFilter;
 import org.jivesoftware.smack.packet.IQ.Type;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
-import org.jivesoftware.smack.util.StringUtils;
+import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.iqversion.packet.Version;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.ping.PingFailedListener;
 import org.jivesoftware.smackx.ping.PingManager;
+import org.jxmpp.util.XmppStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.rkfg.xmpp.bot.plugins.MessagePlugin;
 import ru.ppsrk.gwt.server.HibernateUtil;
 import ru.ppsrk.gwt.server.SettingsManager;
 
@@ -50,7 +50,7 @@ public class Main {
     private static ExecutorService outgoingMsgsExecutor = Executors.newSingleThreadExecutor();
     private static List<MessagePlugin> plugins = new LinkedList<MessagePlugin>();
     private static ExecutorService commandExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 4);
-    private static XMPPConnection connection;
+    private static XMPPTCPConnection connection;
 
     public static void main(String[] args) throws InterruptedException, SmackException, IOException {
         log.info("Starting up...");
@@ -81,7 +81,9 @@ public class Main {
         }
         log.info("Plugins initializion complete.");
 
-        connection = new XMPPTCPConnection(sm.getStringSetting("server"));
+        XMPPTCPConnectionConfiguration conf = XMPPTCPConnectionConfiguration.builder().setServiceName(sm.getStringSetting("server"))
+                .build();
+        connection = new XMPPTCPConnection(conf);
         try {
             connection.connect();
             connection.login(sm.getStringSetting("login"), sm.getStringSetting("password"), sm.getStringSetting("resource"));
@@ -106,7 +108,7 @@ public class Main {
 
             @Override
             public void chatCreated(Chat chat, boolean createdLocally) {
-                chat.addMessageListener(new MessageListener() {
+                chat.addMessageListener(new ChatMessageListener() {
 
                     @Override
                     public void processMessage(Chat chat, Message message) {
@@ -116,23 +118,22 @@ public class Main {
             }
         });
 
-        connection.addPacketListener(new PacketListener() {
+        connection.addAsyncStanzaListener(new StanzaListener() {
 
             @Override
-            public void processPacket(Packet packet) {
+            public void processPacket(Stanza packet) throws NotConnectedException {
                 Version version = new Version("Gekko-go console", "14.7", "Nirvash OpenFirmware v7.1");
                 version.setFrom(packet.getTo());
                 version.setTo(packet.getFrom());
-                version.setType(Type.RESULT);
-                version.setPacketID(packet.getPacketID());
+                version.setType(Type.result);
+                version.setStanzaId(packet.getStanzaId());
                 try {
-                    connection.sendPacket(version);
+                    connection.sendStanza(version);
                 } catch (NotConnectedException e) {
                     e.printStackTrace();
                 }
             }
-        }, new AndFilter(new IQTypeFilter(Type.GET), new PacketTypeFilter(Version.class)));
-        log.info("Sub req: {}", connection.getRoster().getSubscriptionMode());
+        }, new AndFilter(IQTypeFilter.GET, new StanzaTypeFilter(Version.class)));
         final PingManager pingManager = PingManager.getInstanceFor(connection);
         pingManager.setPingInterval(10);
         pingManager.registerPingFailedListener(new PingFailedListener() {
@@ -180,7 +181,7 @@ public class Main {
 
             @Override
             public void run() {
-                if (nick.equals(StringUtils.parseResource(message.getFrom()))) {
+                if (nick.equals(XmppStringUtils.parseResource(message.getFrom()))) {
                     return;
                 }
                 if (message.getSubject() != null && !message.getSubject().isEmpty()) {
