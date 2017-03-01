@@ -187,6 +187,10 @@ public class Main {
                 if (message.getSubject() != null && !message.getSubject().isEmpty()) {
                     return;
                 }
+                if (message.getExtension("replace", "urn:xmpp:message-correct:0") != null) {
+                    // skip XEP-0308 corrections
+                    return;
+                }
                 String text = message.getBody();
                 log.info("<{}>: {}", message.getFrom(), text);
                 for (MessagePlugin plugin : plugins) {
