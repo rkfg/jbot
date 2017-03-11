@@ -73,10 +73,7 @@ public class CustomSearchPlugin extends CommandPlugin {
             }
             else
             {
-                Element divAd = doc.select("div.result--ad").first();
-                if (divAd != null) {
-                    divAd.remove();
-                }
+                doc.select("div.result--ad").remove();
                 Element title = doc.select("a.result__a").first();
                 Element text = doc.select("a.result__snippet").first();
                 Element link = doc.select("a.result__url").first();
