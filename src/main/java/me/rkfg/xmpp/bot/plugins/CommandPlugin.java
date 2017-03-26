@@ -13,6 +13,7 @@ import ru.ppsrk.gwt.client.LogicException;
 public abstract class CommandPlugin extends MessagePluginImpl {
 
     protected static final String PREFIX = "%";
+    protected static final int COMMAND_NAME_GROUP = 1;
     protected static final int COMMAND_GROUP = 3;
     protected static final int REDIRECT_GROUP = 5;
 
@@ -33,10 +34,10 @@ public abstract class CommandPlugin extends MessagePluginImpl {
                 target = matcher.group(REDIRECT_GROUP);
             }
             return getAppeal(message, target) + processCommand(message, matcher);
-        } catch (ClientAuthException e) {
+        } catch (final ClientAuthException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } catch (LogicException e) {
+        } catch (final LogicException e) {
             log.warn("LogicError while processing command: ", e);
         }
         return "ошибка обработки команды, подробности в логе.";
