@@ -30,6 +30,7 @@ import java.util.Random;
 import java.util.regex.Matcher;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.NonUniqueResultException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.muc.MultiUserChat;
@@ -103,6 +104,7 @@ public final class FaggotOfTheDayPlugin extends CommandPlugin {
      * @param muc MUC that needs to be checked.
      */
     private void prefillContendersIfNeeded(MultiUserChat muc) {
+        // TODO: move exception handling to the calling method
         try {
             HibernateUtil.exec(session -> {
                 if (session
@@ -115,11 +117,11 @@ public final class FaggotOfTheDayPlugin extends CommandPlugin {
                     .stream()
                     .map(muc::getOccupant)
                     .map(occupant -> {
+                        // TODO: refactor to a separate method
                         final String jid = Optional
                                 .ofNullable(occupant.getJid())
                                 .map(XmppStringUtils::parseBareJid)
                                 .orElse(null);
-                        logger.info("{}", jid);
                         if (jid == null || jid.equals(getBotJid())) {
                             return null;
                         }
@@ -127,7 +129,7 @@ public final class FaggotOfTheDayPlugin extends CommandPlugin {
                         final String room = muc.getRoom();
                         return new Contender(nick, jid, room);
                     })
-                    .filter(c -> c != null)
+                    .filter(c -> c != null) // TODO: check if this is needed
                     .forEach(session::merge);
                 }
                 return null;
@@ -144,8 +146,10 @@ public final class FaggotOfTheDayPlugin extends CommandPlugin {
      * @param presence Presence object of occupant.
      */
     private void updateContenderOnJoin(MultiUserChat muc, Presence presence) {
+        // TODO: move exception handling to the calling method
         try {
             HibernateUtil.exec(session -> {
+                // TODO: refactor to a separate method
                 final Occupant occupant = muc.getOccupant(presence.getFrom());
                 final String jid = Optional
                         .ofNullable(occupant.getJid())
@@ -162,10 +166,7 @@ public final class FaggotOfTheDayPlugin extends CommandPlugin {
                         .createQuery("from Contender where jid = :jid and room = :room")
                         .setString("jid", jid)
                         .setString("room", room)
-                        .list()
-                        .stream()
-                        .findFirst()
-                        .orElse(null);
+                        .uniqueResult();
 
                 if (contender == null) {
                     session.merge(new Contender(nick, jid, room));
@@ -175,7 +176,7 @@ public final class FaggotOfTheDayPlugin extends CommandPlugin {
 
                 return null;
             });
-        } catch (LogicException | ClientAuthException e) {
+        } catch (LogicException | ClientAuthException | NonUniqueResultException e) {
             logger.warn("HibernateUtil.exec exception: ", e);
         }
     }
@@ -265,10 +266,9 @@ public final class FaggotOfTheDayPlugin extends CommandPlugin {
         final String commands = StringUtils.join(ALL_COMMANDS, "|");
         final String sampleCommand = PREFIX + ALL_COMMANDS.get(0);
 
-        return "сыграть в игру Пидор дня.\n" +
+        return "узнать, кто сегодня Пидор дня.\n" +
         "Формат: <" + commands + ">\n" +
-        "Пример: " + sampleCommand + "\n" +
-        "Узнать, кто сегодня Пидор дня.";
+        "Пример: " + sampleCommand;
     }
 
     @SuppressWarnings({ "unchecked", "unused" })
