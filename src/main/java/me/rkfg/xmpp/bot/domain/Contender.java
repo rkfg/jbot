@@ -37,16 +37,17 @@ public final class Contender extends BasicDomain {
     private String nick;
     private String jid;
     private String room;
+    private Boolean loggedInYesterday;
     @OneToMany(mappedBy = "contender")
     private List<Winning> winnings;
 
     public Contender() {}
 
-    public Contender(String nick, String jid, String room) {
-        super();
+    public Contender(String nick, String jid, String room, Boolean loggedInYesterday) {
         this.nick = nick;
         this.jid = jid;
         this.room = room;
+        this.loggedInYesterday = loggedInYesterday;
     }
 
     @Override
@@ -58,6 +59,8 @@ public final class Contender extends BasicDomain {
                 .append(jid)
                 .append(", room=")
                 .append(room)
+                .append(", loggedInYesterday=")
+                .append(loggedInYesterday)
                 .append("]");
         return builder.toString();
     }
@@ -84,6 +87,14 @@ public final class Contender extends BasicDomain {
 
     public void setRoom(String room) {
         this.room = room;
+    }
+
+    public Boolean getLoggedInYesterday() {
+        return loggedInYesterday;
+    }
+
+    public void setLoggedInYesterday(Boolean loggedInYesterday) {
+        this.loggedInYesterday = loggedInYesterday;
     }
 
 }
