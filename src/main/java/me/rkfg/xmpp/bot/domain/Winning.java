@@ -41,7 +41,6 @@ public final class Winning extends BasicDomain {
     public Winning() {}
 
     public Winning(Date date, Contender contender) {
-        super();
         this.date = date;
         this.contender = contender;
     }

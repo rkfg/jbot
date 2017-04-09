@@ -27,10 +27,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.NonUniqueResultException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.muc.MultiUserChat;
@@ -42,17 +44,17 @@ import org.slf4j.LoggerFactory;
 import me.rkfg.xmpp.bot.MUCManager;
 import me.rkfg.xmpp.bot.Main;
 import me.rkfg.xmpp.bot.domain.Contender;
-import me.rkfg.xmpp.bot.domain.Winning;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 import ru.ppsrk.gwt.server.HibernateUtil;
+import ru.ppsrk.gwt.server.HibernateUtil.ListQueryFilter;
 import ru.ppsrk.gwt.server.SettingsManager;
 
 /**
  * Lets users of MUCs play Faggot of the Day.
  *
  * @author Kona-chan
- * @version 0.1.0
+ * @version 0.2.0
  */
 public final class FaggotOfTheDayPlugin extends CommandPlugin {
 
@@ -70,124 +72,19 @@ public final class FaggotOfTheDayPlugin extends CommandPlugin {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Random random = new Random();
 
-    private boolean isListening = false;
+    private Timer timer;
+    private Contender winner;
 
     @Override
     public String processCommand(Message message, Matcher matcher)
             throws LogicException, ClientAuthException {
         startListeningIfNeeded();
 
-        return roll(message);
-    }
-
-    private void startListeningIfNeeded() {
-        if (isListening) {
-            return;
-        }
-        isListening = true;
-
-        mucManager.listMUCs().forEach(muc -> {
-            prefillContendersIfNeeded(muc);
-
-            muc.addParticipantListener(presence -> {
-                if (presence.getType().equals(Presence.Type.available)) {
-                    updateContenderOnJoin(muc, presence);
-                }
-            });
-        });
-    }
-
-    /**
-     * Checks if at least one Contender from a given MUC has been registered
-     * and adds all users from that MUC as Contenders if not.
-     *
-     * @param muc MUC that needs to be checked.
-     */
-    private void prefillContendersIfNeeded(MultiUserChat muc) {
-        // TODO: move exception handling to the calling method
-        try {
-            HibernateUtil.exec(session -> {
-                if (session
-                        .createQuery("from Contender cont where cont.room = :room")
-                        .setParameter("room", muc.getRoom())
-                        .list()
-                        .isEmpty()) {
-                    muc
-                    .getOccupants()
-                    .stream()
-                    .map(muc::getOccupant)
-                    .map(occupant -> {
-                        // TODO: refactor to a separate method
-                        final String jid = Optional
-                                .ofNullable(occupant.getJid())
-                                .map(XmppStringUtils::parseBareJid)
-                                .orElse(null);
-                        if (jid == null || jid.equals(getBotJid())) {
-                            return null;
-                        }
-                        final String nick = occupant.getNick();
-                        final String room = muc.getRoom();
-                        return new Contender(nick, jid, room);
-                    })
-                    .filter(c -> c != null) // TODO: check if this is needed
-                    .forEach(session::merge);
-                }
-                return null;
-            });
-        } catch (LogicException | ClientAuthException e) {
-            logger.warn("HibernateUtil.exec exception: ", e);
-        }
-    }
-
-    /**
-     * Monitors a MUC for new occupants and adds them to the database.
-     *
-     * @param muc MUC that needs to be monitored.
-     * @param presence Presence object of occupant.
-     */
-    private void updateContenderOnJoin(MultiUserChat muc, Presence presence) {
-        // TODO: move exception handling to the calling method
-        try {
-            HibernateUtil.exec(session -> {
-                // TODO: refactor to a separate method
-                final Occupant occupant = muc.getOccupant(presence.getFrom());
-                final String jid = Optional
-                        .ofNullable(occupant.getJid())
-                        .map(XmppStringUtils::parseBareJid)
-                        .orElse(null);
-                if (jid == null || jid.equals(getBotJid())) {
-                    return null;
-                }
-                final String nick = occupant.getNick();
-                final String room = muc.getRoom();
-
-                @SuppressWarnings("unchecked")
-                final Contender contender = (Contender) session
-                        .createQuery("from Contender where jid = :jid and room = :room")
-                        .setString("jid", jid)
-                        .setString("room", room)
-                        .uniqueResult();
-
-                if (contender == null) {
-                    session.merge(new Contender(nick, jid, room));
-                } else {
-                    contender.setNick(nick);
-                }
-
-                return null;
-            });
-        } catch (LogicException | ClientAuthException | NonUniqueResultException e) {
-            logger.warn("HibernateUtil.exec exception: ", e);
-        }
-    }
-
-    private String roll(Message message) {
-        final Contender winner = getTodaysWinner();
         if (winner == null || winner.getJid() == null) {
             return INFO_NO_WINNER_TODAY;
         }
 
-        final String senderJid = XmppStringUtils.parseBareJid(mucManager
+        final String senderJid = bareJid(mucManager
                 .getMUCOccupant(message.getFrom())
                 .getJid());
         if (senderJid != null && senderJid.equals(winner.getJid())) {
@@ -196,7 +93,7 @@ public final class FaggotOfTheDayPlugin extends CommandPlugin {
 
         // Search MUC for winner's JID and fetch their current nickname if they are
         // available, use fallback nickname otherwise.
-        final String roomJID = XmppStringUtils.parseBareJid(message.getFrom());
+        final String roomJID = bareJid(message.getFrom());
         final String nick = mucManager
                 .listMUCs()
                 .stream()
@@ -209,38 +106,134 @@ public final class FaggotOfTheDayPlugin extends CommandPlugin {
         return INFO_TODAYS_WINNER_IS + nick + ".";
     }
 
-    @SuppressWarnings("unchecked")
-    private Contender getTodaysWinner() {
-        try {
-            return HibernateUtil.exec(session -> {
-                // One winner per day. If there is no winner for a given date,
-                // generate one and return them.
-                final List<Winning> winnings = session
-                        .createQuery("from Winning win where win.date = :current_date")
-                        .setDate("current_date", getToday())
-                        .list();
+    private void startListeningIfNeeded() {
+        if (timer != null) {
+            return;
+        }
 
-                Contender winner;
-                if (winnings.isEmpty()) {
-                    final List<Contender> contenders = session
-                            .createQuery("from Contender")
-                            .list();
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+
+            @Override
+            public void run() {
+                try {
+                    logger.info("");
+                    logger.info("A new day starts in the Empire.");
+                    logger.info("");
+
+                    final List<Contender> contenders = HibernateUtil.queryList(
+                            "from Contender cont where cont.loggedInYesterday is true",
+                            null, null, (ListQueryFilter) null);
+                    logger.info("Today's contenders:");
+                    contenders.forEach(c -> logger.info("{}", c.toString()));
+                    logger.info("");
+
+                    contenders.forEach(c -> c.setLoggedInYesterday(false));
+
                     if (contenders.isEmpty()) {
-                        return null;
+                        logger.info("There are no contenders today.");
+                        logger.info("");
+                    } else {
+                        winner = contenders.get(random.nextInt(contenders.size()));
+                        logger.info("Today's winner is {}! Congrats!", winner.toString());
+                        HibernateUtil.saveObject(winner);
                     }
 
-                    winner = contenders.get(random.nextInt(contenders.size()));
-                    session.merge(new Winning(getToday(), winner));
-                } else {
-                    winner = winnings.get(0).getContender();
-                }
+                    mucManager.listMUCs().forEach(muc -> addContendersFromMuc(muc));
 
-                return winner;
+                } catch (LogicException | ClientAuthException e) {
+                    handleHibernateUtilException(e);
+                }
+            }
+
+        }, getToday(), TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS));
+
+        mucManager.listMUCs().forEach(muc -> {
+            muc.addParticipantListener(presence -> {
+                if (presence.getType().equals(Presence.Type.available)) {
+                    updateContenderOnJoin(muc, presence);
+                }
             });
+        });
+    }
+
+    /**
+     * Adds contenders from MUC occupants and sets loggedInYesterday of existing ones to true.
+     *
+     * @param muc
+     */
+    private void addContendersFromMuc(MultiUserChat muc) {
+        try {
+            final List<Contender> contenders = HibernateUtil.queryList(
+                    "from Contender cont where cont.room = :room",
+                    new String[] { "room" },
+                    new Object[] { muc.getRoom() },
+                    (ListQueryFilter) null);
+
+            muc.getOccupants()
+                .stream()
+                .map(muc::getOccupant)
+                .filter(o -> o.getJid() != null && !bareJid(o.getJid()).equals(getBotJid()))
+                .forEach(o -> {
+                    final Optional<Contender> contender = contenders
+                            .stream()
+                            .filter(c -> c.getJid().equals(bareJid(o.getJid())))
+                            .findFirst();
+                    try {
+                        if (contender.isPresent()) {
+                            logger.debug("Updating existing contender {}", contender.get().toString());
+                            contender.get().setLoggedInYesterday(true);
+                            HibernateUtil.saveObject(contender.get());
+                        } else {
+                            logger.debug("Creating new contender with jid {}", o.getJid());
+                            HibernateUtil.saveObject(new Contender(
+                                    o.getNick(), bareJid(o.getJid()), muc.getRoom(), true));
+                        }
+                    } catch (LogicException | ClientAuthException e) {
+                        handleHibernateUtilException(e);
+                    }
+                });
+
         } catch (LogicException | ClientAuthException e) {
-            logger.warn("HibernateUtil.exec exception: ", e);
-            return null;
+            handleHibernateUtilException(e);
         }
+    }
+
+    /**
+     * Monitors a MUC for new occupants and adds them to the database.
+     *
+     * @param muc MUC that needs to be monitored.
+     * @param presence Presence object of occupant.
+     */
+    private void updateContenderOnJoin(MultiUserChat muc, Presence presence) {
+        final Occupant occupant = muc.getOccupant(presence.getFrom());
+        if (occupant.getJid() == null || bareJid(occupant.getJid()).equals(getBotJid())) {
+            return;
+        }
+
+        try {
+            final List<Contender> contenders = HibernateUtil.queryList(
+                    "from Contender where jid = :jid and room = :room",
+                    new String[] { "jid", "room" },
+                    new Object[] { bareJid(occupant.getJid()), occupant.getNick() },
+                    (ListQueryFilter) null);
+            if (contenders.isEmpty()) {
+               HibernateUtil.saveObject(new Contender(
+                       occupant.getNick(), bareJid(occupant.getJid()), muc.getRoom(), true));
+            } else {
+                final Contender contender = contenders.get(0);
+                contender.setNick(occupant.getNick());
+                contender.setLoggedInYesterday(true);
+                HibernateUtil.saveObject(contender);
+            }
+
+        } catch (LogicException | ClientAuthException e) {
+            handleHibernateUtilException(e);
+        }
+    }
+
+    private static String bareJid(String jid) {
+        return XmppStringUtils.parseBareJid(jid);
     }
 
     private Date getToday() {
@@ -271,23 +264,9 @@ public final class FaggotOfTheDayPlugin extends CommandPlugin {
         "Пример: " + sampleCommand;
     }
 
-    @SuppressWarnings({ "unchecked", "unused" })
-    private void listContendersAndWinnings() {
-        try {
-            HibernateUtil.exec(session -> {
-                logger.info("Contenders:");
-                session.createQuery("from Contender").list().forEach(
-                        contender -> logger.info("{}", contender));
-
-                logger.info("Winnings:");
-                session.createQuery("from Winning").list().forEach(
-                        winning -> logger.info("{}", winning));
-
-                return null;
-            });
-        } catch (LogicException | ClientAuthException e) {
-            logger.warn("HibernateUtil.exec exception: ", e);
-        }
+    private void handleHibernateUtilException(Exception e) {
+        // If I ignore it, maybe it will go away.
+        logger.warn("HibernateUtil exception: ", e);
     }
 
 }
