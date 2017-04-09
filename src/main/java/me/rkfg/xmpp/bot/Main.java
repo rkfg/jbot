@@ -20,6 +20,7 @@ import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.chat.ChatManagerListener;
 import org.jivesoftware.smack.chat.ChatMessageListener;
+import org.jivesoftware.smack.chat.ChatManager.MatchMode;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.IQTypeFilter;
 import org.jivesoftware.smack.filter.StanzaTypeFilter;
@@ -104,6 +105,7 @@ public class Main {
                 }
             }
         });
+        ChatManager.setDefaultMatchMode(MatchMode.SUPPLIED_JID);
         getChatManagerInstance().addChatListener(new ChatManagerListener() {
 
             @Override
