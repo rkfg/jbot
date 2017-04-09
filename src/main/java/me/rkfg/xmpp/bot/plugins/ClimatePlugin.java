@@ -157,4 +157,9 @@ public class ClimatePlugin extends CommandPlugin {
         return Arrays.asList("cl", "кл");
     }
 
+    @Override
+    public String getManual() {
+        return "узнать климат в чате.\nФормат: " + PREFIX + "cl";
+    }
+    
 }
