@@ -28,6 +28,7 @@ public abstract class DotoCommandPlugin extends CommandPlugin
         return commandLine;
     }
 
+    @SuppressWarnings("serial")
     protected class InvalidInputException extends Exception
     {
         InvalidInputException(Exception e)

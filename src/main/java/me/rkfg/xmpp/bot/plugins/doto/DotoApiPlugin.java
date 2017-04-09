@@ -1,19 +1,5 @@
 package me.rkfg.xmpp.bot.plugins.doto;
 
-import me.rkfg.xmpp.bot.Main;
-import me.rkfg.xmpp.bot.plugins.doto.json.*;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Options;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.PropertyNamingStrategy;
-import org.jivesoftware.smack.packet.Message;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import ru.ppsrk.gwt.client.ClientAuthenticationException;
-import ru.ppsrk.gwt.client.LogicException;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -26,6 +12,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.PropertyNamingStrategy;
+import org.jivesoftware.smack.packet.Message;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import me.rkfg.xmpp.bot.plugins.doto.json.Ban;
+import me.rkfg.xmpp.bot.plugins.doto.json.Game;
+import me.rkfg.xmpp.bot.plugins.doto.json.LiveGames;
+import me.rkfg.xmpp.bot.plugins.doto.json.Pick;
+import me.rkfg.xmpp.bot.plugins.doto.json.Player_;
+import me.rkfg.xmpp.bot.plugins.doto.json.Scoreboard;
+import me.rkfg.xmpp.bot.plugins.doto.json.Team;
+import ru.ppsrk.gwt.client.ClientAuthenticationException;
+import ru.ppsrk.gwt.client.LogicException;
 
 /**
  * User: violetta
@@ -64,11 +70,12 @@ public class DotoApiPlugin extends DotoCommandPlugin
     public void init()
     {
         buildOptions();
-        apikey = Main.getSettingsManager().getStringSetting(STEAM_API_KEY_STRING);
+        apikey = getSettingsManager().getStringSetting(STEAM_API_KEY_STRING);
         heroes = getHeroes();
         makeTierRepresentation();
     }
 
+    @SuppressWarnings("static-access")
     void buildOptions()
     {
         opts = new Options();

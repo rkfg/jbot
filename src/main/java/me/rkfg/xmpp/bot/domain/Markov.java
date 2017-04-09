@@ -3,20 +3,18 @@ package me.rkfg.xmpp.bot.domain;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-
-import org.hibernate.annotations.Index;
+import javax.persistence.Index;
+import javax.persistence.Table;
 
 @Entity
+@Table(indexes = { @Index(columnList = "firstWord"), @Index(columnList = "lastWord"), @Index(columnList = "position") })
 public class Markov {
     @Id
     @GeneratedValue
     Long id;
     String text;
-    @Index(name = "fw_index")
     String firstWord;
-    @Index(name = "lw_index")
     String lastWord;
-    @Index(name = "pos_index")
     Integer position;
 
     public Markov() {

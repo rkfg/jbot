@@ -1,24 +1,24 @@
 package me.rkfg.xmpp.bot.plugins.doto;
 
-import de.tobj.twitch.streamobserver.TwitchStreamObserver;
-import de.tobj.twitch.streamobserver.channel.event.StreamStatusEvent;
-import de.tobj.twitch.streamobserver.channel.event.StreamUpdateEvent;
-import de.tobj.twitch.streamobserver.channel.listener.StreamListener;
-import me.rkfg.xmpp.bot.Main;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Options;
-import org.jivesoftware.smack.packet.Message;
-import ru.ppsrk.gwt.client.ClientAuthException;
-import ru.ppsrk.gwt.client.LogicException;
-import ru.ppsrk.gwt.server.SettingsManager;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.jivesoftware.smack.packet.Message;
+
+import de.tobj.twitch.streamobserver.TwitchStreamObserver;
+import de.tobj.twitch.streamobserver.channel.event.StreamStatusEvent;
+import de.tobj.twitch.streamobserver.channel.event.StreamUpdateEvent;
+import de.tobj.twitch.streamobserver.channel.listener.StreamListener;
+import ru.ppsrk.gwt.client.ClientAuthException;
+import ru.ppsrk.gwt.client.LogicException;
+import ru.ppsrk.gwt.server.SettingsManager;
 
 /**
  * User: violetta
@@ -39,7 +39,7 @@ public class TwitchTwitcher extends DotoCommandPlugin
     private static final String TWITCH_SUBSCRIPTIONS = "twitch_subscriptions";
     public void init()
     {
-        client_id = Main.getSettingsManager().getStringSetting(TWITCH_CLIENT_ID);
+        client_id = getSettingsManager().getStringSetting(TWITCH_CLIENT_ID);
         if(client_id == null)
         {
             client_id = "";
@@ -50,6 +50,7 @@ public class TwitchTwitcher extends DotoCommandPlugin
         setupObserver();
     }
 
+    @SuppressWarnings("static-access")
     void buildOptions()
     {
         opts = new Options();
@@ -59,7 +60,7 @@ public class TwitchTwitcher extends DotoCommandPlugin
     }
     void initSubscriptions()
     {
-        String subs = Main.getSettingsManager().getStringSetting(TWITCH_SUBSCRIPTIONS);
+        String subs = getSettingsManager().getStringSetting(TWITCH_SUBSCRIPTIONS);
         if(subs == null)
         {
             subs = "";
@@ -90,7 +91,7 @@ public class TwitchTwitcher extends DotoCommandPlugin
                 {
                     streamStatus.put(channel, newStatus);
                     String message = String.format("-> Stream http://www.twitch.tv/%s was updated: %s", channel, newStatus);
-                    Main.sendMUCMessage(message);
+                    sendMUCMessage(message);
                 }
             }
 
@@ -111,7 +112,7 @@ public class TwitchTwitcher extends DotoCommandPlugin
                 streamStatus.put(channel, status);
 
                 String message = String.format("-> Stream http://www.twitch.tv/%s is up: %s", channel, status);
-                Main.sendMUCMessage(message);
+                sendMUCMessage(message);
             }
         });
 
@@ -203,7 +204,7 @@ public class TwitchTwitcher extends DotoCommandPlugin
 
     private void saveSubscriptions()
     {
-        SettingsManager sm =  Main.getSettingsManager();
+        SettingsManager sm =  getSettingsManager();
         sm.setStringSetting(TWITCH_SUBSCRIPTIONS, joinSubscriptions());
         try
         {

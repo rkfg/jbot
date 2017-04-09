@@ -7,15 +7,13 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import me.rkfg.xmpp.bot.Main;
-import me.rkfg.xmpp.bot.domain.Markov;
-import me.rkfg.xmpp.bot.domain.MarkovFirstWord;
-import me.rkfg.xmpp.bot.domain.MarkovFirstWordCount;
-
 import org.hibernate.NonUniqueResultException;
 import org.hibernate.Session;
 import org.jivesoftware.smack.packet.Message;
 
+import me.rkfg.xmpp.bot.domain.Markov;
+import me.rkfg.xmpp.bot.domain.MarkovFirstWord;
+import me.rkfg.xmpp.bot.domain.MarkovFirstWordCount;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 import ru.ppsrk.gwt.server.HibernateCallback;
@@ -53,11 +51,11 @@ public class MarkovResponsePlugin extends MessagePluginImpl {
                                 if (last - first < answersLimitTime) {
                                     cooldown = true;
                                     Thread.sleep(random.nextInt(1000) + 1000);
-                                    Main.sendMUCMessage("Устала вам отвечать. Отдохну.");
+                                    sendMUCMessage("Устала вам отвечать. Отдохну.");
                                     Thread.sleep(random.nextInt((cooldownHoursMax - cooldownHoursMin) * 3600000) + cooldownHoursMin
                                             * 3600000);
                                     cooldown = false;
-                                    Main.sendMUCMessage("Отдохнула.");
+                                    sendMUCMessage("Отдохнула.");
                                 }
                             }
                         } else {
@@ -74,7 +72,7 @@ public class MarkovResponsePlugin extends MessagePluginImpl {
 
     @Override
     public Pattern getPattern() {
-        return Pattern.compile("^" + Main.getNick() + "[,: ] ?(.*)");
+        return Pattern.compile("^" + getBotNick() + "[,: ] ?(.*)");
     }
 
     @Override

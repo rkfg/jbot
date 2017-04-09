@@ -1,20 +1,38 @@
 package me.rkfg.xmpp.bot.plugins.doto;
 
-import me.rkfg.xmpp.bot.Main;
-import me.rkfg.xmpp.bot.plugins.CommandPlugin;
-import org.apache.commons.cli.*;
-import org.jivesoftware.smack.packet.Message;
-import ru.ppsrk.gwt.client.ClientAuthenticationException;
-import ru.ppsrk.gwt.client.LogicException;
-import ru.ppsrk.gwt.server.SettingsManager;
-import twitter4j.*;
-import twitter4j.conf.Configuration;
-import twitter4j.conf.ConfigurationBuilder;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.jivesoftware.smack.packet.Message;
+
+import me.rkfg.xmpp.bot.plugins.CommandPlugin;
+import ru.ppsrk.gwt.client.ClientAuthenticationException;
+import ru.ppsrk.gwt.client.LogicException;
+import ru.ppsrk.gwt.server.SettingsManager;
+import twitter4j.DirectMessage;
+import twitter4j.StallWarning;
+import twitter4j.Status;
+import twitter4j.StatusDeletionNotice;
+import twitter4j.StatusUpdate;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.TwitterStream;
+import twitter4j.TwitterStreamFactory;
+import twitter4j.User;
+import twitter4j.UserList;
+import twitter4j.UserStreamListener;
+import twitter4j.conf.Configuration;
+import twitter4j.conf.ConfigurationBuilder;
 
 /**
  * User: violetta
@@ -39,6 +57,7 @@ public class V4L3TFollowerPlugin extends CommandPlugin
     Configuration config;
     Options opts;
     Twitter twitter;
+    @SuppressWarnings("static-access")
     void buildOptions()
     {
         opts = new Options();
@@ -71,18 +90,18 @@ public class V4L3TFollowerPlugin extends CommandPlugin
     {
         ConfigurationBuilder cb= new ConfigurationBuilder();
         cb.setDebugEnabled(true);
-        SettingsManager sm = Main.getSettingsManager();
+        SettingsManager sm = getSettingsManager();
         cb.setOAuthConsumerKey(sm.getStringSetting(OAUTH_CONSUMER_KEY));
         cb.setOAuthConsumerSecret(sm.getStringSetting(OAUTH_CONSUMER_SECRET));
         cb.setOAuthAccessToken(sm.getStringSetting(OAUTH_ACCESS_TOKEN));
         cb.setOAuthAccessTokenSecret(sm.getStringSetting(OAUTH_ACCESS_TOKEN_SECRET));
         config = cb.build();
     }
-    static UserStreamListener listener = new UserStreamListener() {
+    UserStreamListener listener = new UserStreamListener() {
         @Override
         public void onStatus(Status status) {
             String w = "@" + status.getUser().getScreenName() + " - " + status.getText();
-            Main.sendMUCMessage(w);
+            sendMUCMessage(w);
         }
 
         @Override

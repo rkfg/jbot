@@ -7,9 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import me.rkfg.xmpp.bot.Main;
-import me.rkfg.xmpp.bot.Utils;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -20,6 +17,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.jivesoftware.smack.packet.Message;
 
+import me.rkfg.xmpp.bot.Utils;
 import ru.ppsrk.gwt.client.ClientAuthenticationException;
 import ru.ppsrk.gwt.client.LogicException;
 
@@ -36,7 +34,7 @@ public class BehindComputerPlugin extends CommandPlugin {
         if (text.length() > 1024) {
             return "максимальная длина текста — 1024 символа.";
         }
-        String passwd = Main.getSettingsManager().getStringSetting("bcpasswd");
+        String passwd = getSettingsManager().getStringSetting("bcpasswd");
         try {
             HttpPost req = new HttpPost(new URIBuilder("http://behind.computer/post").build());
             List<NameValuePair> params = new LinkedList<NameValuePair>();

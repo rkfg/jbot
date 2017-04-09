@@ -3,19 +3,17 @@ package me.rkfg.xmpp.bot.domain;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-
-import org.hibernate.annotations.Index;
+import javax.persistence.Index;
+import javax.persistence.Table;
 
 @Entity
+@Table(indexes = { @Index(columnList = "author"), @Index(columnList = "name"), @Index(columnList = "opinion") })
 public class Opinion {
     @Id
     @GeneratedValue
     Long id;
-    @Index(name = "author_index")
     String author;
-    @Index(name = "name_index")
     String name;
-    @Index(name = "opinion_index")
     String opinion;
 
     public Opinion() {

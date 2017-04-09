@@ -3,15 +3,15 @@ package me.rkfg.xmpp.bot.domain;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-
-import org.hibernate.annotations.Index;
+import javax.persistence.Index;
+import javax.persistence.Table;
 
 @Entity
+@Table(indexes = { @Index(columnList = "word") })
 public class MarkovFirstWordCount {
     @Id
     @GeneratedValue
     Long id;
-    @Index(name = "word_index")
     String word;
     Long count;
 

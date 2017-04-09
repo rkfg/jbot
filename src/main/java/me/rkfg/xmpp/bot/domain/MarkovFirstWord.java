@@ -3,19 +3,19 @@ package me.rkfg.xmpp.bot.domain;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
-
-import org.hibernate.annotations.Index;
+import javax.persistence.Table;
 
 @Entity
+@Table(indexes = { @Index(columnList = "number") })
 public class MarkovFirstWord {
     @Id
     @GeneratedValue
     Long id;
     @ManyToOne
     MarkovFirstWordCount word;
-    @Index(name = "number_index")
     Long number;
     @OneToOne
     Markov markov;

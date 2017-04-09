@@ -6,11 +6,9 @@ import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import me.rkfg.xmpp.bot.Main;
-
 import org.jivesoftware.smack.packet.Message;
 
-public class StdinPlugin implements MessagePlugin {
+public class StdinPlugin extends MessagePluginImpl {
 
     @Override
     public Pattern getPattern() {
@@ -36,7 +34,7 @@ public class StdinPlugin implements MessagePlugin {
                             // stdin is not connected
                             break;
                         }
-                        Main.sendMUCMessage(line);
+                        sendMUCMessage(line);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

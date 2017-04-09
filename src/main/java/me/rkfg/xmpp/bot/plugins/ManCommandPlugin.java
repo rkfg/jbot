@@ -5,11 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import me.rkfg.xmpp.bot.Main;
-
 import org.apache.commons.lang3.StringUtils;
 import org.jivesoftware.smack.packet.Message;
 
+import me.rkfg.xmpp.bot.Bot;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 
@@ -20,14 +19,14 @@ public class ManCommandPlugin extends CommandPlugin {
         String cmd = matcher.group(COMMAND_GROUP);
         if (cmd == null || cmd.isEmpty()) {
             List<String> commands = new LinkedList<String>();
-            for (MessagePlugin plugin : Main.getPlugins()) {
+            for (MessagePlugin plugin : getPlugins()) {
                 if (plugin instanceof CommandPlugin) {
                     commands.addAll(((CommandPlugin) plugin).getCommand());
                 }
             }
             return "доступные команды: " + StringUtils.join(commands, ", ");
         } else {
-            for (MessagePlugin plugin : Main.getPlugins()) {
+            for (MessagePlugin plugin : getPlugins()) {
                 if (plugin instanceof CommandPlugin) {
                     if (((CommandPlugin) plugin).getCommand().contains(cmd)) {
                         return plugin.getManual();
@@ -36,6 +35,10 @@ public class ManCommandPlugin extends CommandPlugin {
             }
         }
         return "команда не найдена.";
+    }
+
+    private List<MessagePlugin> getPlugins() {
+        return Bot.INSTANCE.getPlugins();
     }
 
     @Override

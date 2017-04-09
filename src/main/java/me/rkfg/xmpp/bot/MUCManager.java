@@ -110,7 +110,7 @@ public class MUCManager {
             
             @Override
             public void processMessage(Message message) {
-                Main.processMessage(mucAdapted, message);
+                Bot.INSTANCE.processMessage(mucAdapted, message);
             }
         };
         muc.addMessageListener(messageListener);
@@ -119,7 +119,7 @@ public class MUCManager {
 
             @Override
             public void kicked(String participant, String actor, String reason) {
-                Main.sendMessage(mucAdapted, String.format("Ха-ха, загнали под шконарь %s! %s", XmppStringUtils.parseResource(participant),
+                Bot.INSTANCE.sendMessage(mucAdapted, String.format("Ха-ха, загнали под шконарь %s! %s", XmppStringUtils.parseResource(participant),
                         !reason.isEmpty() ? "Мотивировали тем, что " + reason : "Без всякой мотивации."));
             }
         };

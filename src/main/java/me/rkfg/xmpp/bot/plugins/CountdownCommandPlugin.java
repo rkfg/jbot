@@ -19,7 +19,6 @@ import org.hibernate.criterion.Restrictions;
 import org.jivesoftware.smack.packet.Message;
 
 import me.rkfg.xmpp.bot.ChatAdapterImpl;
-import me.rkfg.xmpp.bot.Main;
 import me.rkfg.xmpp.bot.domain.Countdown;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
@@ -57,11 +56,10 @@ public class CountdownCommandPlugin extends CommandPlugin {
                             for (Countdown countdown : countdowns) {
                                 String dateStr = getFormatFull().format(countdown.getDate());
                                 if (Boolean.TRUE.equals(countdown.getGroupchat())) {
-                                    Main.sendMUCMessage(String.format("%s, наступает событие: %s [%s]", getNick(countdown.getCreator()),
+                                    sendMUCMessage(String.format("%s, наступает событие: %s [%s]", getNick(countdown.getCreator()),
                                             countdown.getName(), dateStr), getBareAddress(countdown.getCreator()));
                                 } else {
-                                    Main.sendMessage(
-                                            new ChatAdapterImpl(Main.getChatManagerInstance().createChat(countdown.getCreator(), null)),
+                                    sendMessage(new ChatAdapterImpl(getChatManagerInstance().createChat(countdown.getCreator(), null)),
                                             String.format("Наступает событие: %s [%s]", countdown.getName(), dateStr));
                                 }
                                 countdown.setNotified(true);

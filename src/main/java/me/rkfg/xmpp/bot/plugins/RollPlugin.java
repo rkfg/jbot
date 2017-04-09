@@ -27,8 +27,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.jivesoftware.smack.packet.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
@@ -62,8 +60,6 @@ public final class RollPlugin extends CommandPlugin {
             "ты понимаешь, что ты нулевой?",
             "do that again and I will kill you.",
     };
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public List<String> getCommand() {

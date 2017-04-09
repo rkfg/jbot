@@ -16,8 +16,6 @@ import org.apache.commons.cli.ParseException;
 import org.jivesoftware.smack.packet.Message;
 import org.jxmpp.util.XmppStringUtils;
 
-import me.rkfg.xmpp.bot.Main;
-
 public class TimerPlugin extends CommandPlugin
 {
     private static final String DAY_OPTION = "d";
@@ -41,7 +39,7 @@ public class TimerPlugin extends CommandPlugin
         @Override
         public void run()
         {
-            Main.sendMUCMessage(msg, to);
+            sendMUCMessage(msg, to);
         }
     };
     @Override
@@ -119,6 +117,7 @@ public class TimerPlugin extends CommandPlugin
                 SEC_OPTION + " - секунды; "+REFIX+ " -"+SEC_OPTION+ " " +42 +"\n"+
                 MESSAGE_OPTION + " - запостить \"сообщение\"; "+REFIX + " -" +MESSAGE_OPTION +" \"Борщ готов!\"";
     }
+    @SuppressWarnings("static-access")
     void buildOptions()
     {
         opts = new Options();

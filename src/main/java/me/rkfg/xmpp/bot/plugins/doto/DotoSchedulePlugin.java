@@ -47,6 +47,7 @@ public class DotoSchedulePlugin extends DotoCommandPlugin
         buildOptions();
 
     }
+    @SuppressWarnings("static-access")
     void buildOptions()
     {
         Option n = OptionBuilder.hasArg().create(QUERY_LEN_PARAM);

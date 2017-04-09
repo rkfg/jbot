@@ -42,7 +42,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import me.rkfg.xmpp.bot.MUCManager;
-import me.rkfg.xmpp.bot.Main;
 import me.rkfg.xmpp.bot.domain.Contender;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
@@ -66,8 +65,8 @@ public final class FaggotOfTheDayPlugin extends CommandPlugin {
             "сегодня Пидор дня — ";
     private static final String INFO_A_WINNER_IS_YOU = INFO_TODAYS_WINNER_IS + "ты!";
 
-    private final MUCManager mucManager = Main.getMUCManager();
-    private final SettingsManager settingsManager = Main.getSettingsManager();
+    private final MUCManager mucManager = getMUCManager();
+    private final SettingsManager settingsManager = getSettingsManager();
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Random random = new Random();

@@ -8,16 +8,14 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
 
-import me.rkfg.xmpp.bot.Main;
-import me.rkfg.xmpp.bot.domain.Karma;
-import me.rkfg.xmpp.bot.domain.KarmaHistory;
-import me.rkfg.xmpp.bot.nxt.NXTAPI;
-import me.rkfg.xmpp.bot.nxt.Transaction;
-
 import org.hibernate.Session;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.muc.Occupant;
 
+import me.rkfg.xmpp.bot.domain.Karma;
+import me.rkfg.xmpp.bot.domain.KarmaHistory;
+import me.rkfg.xmpp.bot.nxt.NXTAPI;
+import me.rkfg.xmpp.bot.nxt.Transaction;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 import ru.ppsrk.gwt.server.HibernateCallback;
@@ -31,7 +29,7 @@ public class KarmaPlugin extends CommandPlugin {
 
     @Override
     public void init() {
-        SettingsManager settingsManager = Main.getSettingsManager();
+        SettingsManager settingsManager = getSettingsManager();
         karmaAddress = settingsManager.getStringSetting("karmaAddress");
         nxtapi = new NXTAPI(settingsManager.getStringSetting("nxtAPIAddress"), karmaAddress, settingsManager.getStringSetting("karmaPass"));
         new Timer("karma timer", true).schedule(new TimerTask() {
@@ -98,7 +96,7 @@ public class KarmaPlugin extends CommandPlugin {
                 }
                 karmas = session.createQuery("from Karma k order by k.karma").list();
                 StringBuilder sb = new StringBuilder("Карма участников:\n");
-                Map<String, Occupant> occupants = Main.getMUCManager().listMUCOccupantsByJID(getBareAddress(message));
+                Map<String, Occupant> occupants = getMUCManager().listMUCOccupantsByJID(getBareAddress(message));
                 for (Karma karma : karmas) {
                     String name = karma.getJid();
                     Occupant jidOccupant = occupants.get(name);
