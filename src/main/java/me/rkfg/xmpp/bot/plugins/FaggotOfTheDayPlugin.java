@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
@@ -40,8 +41,6 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.Occupant;
 import org.jxmpp.util.XmppStringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
@@ -52,30 +51,33 @@ import ru.ppsrk.gwt.client.LogicException;
  * @author Kona-chan
  * @version 0.3.0
  */
-public class FaggotOfTheDayPlugin extends CommandPlugin {
+public final class FaggotOfTheDayPlugin extends CommandPlugin {
 
     private static final List<String> ALL_COMMANDS = Arrays.asList("pidor", "пидор");
-    private static final String INFO_FAGGOT_PENDING = "Пидор дня вычисляется.";
     private static final String INFO_FAGGOT_IS = "сегодня Пидор дня — ";
     private static final String INFO_FAGGOT_IS_YOU = INFO_FAGGOT_IS + "ты!";
 
-    private boolean isListening = false;
-    private Timer timer;
+    private static final long PERIOD = TimeUnit.DAYS.toMillis(1);
 
     private final Set<Occupant> occupants = new HashSet<>();
     private Occupant faggot;
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final AtomicBoolean startedListener = new AtomicBoolean(false);
+    private final Timer timer = new Timer();
     private final Random random = new Random();
+
+    @Override
+    public void init() {
+        startTimer();
+    }
 
     @Override
     public String processCommand(Message message, Matcher matcher)
             throws LogicException, ClientAuthException {
         startListening();
-        startTimer();
 
         if (faggot == null) {
-            return INFO_FAGGOT_PENDING;
+            calculateFaggot();
         }
 
         final Occupant sender = getMUCManager().getMUCOccupant(message.getFrom());
@@ -109,12 +111,30 @@ public class FaggotOfTheDayPlugin extends CommandPlugin {
                 "Пример: " + sampleCommand;
     }
 
+    private void startTimer() {
+        timer.scheduleAtFixedRate(new TimerTask() {
+
+            @Override
+            public void run() {
+                log.info("🌚 A new day starts in the Empire 🌝");
+
+                calculateFaggot();
+            }
+
+        }, getFirstTime(), PERIOD);
+    }
+
+    private Date getFirstTime() {
+        final LocalTime midnight = LocalTime.MIDNIGHT;
+        final LocalDate today = LocalDate.now();
+        final LocalDateTime todayMidnight = LocalDateTime.of(today, midnight);
+        return Date.from(todayMidnight.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
     private void startListening() {
-        if (isListening) {
+        if (startedListener.getAndSet(true)) {
             return;
         }
-
-        isListening = true;
 
         getMUCManager().listMUCs().forEach(muc -> {
             muc.addMessageListener(message -> {
@@ -125,74 +145,32 @@ public class FaggotOfTheDayPlugin extends CommandPlugin {
         });
     }
 
-    private void startTimer() {
-        if (timer != null) {
+    private Set<Occupant> getAllOccupants(MultiUserChat muc) {
+        return muc.getOccupants().stream().map(muc::getOccupant)
+                .filter(occupant -> !occupant.getNick().equals(getBotNick()))
+                .collect(Collectors.toSet());
+    }
+
+    private void calculateFaggot() {
+        occupants.removeIf(occupant -> occupant.getNick().equals(getBotNick()));
+
+        if (occupants.isEmpty()) {
+            log.info("No contenders for Faggot of the Day today.");
+            if (faggot != null) {
+                log.info("{} remains Faggot of the Day!", faggot.getNick());
+            }
             return;
         }
 
-        timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
+        final String contenders = occupants.stream().map(Occupant::getNick)
+                    .collect(Collectors.joining(", "));
+        log.info("Contenders for today’s Faggot of the Day title: {}", contenders);
 
-            @Override
-            public void run() {
-                logger.info("🌚 A new day starts in the Empire 🌝");
+        final int i = random.nextInt(occupants.size());
+        faggot = occupants.stream().skip(i).findFirst().get();
+        log.info("{} becomes Faggot of the Day!", faggot.getNick());
 
-                occupants.removeIf(occupant -> {
-                    final String bareJid = XmppStringUtils.parseBareJid(occupant.getJid());
-                    return bareJid.equals(getBotJid());
-                });
-
-                if (occupants.isEmpty()) {
-                    logger.info("No contenders for Faggot of the Day today.");
-                    if (faggot != null) {
-                        logger.info("{} remains Faggot of the Day!", faggot.getNick());
-                    }
-                    return;
-                }
-
-                final String contenders = occupants.stream().map(Occupant::getNick)
-                            .collect(Collectors.joining(", "));
-                logger.info("Contenders for today’s Faggot of the Day title: {}", contenders);
-
-                final int i = random.nextInt(occupants.size());
-                faggot = occupants.stream().skip(i).findFirst().get();
-                logger.info("{} becomes Faggot of the Day!", faggot.getNick());
-
-                occupants.clear();
-            }
-
-        }, getFirstTime(), getPeriod());
-    }
-
-    private Date getFirstTime() {
-        final LocalTime midnight = LocalTime.MIDNIGHT;
-        final LocalDate today = LocalDate.now();
-        final LocalDateTime todayMidnight = LocalDateTime.of(today, midnight);
-        return Date.from(todayMidnight.atZone(ZoneId.systemDefault()).toInstant());
-    }
-
-    private long getPeriod() {
-        return TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS);
-    }
-
-    private Set<Occupant> getAllOccupants(MultiUserChat muc) {
-        return muc.getOccupants().stream().map(muc::getOccupant).filter(occupant -> {
-
-            final String jid = occupant.getJid();
-            if (jid == null) {
-                return false;
-            }
-
-            final String bareJid = XmppStringUtils.parseBareJid(jid);
-            return !bareJid.equals(getBotJid());
-
-        }).collect(Collectors.toSet());
-    }
-
-    private String getBotJid() {
-        final String login = getSettingsManager().getStringSetting("login");
-        final String server = getSettingsManager().getStringSetting("server");
-        return XmppStringUtils.completeJidFrom(login, server);
+        occupants.clear();
     }
 
 }
