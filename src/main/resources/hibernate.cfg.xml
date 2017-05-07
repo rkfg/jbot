@@ -17,7 +17,5 @@
   <mapping class="me.rkfg.xmpp.bot.domain.MarkovFirstWord"/>
   <mapping class="me.rkfg.xmpp.bot.domain.MarkovFirstWordCount"/>
   <mapping class="me.rkfg.xmpp.bot.domain.Opinion"/>
-  <mapping class="me.rkfg.xmpp.bot.domain.Contender"/>
-  <mapping class="me.rkfg.xmpp.bot.domain.Winning"/>
  </session-factory>
 </hibernate-configuration>
