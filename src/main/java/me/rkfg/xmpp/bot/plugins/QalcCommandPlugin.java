@@ -20,7 +20,8 @@ public class QalcCommandPlugin extends CommandPlugin {
     public String processCommand(Message message, Matcher matcher) throws ClientAuthenticationException, LogicException {
         try {
             String inp = matcher.group(COMMAND_GROUP);
-            if (inp.contains("load") || inp.contains("export")) {
+            String inpCheck = inp.toLowerCase();
+            if (inpCheck.contains("load") || inpCheck.contains("export")) {
                 return "команды для работы с файлами заблокированы.";
             }
             Process processQalc = Runtime.getRuntime().exec(new String[] { "qalc", inp });
