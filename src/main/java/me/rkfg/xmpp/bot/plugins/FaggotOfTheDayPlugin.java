@@ -162,12 +162,17 @@ public final class FaggotOfTheDayPlugin extends CommandPlugin {
             return;
         }
 
-        final String contenders = occupants.stream().map(Occupant::getNick)
-                    .collect(Collectors.joining(", "));
-        log.info("Contenders for today’s Faggot of the Day title: {}", contenders);
+        final Set<String> uniqueJids = occupants.stream()
+                .map(Occupant::getJid)
+                .map(XmppStringUtils::parseBareJid)
+                .collect(Collectors.toSet());
+        log.info("Contenders for today’s Faggot of the Day title: {}", uniqueJids);
 
-        final int i = random.nextInt(occupants.size());
-        faggot = occupants.stream().skip(i).findFirst().get();
+        final int i = random.nextInt(uniqueJids.size());
+        final String faggotJid = uniqueJids.stream().skip(i).findFirst().get();
+        faggot = occupants.stream()
+                .filter(occupant -> faggotJid.equals(XmppStringUtils.parseBareJid(occupant.getJid())))
+                .findFirst().get();
         log.info("{} becomes Faggot of the Day!", faggot.getNick());
 
         occupants.clear();
