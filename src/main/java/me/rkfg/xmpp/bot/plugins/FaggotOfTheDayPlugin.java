@@ -89,7 +89,7 @@ public final class FaggotOfTheDayPlugin extends CommandPlugin {
 
         final String roomJid = XmppStringUtils.parseBareJid(message.getFrom());
         final Occupant occupant = Optional
-                .of(getMUCManager().listMUCOccupantsByJID(roomJid).get(faggotJid))
+                .ofNullable(getMUCManager().listMUCOccupantsByJID(roomJid).get(faggotJid))
                 .orElse(faggot);
 
         return INFO_FAGGOT_IS + occupant.getNick() + ".";
