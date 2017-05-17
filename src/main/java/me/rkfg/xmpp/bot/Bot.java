@@ -12,21 +12,21 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jivesoftware.smack.AbstractConnectionListener;
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
-import org.jivesoftware.smack.chat.ChatManagerListener;
-import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.chat.ChatManager.MatchMode;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.IQTypeFilter;
 import org.jivesoftware.smack.filter.StanzaTypeFilter;
+import org.jivesoftware.smack.packet.IQ.Type;
+import org.jivesoftware.smack.parsing.ParsingExceptionCallback;
+import org.jivesoftware.smack.parsing.UnparsablePacket;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Stanza;
-import org.jivesoftware.smack.packet.IQ.Type;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.iqversion.packet.Version;
@@ -42,16 +42,16 @@ import ru.ppsrk.gwt.server.HibernateUtil;
 import ru.ppsrk.gwt.server.SettingsManager;
 
 public enum Bot {
-    
+
     INSTANCE;
-    
+
     private static final String PLUGINS_PACKAGE_NAME = "me.rkfg.xmpp.bot.plugins.";
     private Logger log = LoggerFactory.getLogger(Main.class);
     private String nick;
     private MUCManager mucManager = new MUCManager();
     private SettingsManager sm = SettingsManager.getInstance();
     private ExecutorService outgoingMsgsExecutor = Executors.newSingleThreadExecutor();
-    private List<MessagePlugin> plugins = new LinkedList<MessagePlugin>();
+    private List<MessagePlugin> plugins = new LinkedList<>();
     private ExecutorService commandExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 4);
     private XMPPTCPConnection connection;
     private String[] mucs;
@@ -88,6 +88,12 @@ public enum Bot {
         XMPPTCPConnectionConfiguration conf = XMPPTCPConnectionConfiguration.builder().setServiceName(sm.getStringSetting("server"))
                 .build();
         connection = new XMPPTCPConnection(conf);
+        connection.setParsingExceptionCallback(new ParsingExceptionCallback() {
+            @Override
+            public void handleUnparsablePacket(UnparsablePacket stanzaData) throws Exception {
+                log.warn("Parsing error: {}\nContent:{}", stanzaData.getParsingException(), stanzaData.getContent());
+            }
+        });
         connection.addConnectionListener(new AbstractConnectionListener() {
             @Override
             public void reconnectionSuccessful() {
@@ -108,21 +114,18 @@ public enum Bot {
             public void connectionClosedOnError(Exception e) {
                 connect();
             }
+
+            @Override
+            public void reconnectionFailed(Exception e) {
+                connect();
+            }
         });
         connect();
         ChatManager.setDefaultMatchMode(MatchMode.SUPPLIED_JID);
-        getChatManagerInstance().addChatListener(new ChatManagerListener() {
-
-            @Override
-            public void chatCreated(Chat chat, boolean createdLocally) {
-                chat.addMessageListener(new ChatMessageListener() {
-
-                    @Override
-                    public void processMessage(Chat chat, Message message) {
-                        Bot.this.processMessage(new ChatAdapterImpl(chat), message);
-                    }
-                });
-            }
+        getChatManagerInstance().addChatListener((Chat chat, boolean createdLocally) -> {
+            chat.addMessageListener((Chat chat2, Message message) -> {
+                Bot.this.processMessage(new ChatAdapterImpl(chat2), message);
+            });
         });
         connection.addAsyncStanzaListener(new StanzaListener() {
 
@@ -198,36 +201,32 @@ public enum Bot {
     }
 
     public void processMessage(final ChatAdapter chat, final Message message) {
-        commandExecutor.submit(new Runnable() {
-
-            @Override
-            public void run() {
-                if (nick.equals(XmppStringUtils.parseResource(message.getFrom()))) {
-                    return;
-                }
-                if (message.getSubject() != null && !message.getSubject().isEmpty()) {
-                    return;
-                }
-                if (message.getExtension("replace", "urn:xmpp:message-correct:0") != null) {
-                    // skip XEP-0308 corrections
-                    return;
-                }
-                String text = message.getBody();
-                log.info("<{}>: {}", message.getFrom(), text);
-                for (MessagePlugin plugin : plugins) {
-                    Pattern pattern = plugin.getPattern();
-                    if (pattern != null) {
-                        Matcher matcher = pattern.matcher(text);
-                        if (matcher.find()) {
-                            try {
-                                String result = plugin.process(message, matcher);
-                                if (result != null && !result.isEmpty()) {
-                                    sendMessage(chat, StringEscapeUtils.unescapeHtml4(result));
-                                    break;
-                                }
-                            } catch (Throwable e) {
-                                e.printStackTrace();
+        commandExecutor.submit(() -> {
+            if (nick.equals(XmppStringUtils.parseResource(message.getFrom()))) {
+                return;
+            }
+            if (message.getSubject() != null && !message.getSubject().isEmpty()) {
+                return;
+            }
+            if (message.getExtension("replace", "urn:xmpp:message-correct:0") != null) {
+                // skip XEP-0308 corrections
+                return;
+            }
+            String text = message.getBody();
+            log.info("<{}>: {}", message.getFrom(), text);
+            for (MessagePlugin plugin : plugins) {
+                Pattern pattern = plugin.getPattern();
+                if (pattern != null) {
+                    Matcher matcher = pattern.matcher(text);
+                    if (matcher.find()) {
+                        try {
+                            String result = plugin.process(message, matcher);
+                            if (result != null && !result.isEmpty()) {
+                                sendMessage(chat, StringEscapeUtils.unescapeHtml4(result));
+                                break;
                             }
+                        } catch (Throwable e) {
+                            e.printStackTrace();
                         }
                     }
                 }
