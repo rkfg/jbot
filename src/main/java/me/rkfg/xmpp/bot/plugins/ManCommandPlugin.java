@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 import org.apache.commons.lang3.StringUtils;
 import org.jivesoftware.smack.packet.Message;
 
-import me.rkfg.xmpp.bot.Bot;
+import me.rkfg.xmpp.bot.Main;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 
@@ -38,7 +38,7 @@ public class ManCommandPlugin extends CommandPlugin {
     }
 
     private List<MessagePlugin> getPlugins() {
-        return Bot.INSTANCE.getPlugins();
+        return Main.INSTANCE.getPlugins();
     }
 
     @Override

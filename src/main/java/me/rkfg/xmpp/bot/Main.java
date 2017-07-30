@@ -6,8 +6,10 @@ import org.jivesoftware.smack.SmackException;
 
 public class Main {
 
+    public static Bot INSTANCE = new Bot();
+    
     public static void main(String[] args) throws InterruptedException, SmackException, IOException {
-        Bot.INSTANCE.run();
+        INSTANCE.run();
     }
 
 }

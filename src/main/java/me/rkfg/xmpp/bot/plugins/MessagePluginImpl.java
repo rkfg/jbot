@@ -7,9 +7,9 @@ import org.jxmpp.util.XmppStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import me.rkfg.xmpp.bot.Bot;
 import me.rkfg.xmpp.bot.ChatAdapter;
 import me.rkfg.xmpp.bot.MUCManager;
+import me.rkfg.xmpp.bot.Main;
 import ru.ppsrk.gwt.server.SettingsManager;
 
 public abstract class MessagePluginImpl implements MessagePlugin {
@@ -65,30 +65,30 @@ public abstract class MessagePluginImpl implements MessagePlugin {
     }
 
     protected SettingsManager getSettingsManager() {
-        return Bot.INSTANCE.getSettingsManager();
+        return Main.INSTANCE.getSettingsManager();
     }
 
     protected MUCManager getMUCManager() {
-        return Bot.INSTANCE.getMUCManager();
+        return Main.INSTANCE.getMUCManager();
     }
 
     protected ChatManager getChatManagerInstance() {
-        return Bot.INSTANCE.getChatManagerInstance();
+        return Main.INSTANCE.getChatManagerInstance();
     }
 
     protected void sendMUCMessage(String message, String mucName) {
-        Bot.INSTANCE.sendMUCMessage(message, mucName);
+        Main.INSTANCE.sendMUCMessage(message, mucName);
     }
 
     protected void sendMessage(ChatAdapter chatAdapter, String message) {
-        Bot.INSTANCE.sendMessage(chatAdapter, message);
+        Main.INSTANCE.sendMessage(chatAdapter, message);
     }
 
     protected void sendMUCMessage(String message) {
-        Bot.INSTANCE.sendMUCMessage(message);
+        Main.INSTANCE.sendMUCMessage(message);
     }
 
     protected String getBotNick() {
-        return Bot.INSTANCE.getBotNick();
+        return Main.INSTANCE.getBotNick();
     }
 }

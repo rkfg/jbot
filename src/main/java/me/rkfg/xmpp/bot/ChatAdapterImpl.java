@@ -9,7 +9,7 @@ public class ChatAdapterImpl extends LoggingChatAdapter {
     private Chat chat;
 
     public ChatAdapterImpl(Chat chat) {
-        super(Bot.INSTANCE.getBotNick() + " ⇒ " + chat.getParticipant());
+        super(Main.INSTANCE.getBotNick() + " ⇒ " + chat.getParticipant());
         this.chat = chat;
     }
 

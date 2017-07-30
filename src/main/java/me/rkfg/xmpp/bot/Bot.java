@@ -41,9 +41,7 @@ import me.rkfg.xmpp.bot.plugins.MessagePlugin;
 import ru.ppsrk.gwt.server.HibernateUtil;
 import ru.ppsrk.gwt.server.SettingsManager;
 
-public enum Bot {
-
-    INSTANCE;
+public class Bot {
 
     private static final String PLUGINS_PACKAGE_NAME = "me.rkfg.xmpp.bot.plugins.";
     private Logger log = LoggerFactory.getLogger(Main.class);
