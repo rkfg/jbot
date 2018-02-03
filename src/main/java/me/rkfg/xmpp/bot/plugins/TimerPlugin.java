@@ -13,8 +13,9 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.jivesoftware.smack.packet.Message;
 import org.jxmpp.util.XmppStringUtils;
+
+import me.rkfg.xmpp.bot.message.Message;
 
 public class TimerPlugin extends CommandPlugin
 {

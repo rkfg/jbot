@@ -7,8 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import org.jivesoftware.smack.packet.Message;
-
+import me.rkfg.xmpp.bot.message.Message;
 import ru.ppsrk.gwt.client.ClientAuthenticationException;
 import ru.ppsrk.gwt.client.LogicException;
 

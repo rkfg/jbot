@@ -18,17 +18,7 @@
 
 package me.rkfg.xmpp.bot.plugins;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.jivesoftware.smack.packet.Message;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.safety.Whitelist;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ru.ppsrk.gwt.client.ClientAuthException;
-import ru.ppsrk.gwt.client.LogicException;
+import static org.jsoup.helper.HttpConnection.*;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -39,7 +29,18 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.jsoup.helper.HttpConnection.DEFAULT_UA;
+import org.apache.commons.lang3.ArrayUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.TextNode;
+import org.jsoup.safety.Whitelist;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import me.rkfg.xmpp.bot.message.Message;
+import ru.ppsrk.gwt.client.ClientAuthException;
+import ru.ppsrk.gwt.client.LogicException;
 
 /**
  * Fetches random stories from different websites.

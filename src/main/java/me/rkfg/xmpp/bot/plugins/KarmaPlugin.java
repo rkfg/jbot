@@ -9,11 +9,11 @@ import java.util.TimerTask;
 import java.util.regex.Matcher;
 
 import org.hibernate.Session;
-import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.muc.Occupant;
 
 import me.rkfg.xmpp.bot.domain.Karma;
 import me.rkfg.xmpp.bot.domain.KarmaHistory;
+import me.rkfg.xmpp.bot.message.Message;
 import me.rkfg.xmpp.bot.nxt.NXTAPI;
 import me.rkfg.xmpp.bot.nxt.Transaction;
 import ru.ppsrk.gwt.client.ClientAuthException;
@@ -96,7 +96,7 @@ public class KarmaPlugin extends CommandPlugin {
                 }
                 karmas = session.createQuery("from Karma k order by k.karma").list();
                 StringBuilder sb = new StringBuilder("Карма участников:\n");
-                Map<String, Occupant> occupants = getMUCManager().listMUCOccupantsByJID(getBareAddress(message));
+                Map<String, Occupant> occupants = getMUCManager().listMUCOccupantsByJID(message.getFromRoom());
                 for (Karma karma : karmas) {
                     String name = karma.getJid();
                     Occupant jidOccupant = occupants.get(name);

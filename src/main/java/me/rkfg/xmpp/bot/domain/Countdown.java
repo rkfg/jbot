@@ -15,6 +15,7 @@ public class Countdown extends BasicDomain {
     @Temporal(TemporalType.TIMESTAMP)
     Date date;
     String creator;
+    String room;
     Boolean groupchat;
     Boolean notified;
 
@@ -40,6 +41,14 @@ public class Countdown extends BasicDomain {
 
     public void setCreator(String creator) {
         this.creator = creator;
+    }
+
+    public String getRoom() {
+        return room;
+    }
+
+    public void setRoom(String room) {
+        this.room = room;
     }
 
     public Boolean getGroupchat() {

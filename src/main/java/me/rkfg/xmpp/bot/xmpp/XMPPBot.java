@@ -1,9 +1,6 @@
-package me.rkfg.xmpp.bot;
+package me.rkfg.xmpp.bot.xmpp;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
@@ -23,10 +20,10 @@ import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.IQTypeFilter;
 import org.jivesoftware.smack.filter.StanzaTypeFilter;
 import org.jivesoftware.smack.packet.IQ.Type;
-import org.jivesoftware.smack.parsing.ParsingExceptionCallback;
-import org.jivesoftware.smack.parsing.UnparsablePacket;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Stanza;
+import org.jivesoftware.smack.parsing.ParsingExceptionCallback;
+import org.jivesoftware.smack.parsing.UnparsablePacket;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.iqversion.packet.Version;
@@ -37,51 +34,25 @@ import org.jxmpp.util.XmppStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.rkfg.xmpp.bot.BotBase;
+import me.rkfg.xmpp.bot.Main;
+import me.rkfg.xmpp.bot.message.XMPPMessage;
 import me.rkfg.xmpp.bot.plugins.MessagePlugin;
-import ru.ppsrk.gwt.server.HibernateUtil;
 import ru.ppsrk.gwt.server.SettingsManager;
 
-public class Bot {
+public class XMPPBot extends BotBase {
 
-    private static final String PLUGINS_PACKAGE_NAME = "me.rkfg.xmpp.bot.plugins.";
     private Logger log = LoggerFactory.getLogger(Main.class);
-    private String nick;
     private MUCManager mucManager = new MUCManager();
     private SettingsManager sm = SettingsManager.getInstance();
     private ExecutorService outgoingMsgsExecutor = Executors.newSingleThreadExecutor();
-    private List<MessagePlugin> plugins = new LinkedList<>();
     private ExecutorService commandExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 4);
     private XMPPTCPConnection connection;
     private String[] mucs;
 
+    @Override
     public void run() {
-        log.info("Starting up...");
-        sm.setFilename("settings.ini");
-        try {
-            sm.loadSettings();
-        } catch (FileNotFoundException e) {
-            log.warn("settings.ini not found!", e);
-            return;
-        } catch (IOException e) {
-            log.warn("settings.ini can't be read!", e);
-            return;
-        }
-        sm.setDefault("nick", "Talho-san");
-        sm.setDefault("login", "talho");
-        sm.setDefault("resource", "jbot");
-        sm.setDefault("usedb", "0");
-        if (sm.getIntegerSetting("usedb") != 0) {
-            HibernateUtil.initSessionFactory("hibernate.cfg.xml");
-        }
-
-        nick = sm.getStringSetting("nick");
-        String pluginClasses = sm.getStringSetting("plugins");
-        loadPlugins(pluginClasses);
-        log.info("Plugins loaded, initializing...");
-        for (MessagePlugin plugin : plugins) {
-            plugin.init();
-        }
-        log.info("Plugins initializion complete.");
+        init();
         mucs = org.apache.commons.lang3.StringUtils.split(sm.getStringSetting("join"), ',');
         XMPPTCPConnectionConfiguration conf = XMPPTCPConnectionConfiguration.builder().setServiceName(sm.getStringSetting("server"))
                 .build();
@@ -122,7 +93,7 @@ public class Bot {
         ChatManager.setDefaultMatchMode(MatchMode.SUPPLIED_JID);
         getChatManagerInstance().addChatListener((Chat chat, boolean createdLocally) -> {
             chat.addMessageListener((Chat chat2, Message message) -> {
-                Bot.this.processMessage(new ChatAdapterImpl(chat2), message);
+                XMPPBot.this.processMessage(new ChatAdapterImpl(chat2), message);
             });
         });
         connection.addAsyncStanzaListener(new StanzaListener() {
@@ -181,23 +152,6 @@ public class Bot {
         }
     }
 
-    private void loadPlugins(String pluginClassesNamesStr) {
-        String[] pluginClassesNames = pluginClassesNamesStr.split(",\\s?");
-        log.debug("Plugins found: {}", (Object) pluginClassesNames);
-        for (String pluginName : pluginClassesNames) {
-            try {
-                Class<? extends MessagePlugin> clazz = Class.forName(PLUGINS_PACKAGE_NAME + pluginName).asSubclass(MessagePlugin.class);
-                plugins.add(clazz.newInstance());
-            } catch (ClassNotFoundException e) {
-                log.warn("Couldn't load plugin {}: {}", pluginName, e);
-            } catch (InstantiationException e) {
-                log.warn("Couldn't load plugin {}: {}", pluginName, e);
-            } catch (IllegalAccessException e) {
-                log.warn("Couldn't load plugin {}: {}", pluginName, e);
-            }
-        }
-    }
-
     public void processMessage(final ChatAdapter chat, final Message message) {
         commandExecutor.submit(() -> {
             if (nick.equals(XmppStringUtils.parseResource(message.getFrom()))) {
@@ -218,7 +172,7 @@ public class Bot {
                     Matcher matcher = pattern.matcher(text);
                     if (matcher.find()) {
                         try {
-                            String result = plugin.process(message, matcher);
+                            String result = plugin.process(new XMPPMessage(message), matcher);
                             if (result != null && !result.isEmpty()) {
                                 sendMessage(chat, StringEscapeUtils.unescapeHtml4(result));
                                 break;
@@ -251,31 +205,22 @@ public class Bot {
         });
     }
 
-    public String getBotNick() {
-        return nick;
-    }
-
-    public void sendMUCMessage(String message) {
+    @Override
+    public void sendMessage(String message) {
         for (MUCParams mucParams : mucManager.listMUCParams()) {
             sendMessage(mucParams.getMucAdapted(), message);
         }
     }
 
-    public void sendMUCMessage(String message, String mucName) {
+    @Override
+    public String sendMessage(String message, String mucName) {
         for (MultiUserChat multiUserChat : mucManager.listMUCs()) {
             if (multiUserChat.getRoom().equals(mucName)) {
                 sendMessage(mucManager.getMUCParams(multiUserChat).getMucAdapted(), message);
-                return;
+                return "";
             }
         }
-    }
-
-    public SettingsManager getSettingsManager() {
-        return sm;
-    }
-
-    public List<MessagePlugin> getPlugins() {
-        return plugins;
+        return null;
     }
 
     public MUCManager getMUCManager() {

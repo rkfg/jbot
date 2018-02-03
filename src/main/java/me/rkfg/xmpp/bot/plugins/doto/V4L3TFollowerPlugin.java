@@ -12,8 +12,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.jivesoftware.smack.packet.Message;
 
+import me.rkfg.xmpp.bot.message.Message;
 import me.rkfg.xmpp.bot.plugins.CommandPlugin;
 import ru.ppsrk.gwt.client.ClientAuthenticationException;
 import ru.ppsrk.gwt.client.LogicException;

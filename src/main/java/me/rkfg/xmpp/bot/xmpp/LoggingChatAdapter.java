@@ -1,4 +1,4 @@
-package me.rkfg.xmpp.bot;
+package me.rkfg.xmpp.bot.xmpp;
 
 import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPException;

@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 
 import org.hibernate.Session;
-import org.jivesoftware.smack.packet.Message;
 
+import me.rkfg.xmpp.bot.message.Message;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 import ru.ppsrk.gwt.server.HibernateCallback;

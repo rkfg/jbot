@@ -26,8 +26,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.jivesoftware.smack.packet.Message;
-
+import me.rkfg.xmpp.bot.message.Message;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 
@@ -48,18 +47,8 @@ public final class RollPlugin extends CommandPlugin {
     private static final int MAX_DICE = 10;
     private static final int MAX_SIDES = 120;
 
-    private static final String[] FUNNY_ERRORS = new String[] {
-            "\uD83C\uDF1D",
-            "чух.",
-            "пук.",
-            "вуф.",
-            "хрюк.",
-            "среньк.",
-            "тупица.",
-            "RTFM.",
-            "ты понимаешь, что ты нулевой?",
-            "do that again and I will kill you.",
-    };
+    private static final String[] FUNNY_ERRORS = new String[] { "\uD83C\uDF1D", "чух.", "пук.", "вуф.", "хрюк.", "среньк.", "тупица.",
+            "RTFM.", "ты понимаешь, что ты нулевой?", "do that again and I will kill you.", };
 
     @Override
     public List<String> getCommand() {
@@ -71,20 +60,13 @@ public final class RollPlugin extends CommandPlugin {
         final String commands = COMMANDS.stream().collect(Collectors.joining("|"));
         final String command = PREFIX + COMMANDS.get(0);
 
-        return "сгенерировать случайное число в диапазоне от 1 до " + Integer.toString(DEFAULT_LIMIT) + ".\n" +
-                "Формат: <" + commands + ">\n" +
-                "Пример: " + command + "\n" +
-                "\n" +
-                "Сгенерировать случайное число в диапазоне от 1 до заданной верхней границы.\n" +
-                "Максимальная верхняя граница: 999999.\n" +
-                "Формат: <" + commands + "> <верхняя граница>\n" +
-                "Пример: " + command + " 20\n" +
-                "\n" +
-                "Бросить заданное количество костей с заданным числом граней.\n" +
-                "Максимальное количество костей: " + Integer.toString(MAX_DICE) + ".\n" +
-                "Максимальное число граней у кости: " + Integer.toString(MAX_SIDES) + ".\n" +
-                "Формат: <" + commands + "> <количество костей>d<число граней>\n" +
-                "Пример: " + command + " 5d6\n";
+        return "сгенерировать случайное число в диапазоне от 1 до " + Integer.toString(DEFAULT_LIMIT) + ".\n" + "Формат: <" + commands
+                + ">\n" + "Пример: " + command + "\n" + "\n"
+                + "Сгенерировать случайное число в диапазоне от 1 до заданной верхней границы.\n"
+                + "Максимальная верхняя граница: 999999.\n" + "Формат: <" + commands + "> <верхняя граница>\n" + "Пример: " + command
+                + " 20\n" + "\n" + "Бросить заданное количество костей с заданным числом граней.\n" + "Максимальное количество костей: "
+                + Integer.toString(MAX_DICE) + ".\n" + "Максимальное число граней у кости: " + Integer.toString(MAX_SIDES) + ".\n"
+                + "Формат: <" + commands + "> <количество костей>d<число граней>\n" + "Пример: " + command + " 5d6\n";
     }
 
     @Override
@@ -122,9 +104,7 @@ public final class RollPlugin extends CommandPlugin {
             return randomError();
         }
 
-        return IntStream.range(0, count)
-                .map(i -> ThreadLocalRandom.current().nextInt(1, sides + 1))
-                .mapToObj(Integer::toString)
+        return IntStream.range(0, count).map(i -> ThreadLocalRandom.current().nextInt(1, sides + 1)).mapToObj(Integer::toString)
                 .collect(Collectors.joining(", ")) + ".";
     }
 

@@ -19,10 +19,10 @@ import org.apache.commons.cli.Options;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.PropertyNamingStrategy;
-import org.jivesoftware.smack.packet.Message;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import me.rkfg.xmpp.bot.message.Message;
 import me.rkfg.xmpp.bot.plugins.doto.json.Ban;
 import me.rkfg.xmpp.bot.plugins.doto.json.Game;
 import me.rkfg.xmpp.bot.plugins.doto.json.LiveGames;

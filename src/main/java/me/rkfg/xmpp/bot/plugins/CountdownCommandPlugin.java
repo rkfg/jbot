@@ -16,10 +16,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-import org.jivesoftware.smack.packet.Message;
 
-import me.rkfg.xmpp.bot.ChatAdapterImpl;
 import me.rkfg.xmpp.bot.domain.Countdown;
+import me.rkfg.xmpp.bot.message.Message;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 import ru.ppsrk.gwt.server.HibernateCallback;
@@ -56,12 +55,13 @@ public class CountdownCommandPlugin extends CommandPlugin {
                             for (Countdown countdown : countdowns) {
                                 String dateStr = getFormatFull().format(countdown.getDate());
                                 if (Boolean.TRUE.equals(countdown.getGroupchat())) {
-                                    sendMUCMessage(String.format("%s, наступает событие: %s [%s]", getNick(countdown.getCreator()),
-                                            countdown.getName(), dateStr), getBareAddress(countdown.getCreator()));
+                                    sendMUCMessage(String.format("%s, наступает событие: %s [%s]", countdown.getCreator(),
+                                            countdown.getName(), dateStr), countdown.getRoom());
                                 } else {
-                                    sendMessage(new ChatAdapterImpl(getChatManagerInstance().createChat(countdown.getCreator(), null)),
-                                            String.format("Наступает событие: %s [%s]", countdown.getName(), dateStr));
-                                }
+                                    /*
+                                     * sendMessage(new ChatAdapterImpl(getChatManagerInstance().createChat(countdown.getCreator(), null)),
+                                     * String.format("Наступает событие: %s [%s]", countdown.getName(), dateStr));
+                                     */ }
                                 countdown.setNotified(true);
                             }
                             return null;
@@ -157,11 +157,12 @@ public class CountdownCommandPlugin extends CommandPlugin {
                 Countdown countdown = new Countdown();
                 countdown.setDate(date);
                 countdown.setName(name);
-                boolean fromGroupchat = isFromGroupchat(message);
+                boolean fromGroupchat = message.isFromGroupchat();
+                countdown.setCreator(message.getNick());
                 if (fromGroupchat) {
-                    countdown.setCreator(message.getFrom());
+                    countdown.setRoom(message.getFromRoom());
                 } else {
-                    countdown.setCreator(getBareAddress(message.getFrom()));
+                    countdown.setRoom(message.getFrom());
                 }
                 countdown.setGroupchat(fromGroupchat);
                 session.save(countdown);
@@ -176,10 +177,10 @@ public class CountdownCommandPlugin extends CommandPlugin {
             @Override
             public String run(Session session) throws LogicException, ClientAuthException {
                 Criteria criteria = session.createCriteria(Countdown.class).add(Restrictions.like("name", "%" + name + "%"));
-                if (isFromGroupchat(message)) {
+                if (message.isFromGroupchat()) {
                     criteria.add(Restrictions.eq("groupchat", true));
                 } else {
-                    criteria.add(Restrictions.eq("groupchat", false)).add(Restrictions.eq("creator", getBareAddress(message)));
+                    criteria.add(Restrictions.eq("groupchat", false)).add(Restrictions.eq("creator", message.getFrom()));
                 }
                 @SuppressWarnings("unchecked")
                 List<Countdown> countdowns = criteria.list();

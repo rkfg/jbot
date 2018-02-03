@@ -7,16 +7,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import me.rkfg.xmpp.bot.Utils;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.jivesoftware.smack.packet.Message;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import me.rkfg.xmpp.bot.Utils;
+import me.rkfg.xmpp.bot.message.Message;
 
 public class GoogleCommandPlugin extends CommandPlugin {
 

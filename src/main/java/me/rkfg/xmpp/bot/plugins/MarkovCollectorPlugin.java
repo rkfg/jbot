@@ -4,15 +4,14 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import me.rkfg.xmpp.bot.domain.Markov;
-import me.rkfg.xmpp.bot.domain.MarkovFirstWord;
-import me.rkfg.xmpp.bot.domain.MarkovFirstWordCount;
-
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.NonUniqueResultException;
 import org.hibernate.Session;
-import org.jivesoftware.smack.packet.Message;
 
+import me.rkfg.xmpp.bot.domain.Markov;
+import me.rkfg.xmpp.bot.domain.MarkovFirstWord;
+import me.rkfg.xmpp.bot.domain.MarkovFirstWordCount;
+import me.rkfg.xmpp.bot.message.Message;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 import ru.ppsrk.gwt.server.HibernateCallback;
@@ -29,7 +28,7 @@ public class MarkovCollectorPlugin extends MessagePluginImpl {
 
     @Override
     public String process(Message message, final Matcher matcher) {
-        if (!isMessageFromUser(message)) {
+        if (!message.isFromUser()) {
             // don't store system messages
             return null;
         }

@@ -14,8 +14,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.jivesoftware.smack.packet.Message;
 import org.json.JSONObject;
+
+import me.rkfg.xmpp.bot.message.Message;
 
 public class VKRepostPlugin extends MessagePluginImpl {
 

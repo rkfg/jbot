@@ -16,8 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jivesoftware.smack.packet.Message;
-
+import me.rkfg.xmpp.bot.message.Message;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 
@@ -88,7 +87,7 @@ public class ClimatePlugin extends CommandPlugin {
 
     @Override
     public String process(Message message, Matcher matcher) {
-        if (!isMessageFromUser(message)) {
+        if (!message.isFromUser()) {
             // don't store system messages
             return null;
         }

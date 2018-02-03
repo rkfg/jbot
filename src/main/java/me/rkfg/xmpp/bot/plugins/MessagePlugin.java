@@ -3,7 +3,7 @@ package me.rkfg.xmpp.bot.plugins;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jivesoftware.smack.packet.Message;
+import me.rkfg.xmpp.bot.message.Message;
 
 public interface MessagePlugin {
     public Pattern getPattern();

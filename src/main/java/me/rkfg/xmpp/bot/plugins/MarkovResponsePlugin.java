@@ -9,11 +9,11 @@ import java.util.regex.Pattern;
 
 import org.hibernate.NonUniqueResultException;
 import org.hibernate.Session;
-import org.jivesoftware.smack.packet.Message;
 
 import me.rkfg.xmpp.bot.domain.Markov;
 import me.rkfg.xmpp.bot.domain.MarkovFirstWord;
 import me.rkfg.xmpp.bot.domain.MarkovFirstWordCount;
+import me.rkfg.xmpp.bot.message.Message;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 import ru.ppsrk.gwt.server.HibernateCallback;
@@ -78,7 +78,7 @@ public class MarkovResponsePlugin extends MessagePluginImpl {
     @Override
     public String process(final Message message, final Matcher matcher) {
         try {
-            return getAppeal(message) + HibernateUtil.exec(new HibernateCallback<String>() {
+            return message.getAppeal() + HibernateUtil.exec(new HibernateCallback<String>() {
 
                 @Override
                 public String run(Session session) throws LogicException, ClientAuthException {

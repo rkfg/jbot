@@ -1,4 +1,4 @@
-package me.rkfg.xmpp.bot;
+package me.rkfg.xmpp.bot.xmpp;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,7 +13,6 @@ import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smackx.muc.DefaultParticipantStatusListener;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
@@ -21,6 +20,8 @@ import org.jivesoftware.smackx.muc.Occupant;
 import org.jxmpp.util.XmppStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import me.rkfg.xmpp.bot.Main;
 
 public class MUCManager {
     private static Logger log = LoggerFactory.getLogger(Main.class);
@@ -115,16 +116,6 @@ public class MUCManager {
         };
         muc.addMessageListener(messageListener);
         mucParams.setMessageListener(messageListener);
-        DefaultParticipantStatusListener participantStatusListener = new DefaultParticipantStatusListener() {
-
-            @Override
-            public void kicked(String participant, String actor, String reason) {
-                Main.INSTANCE.sendMessage(mucAdapted, String.format("Ха-ха, загнали под шконарь %s! %s", XmppStringUtils.parseResource(participant),
-                        !reason.isEmpty() ? "Мотивировали тем, что " + reason : "Без всякой мотивации."));
-            }
-        };
-        muc.addParticipantStatusListener(participantStatusListener);
-        mucParams.setParticipantStatusListener(participantStatusListener);
         mucsList.put(muc, mucParams);
         mucsJIDs.put(muc.getRoom(), muc);
         log.info("Joined {}", muc.getRoom());

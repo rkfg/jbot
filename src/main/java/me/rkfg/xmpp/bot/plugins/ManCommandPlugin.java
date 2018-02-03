@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jivesoftware.smack.packet.Message;
 
 import me.rkfg.xmpp.bot.Main;
+import me.rkfg.xmpp.bot.message.Message;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 

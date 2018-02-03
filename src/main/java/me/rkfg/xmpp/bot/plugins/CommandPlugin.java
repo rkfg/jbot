@@ -5,8 +5,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jivesoftware.smack.packet.Message;
 
+import me.rkfg.xmpp.bot.message.Message;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 
@@ -25,17 +25,16 @@ public abstract class CommandPlugin extends MessagePluginImpl {
 
     @Override
     public String process(Message message, Matcher matcher) {
-        if (!isMessageFromUser(message)) {
+        if (!message.isFromUser()) {
             return null;
         }
         try {
-            String target = getNick(message);
+            String target = message.getNick();
             if (matcher.group(REDIRECT_GROUP) != null) {
                 target = matcher.group(REDIRECT_GROUP);
             }
-            return getAppeal(message, target) + processCommand(message, matcher);
+            return message.getAppeal(target) + processCommand(message, matcher);
         } catch (final ClientAuthException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (final LogicException e) {
             log.warn("LogicError while processing command: ", e);

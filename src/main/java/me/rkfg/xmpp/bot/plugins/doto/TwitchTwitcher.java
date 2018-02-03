@@ -10,12 +10,12 @@ import java.util.regex.Matcher;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
-import org.jivesoftware.smack.packet.Message;
 
 import de.tobj.twitch.streamobserver.TwitchStreamObserver;
 import de.tobj.twitch.streamobserver.channel.event.StreamStatusEvent;
 import de.tobj.twitch.streamobserver.channel.event.StreamUpdateEvent;
 import de.tobj.twitch.streamobserver.channel.listener.StreamListener;
+import me.rkfg.xmpp.bot.message.Message;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 import ru.ppsrk.gwt.server.SettingsManager;

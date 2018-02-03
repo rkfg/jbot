@@ -17,10 +17,11 @@ import java.util.regex.Matcher;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.jivesoftware.smack.packet.Message;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+
+import me.rkfg.xmpp.bot.message.Message;
 
 /**
  *

@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jivesoftware.smack.packet.Message;
+import me.rkfg.xmpp.bot.message.Message;
 
 public class StdinPlugin extends MessagePluginImpl {
 

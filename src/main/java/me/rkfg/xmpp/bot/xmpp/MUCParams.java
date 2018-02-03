@@ -1,4 +1,4 @@
-package me.rkfg.xmpp.bot;
+package me.rkfg.xmpp.bot.xmpp;
 
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smackx.muc.ParticipantStatusListener;
