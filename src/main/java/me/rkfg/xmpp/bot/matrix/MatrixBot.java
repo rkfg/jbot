@@ -48,7 +48,7 @@ public class MatrixBot extends BotBase {
             .setConnectionRequestTimeout(TIMEOUT).build();
     private Logger log = LoggerFactory.getLogger(getClass());
     private StateManager stateManager = new StateManager();
-    private Map<String, Transaction> events = new HashMap<>();
+    private Map<String, Transaction> pendingEvents = new HashMap<>();
 
     @Override
     public void run() {
@@ -66,39 +66,56 @@ public class MatrixBot extends BotBase {
             }
             JSONObject resp = get("sync", new BasicNameValuePair("timeout", "30000"));
             String next = resp.getString("next_batch");
-            parseSync(resp, false);
-            while (!Thread.currentThread().isInterrupted()) {
-                resp = get("sync", new BasicNameValuePair("timeout", "30000"), new BasicNameValuePair("since", next));
-                next = resp.getString("next_batch");
-                try {
-                    parseSync(resp, true);
-                } catch (JSONException e) {
-                    log.warn("Can't parse sync: {}", resp.toString(2));
-                }
-            }
+            parseSync(resp, true);
+            loopSync(next);
         } catch (IOException | URISyntaxException e) {
             log.warn("{}", e);
         }
     }
 
-    public void parseSync(JSONObject resp, boolean processMessages) {
-        JSONObject rooms = resp.getJSONObject("rooms").getJSONObject("join");
-        for (Object roomName : rooms.keySet()) {
-            String roomNameStr = (String) roomName;
-            stateManager.joinRoom(roomNameStr);
-            JSONArray timelineEvents = rooms.getJSONObject(roomNameStr).getJSONObject("timeline").getJSONArray("events");
-            processTimeline(processMessages, roomNameStr, timelineEvents);
-            JSONArray stateEvents = rooms.getJSONObject(roomNameStr).getJSONObject("state").getJSONArray("events");
-            processState(stateEvents);
+    public void loopSync(String next) throws URISyntaxException, IOException {
+        while (!Thread.currentThread().isInterrupted()) {
+            JSONObject resp = get("sync", new BasicNameValuePair("timeout", "30000"), new BasicNameValuePair("since", next));
+            next = resp.getString("next_batch");
+            try {
+                parseSync(resp, false);
+            } catch (JSONException e) {
+                log.warn("Can't parse sync: {}", resp.toString(2));
+            }
         }
     }
 
-    private void processState(JSONArray events) {
+    public void parseSync(JSONObject resp, boolean initialSync) {
+        JSONObject rooms = resp.getJSONObject("rooms").getJSONObject("join");
+        for (Object roomName : rooms.keySet()) {
+            String roomNameStr = (String) roomName;
+            JSONObject room = rooms.getJSONObject(roomNameStr);
+            stateManager.joinRoom(roomNameStr);
+            JSONArray events = room.getJSONObject("timeline").getJSONArray("events");
+            processEvents(initialSync, roomNameStr, events);
+            if (initialSync) {
+                events = room.getJSONObject("state").getJSONArray("events");
+                processEvents(initialSync, roomNameStr, events);
+            }
+        }
+    }
+
+    public void processEvents(boolean initialSync, String roomName, JSONArray events) {
         for (int i = 0; i < events.length(); ++i) {
             JSONObject event = events.getJSONObject(i);
             String type = event.optString("type");
             String sender = event.getString("sender");
             JSONObject content = event.getJSONObject("content");
+            if (!initialSync && "m.room.message".equals(type)) {
+                String body = content.getString("body");
+                log.debug(event.toString(4));
+                log.debug("Content: {}", body);
+                if (!fromMyself(event)) {
+                    processMessage(body, roomName, sender);
+                } else {
+                    log.debug("Received a message from myself, not processing");
+                }
+            }
             if ("m.room.member".equals(type)) {
                 boolean join = "join".equals(content.optString("membership"));
                 if (join) {
@@ -110,29 +127,10 @@ public class MatrixBot extends BotBase {
         }
     }
 
-    public void processTimeline(boolean processMessages, String roomName, JSONArray events) {
-        for (int i = 0; i < events.length(); ++i) {
-            JSONObject event = events.getJSONObject(i);
-            String type = event.optString("type");
-            String sender = event.getString("sender");
-            JSONObject content = event.getJSONObject("content");
-            if (processMessages && "m.room.message".equals(type)) {
-                String body = content.getString("body");
-                log.debug(event.toString(4));
-                log.debug("Content: {}", body);
-                if (!fromMyself(event)) {
-                    processMessage(body, roomName, sender);
-                } else {
-                    log.debug("Received a message from myself, not processing");
-                }
-            }
-        }
-    }
-
     private boolean fromMyself(JSONObject event) {
         try {
             String eventId = event.getString("event_id");
-            return events.remove(eventId) != null;
+            return pendingEvents.remove(eventId) != null;
         } catch (JSONException e) {
             // not found
         }
@@ -149,8 +147,7 @@ public class MatrixBot extends BotBase {
     public JSONObject exec(HttpUriRequest req) throws IOException {
         HttpResponse response = httpClient.execute(req);
         String entity = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
-        JSONObject jsonObject = new JSONObject(entity);
-        return jsonObject;
+        return new JSONObject(entity);
     }
 
     public URI buildURI(String method, NameValuePair... params) throws URISyntaxException {
@@ -165,7 +162,7 @@ public class MatrixBot extends BotBase {
                     new JSONObject().put("msgtype", "m.text").put("formatted_body", body).put("format", "org.matrix.custom.html")
                             .put("body", body.replaceAll("<a[^>]*>([^<]*)</a>", "$1")));
             String eventId = resp.optString("event_id");
-            events.put(eventId, new Transaction(eventId, new MatrixMessage(stateManager, body, room, null)));
+            pendingEvents.put(eventId, new Transaction(eventId, new MatrixMessage(stateManager, body, room, null)));
             return eventId;
         } catch (JSONException | URISyntaxException | IOException e) {
             log.warn("{}", e);
