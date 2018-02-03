@@ -48,7 +48,7 @@ public abstract class BotBase implements IBot {
         }
         log.info("Plugins initializion complete.");
     }
-    
+
     @Override
     public SettingsManager getSettingsManager() {
         return sm;
@@ -70,11 +70,7 @@ public abstract class BotBase implements IBot {
             try {
                 Class<? extends MessagePlugin> clazz = Class.forName(PLUGINS_PACKAGE_NAME + pluginName).asSubclass(MessagePlugin.class);
                 plugins.add(clazz.newInstance());
-            } catch (ClassNotFoundException e) {
-                log.warn("Couldn't load plugin {}: {}", pluginName, e);
-            } catch (InstantiationException e) {
-                log.warn("Couldn't load plugin {}: {}", pluginName, e);
-            } catch (IllegalAccessException e) {
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
                 log.warn("Couldn't load plugin {}: {}", pluginName, e);
             }
         }
