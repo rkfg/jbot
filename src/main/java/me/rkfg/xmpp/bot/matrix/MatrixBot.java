@@ -75,12 +75,13 @@ public class MatrixBot extends BotBase {
 
     public void loopSync(String next) throws URISyntaxException, IOException {
         while (!Thread.currentThread().isInterrupted()) {
-            JSONObject resp = get("sync", new BasicNameValuePair("timeout", "30000"), new BasicNameValuePair("since", next));
-            next = resp.getString("next_batch");
+            JSONObject resp = new JSONObject();
             try {
+                resp = get("sync", new BasicNameValuePair("timeout", "30000"), new BasicNameValuePair("since", next));
+                next = resp.getString("next_batch");
                 parseSync(resp, false);
-            } catch (JSONException e) {
-                log.warn("Can't parse sync: {}", resp.toString(2));
+            } catch (Exception e) {
+                log.warn("Can't parse sync: {}, {}", resp.toString(2), e);
             }
         }
     }
