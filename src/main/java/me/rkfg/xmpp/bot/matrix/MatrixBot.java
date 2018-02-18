@@ -161,7 +161,7 @@ public class MatrixBot extends BotBase {
         try {
             JSONObject resp = put("rooms/" + room + "/send/m.room.message/jbot" + System.currentTimeMillis(),
                     new JSONObject().put("msgtype", "m.text").put("formatted_body", body).put("format", "org.matrix.custom.html")
-                            .put("body", body.replaceAll("<a[^>]*>([^<]*)</a>", "$1")));
+                            .put("body", body.replaceAll("<[^>]*>([^<]*)</[^>]*>", "$1")));
             String eventId = resp.optString("event_id");
             pendingEvents.put(eventId, new Transaction(eventId, new MatrixMessage(stateManager, body, room, null)));
             return eventId;
