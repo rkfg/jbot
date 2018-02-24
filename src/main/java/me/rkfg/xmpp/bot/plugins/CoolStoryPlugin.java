@@ -44,7 +44,7 @@ import ru.ppsrk.gwt.client.LogicException;
 
 /**
  * Fetches random stories from different websites.
- * At the moment supported websites are: killmepls.ru, ibash.org.ru, anekdot.ru, svalko.org.
+ * At the moment supported websites are: killpls.me, ibash.org.ru, anekdot.ru, svalko.org.
  *
  * @author Kona-chan
  * @version 0.1.0
@@ -55,8 +55,8 @@ public final class CoolStoryPlugin extends CommandPlugin {
 
         KILLMEPLS(
                 new String[] { "kmp", "кмп" },
-                "Получить случайную историю с сайта killmepls.ru.",
-                "http://killmepls.ru/random/",
+                "Получить случайную историю с сайта killpls.me.",
+                "http://killpls.me/random/",
                 "div#stories > div.row + div.row > div"
         ),
         IBASH(
