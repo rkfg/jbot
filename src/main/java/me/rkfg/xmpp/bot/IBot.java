@@ -8,11 +8,12 @@ import org.jivesoftware.smack.packet.Message;
 import me.rkfg.xmpp.bot.plugins.MessagePlugin;
 import me.rkfg.xmpp.bot.xmpp.ChatAdapter;
 import me.rkfg.xmpp.bot.xmpp.MUCManager;
+import ru.ppsrk.gwt.client.LogicException;
 import ru.ppsrk.gwt.server.SettingsManager;
 
 public interface IBot {
 
-    void run();
+    void run() throws LogicException;
 
     SettingsManager getSettingsManager();
 

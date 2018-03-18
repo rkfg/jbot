@@ -4,9 +4,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class RoomParticipantsManager {
     private Map<String, Set<String>> roomUsers = new HashMap<>();
+    private String mxid;
+
+    public RoomParticipantsManager(String mxid) {
+        this.mxid = mxid;
+    }
 
     public void addUser(String roomId, String userId) {
         getUsers(roomId).add(userId);
@@ -21,6 +27,15 @@ public class RoomParticipantsManager {
     }
 
     public boolean isRoomEmpty(String roomId) {
-        return getUsers(roomId).size() == 1; // only I left
+        Set<String> users = getUsers(roomId);
+        return users.size() == 1 && users.contains(mxid); // only I left
+    }
+
+    public Set<String> getEmptyRooms() {
+        return roomUsers.keySet().stream().filter(k -> isRoomEmpty(k)).collect(Collectors.toSet());
+    }
+
+    public void removeRoom(String roomId) {
+        roomUsers.remove(roomId);
     }
 }

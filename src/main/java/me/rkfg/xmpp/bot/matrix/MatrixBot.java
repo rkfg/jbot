@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,25 +40,34 @@ import me.rkfg.xmpp.bot.message.MatrixMessage;
 import me.rkfg.xmpp.bot.plugins.MessagePlugin;
 import me.rkfg.xmpp.bot.xmpp.ChatAdapter;
 import me.rkfg.xmpp.bot.xmpp.MUCManager;
+import ru.ppsrk.gwt.client.LogicException;
 
 public class MatrixBot extends BotBase {
 
+    private static final String ROOMS = "rooms/";
+    private static final String EVENTS = "events";
     private static final int TIMEOUT = 40000;
     private String token = null;
     private String apiServer = null;
+    private String ownMXID = null;
     private HttpClient httpClient = HttpClientBuilder.create().build();
     private RequestConfig reqConfig = RequestConfig.custom().setSocketTimeout(TIMEOUT).setConnectTimeout(TIMEOUT)
             .setConnectionRequestTimeout(TIMEOUT).build();
     private Logger log = LoggerFactory.getLogger(getClass());
     private StateManager stateManager = new StateManager();
-    private RoomParticipantsManager roomParticipantsManager = new RoomParticipantsManager();
+    private RoomParticipantsManager roomParticipantsManager = null;
     private Map<String, Transaction> pendingEvents = new HashMap<>();
 
     @Override
-    public void run() {
+    public void run() throws LogicException {
         try {
             init();
             token = sm.getStringSetting("matrixToken");
+            ownMXID = sm.getStringSetting("mxid");
+            if (ownMXID == null) {
+                throw new LogicException("Set mxid property in settings.ini");
+            }
+            roomParticipantsManager = new RoomParticipantsManager(ownMXID);
             if (token == null) {
                 log.error("Please set matrixToken in settings.ini to the access token");
                 System.exit(1);
@@ -96,21 +106,35 @@ public class MatrixBot extends BotBase {
             String roomIdStr = (String) roomId;
             JSONObject room = joinedRooms.getJSONObject(roomIdStr);
             stateManager.joinRoom(roomIdStr);
-            JSONArray events = room.getJSONObject("timeline").getJSONArray("events");
+            JSONArray events = room.getJSONObject("timeline").getJSONArray(EVENTS);
             processEvents(initialSync, roomIdStr, events);
             if (initialSync) {
-                events = room.getJSONObject("state").getJSONArray("events");
+                events = room.getJSONObject("state").getJSONArray(EVENTS);
                 processEvents(initialSync, roomIdStr, events);
             }
         }
         JSONObject invitedRooms = rooms.getJSONObject("invite");
         for (Object roomId : invitedRooms.keySet()) {
+            String roomIdStr = (String) roomId;
             try {
-                post("rooms/" + roomId + "/join", new JSONObject());
+                log.info("Invited to {}, joining", roomIdStr);
+                post(ROOMS + roomIdStr + "/join", new JSONObject());
             } catch (URISyntaxException | IOException e) {
                 log.warn("{}", e);
             }
+            roomParticipantsManager.addUser(roomIdStr, ownMXID);
+            processEvents(initialSync, roomIdStr, invitedRooms.getJSONObject(roomIdStr).getJSONObject("invite_state").getJSONArray(EVENTS));
         }
+        Set<String> emptyRooms = roomParticipantsManager.getEmptyRooms();
+        emptyRooms.stream().forEach(roomId -> {
+            try {
+                log.info("No more users in {}, leaving", roomId);
+                post(ROOMS + roomId + "/leave", new JSONObject());
+            } catch (URISyntaxException | IOException e) {
+                log.warn("{}", e);
+            }
+        });
+        emptyRooms.stream().forEach(roomParticipantsManager::removeRoom);
     }
 
     public void processEvents(boolean initialSync, String roomId, JSONArray events) {
@@ -130,21 +154,16 @@ public class MatrixBot extends BotBase {
                 }
             }
             if ("m.room.member".equals(type)) {
-                boolean join = "join".equals(content.optString("membership"));
+                String membership = content.optString("membership");
+                boolean join = "join".equals(membership);
+                boolean leave = "leave".equals(membership);
                 if (join) {
                     stateManager.addDisplayName(senderId, content.optString("displayname"));
                     roomParticipantsManager.addUser(roomId, senderId);
-                } else {
+                }
+                if (leave) {
                     stateManager.removeDisplayName(senderId);
                     roomParticipantsManager.removeUser(roomId, senderId);
-                    if (roomParticipantsManager.isRoomEmpty(roomId)) {
-                        try {
-                            log.info("No more users in {}, leaving", roomId);
-                            post("rooms/" + roomId + "/leave", new JSONObject());
-                        } catch (URISyntaxException | IOException e) {
-                            log.warn("{}", e);
-                        }
-                    }
                 }
             }
         }
@@ -181,7 +200,7 @@ public class MatrixBot extends BotBase {
     @Override
     public String sendMessage(String body, String roomId) {
         try {
-            JSONObject resp = put("rooms/" + roomId + "/send/m.room.message/jbot" + System.currentTimeMillis(),
+            JSONObject resp = put(ROOMS + roomId + "/send/m.room.message/jbot" + System.currentTimeMillis(),
                     new JSONObject().put("msgtype", "m.text").put("formatted_body", body.replaceAll("\n", "<br/>"))
                             .put("format", "org.matrix.custom.html").put("body", body.replaceAll("<[^>]*>([^<]*)</[^>]*>", "$1")));
             String eventId = resp.optString("event_id");
