@@ -15,7 +15,9 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
@@ -48,6 +50,7 @@ public class MatrixBot extends BotBase {
             .setConnectionRequestTimeout(TIMEOUT).build();
     private Logger log = LoggerFactory.getLogger(getClass());
     private StateManager stateManager = new StateManager();
+    private RoomParticipantsManager roomParticipantsManager = new RoomParticipantsManager();
     private Map<String, Transaction> pendingEvents = new HashMap<>();
 
     @Override
@@ -87,32 +90,41 @@ public class MatrixBot extends BotBase {
     }
 
     public void parseSync(JSONObject resp, boolean initialSync) {
-        JSONObject rooms = resp.getJSONObject("rooms").getJSONObject("join");
-        for (Object roomName : rooms.keySet()) {
-            String roomNameStr = (String) roomName;
-            JSONObject room = rooms.getJSONObject(roomNameStr);
-            stateManager.joinRoom(roomNameStr);
+        JSONObject rooms = resp.getJSONObject("rooms");
+        JSONObject joinedRooms = rooms.getJSONObject("join");
+        for (Object roomId : joinedRooms.keySet()) {
+            String roomIdStr = (String) roomId;
+            JSONObject room = joinedRooms.getJSONObject(roomIdStr);
+            stateManager.joinRoom(roomIdStr);
             JSONArray events = room.getJSONObject("timeline").getJSONArray("events");
-            processEvents(initialSync, roomNameStr, events);
+            processEvents(initialSync, roomIdStr, events);
             if (initialSync) {
                 events = room.getJSONObject("state").getJSONArray("events");
-                processEvents(initialSync, roomNameStr, events);
+                processEvents(initialSync, roomIdStr, events);
+            }
+        }
+        JSONObject invitedRooms = rooms.getJSONObject("invite");
+        for (Object roomId : invitedRooms.keySet()) {
+            try {
+                post("rooms/" + roomId + "/join", new JSONObject());
+            } catch (URISyntaxException | IOException e) {
+                log.warn("{}", e);
             }
         }
     }
 
-    public void processEvents(boolean initialSync, String roomName, JSONArray events) {
+    public void processEvents(boolean initialSync, String roomId, JSONArray events) {
         for (int i = 0; i < events.length(); ++i) {
             JSONObject event = events.getJSONObject(i);
             String type = event.optString("type");
-            String sender = event.getString("sender");
+            String senderId = event.getString("sender");
             JSONObject content = event.getJSONObject("content");
             if (!initialSync && "m.room.message".equals(type)) {
                 String body = content.getString("body");
                 log.debug(event.toString(4));
                 log.debug("Content: {}", body);
                 if (!fromMyself(event)) {
-                    processMessage(body, roomName, sender);
+                    processMessage(body, roomId, senderId);
                 } else {
                     log.debug("Received a message from myself, not processing");
                 }
@@ -120,9 +132,19 @@ public class MatrixBot extends BotBase {
             if ("m.room.member".equals(type)) {
                 boolean join = "join".equals(content.optString("membership"));
                 if (join) {
-                    stateManager.addDisplayName(sender, content.optString("displayname"));
+                    stateManager.addDisplayName(senderId, content.optString("displayname"));
+                    roomParticipantsManager.addUser(roomId, senderId);
                 } else {
-                    stateManager.removeDisplayName(sender);
+                    stateManager.removeDisplayName(senderId);
+                    roomParticipantsManager.removeUser(roomId, senderId);
+                    if (roomParticipantsManager.isRoomEmpty(roomId)) {
+                        try {
+                            log.info("No more users in {}, leaving", roomId);
+                            post("rooms/" + roomId + "/leave", new JSONObject());
+                        } catch (URISyntaxException | IOException e) {
+                            log.warn("{}", e);
+                        }
+                    }
                 }
             }
         }
@@ -157,13 +179,13 @@ public class MatrixBot extends BotBase {
     }
 
     @Override
-    public String sendMessage(String body, String room) {
+    public String sendMessage(String body, String roomId) {
         try {
-            JSONObject resp = put("rooms/" + room + "/send/m.room.message/jbot" + System.currentTimeMillis(),
+            JSONObject resp = put("rooms/" + roomId + "/send/m.room.message/jbot" + System.currentTimeMillis(),
                     new JSONObject().put("msgtype", "m.text").put("formatted_body", body.replaceAll("\n", "<br/>"))
                             .put("format", "org.matrix.custom.html").put("body", body.replaceAll("<[^>]*>([^<]*)</[^>]*>", "$1")));
             String eventId = resp.optString("event_id");
-            pendingEvents.put(eventId, new Transaction(eventId, new MatrixMessage(stateManager, body, room, null)));
+            pendingEvents.put(eventId, new Transaction(eventId, new MatrixMessage(stateManager, body, roomId, null)));
             return eventId;
         } catch (JSONException | URISyntaxException | IOException e) {
             log.warn("{}", e);
@@ -171,25 +193,31 @@ public class MatrixBot extends BotBase {
         return null;
     }
 
-    private JSONObject put(String method, JSONObject body, NameValuePair... params) throws URISyntaxException, IOException {
-        URI uri = buildURI(method, params);
-        HttpPut req = new HttpPut(uri);
+    public JSONObject fillAndExec(JSONObject body, HttpEntityEnclosingRequestBase req) throws IOException {
         req.setConfig(reqConfig);
         req.setHeader("Content-Type", "application/json");
         req.setEntity(new StringEntity(body.toString(), StandardCharsets.UTF_8));
         return exec(req);
     }
 
-    private void processMessage(String body, String room, String sender) {
+    private JSONObject put(String method, JSONObject body, NameValuePair... params) throws URISyntaxException, IOException {
+        return fillAndExec(body, new HttpPut(buildURI(method, params)));
+    }
+
+    private JSONObject post(String method, JSONObject body, NameValuePair... params) throws URISyntaxException, IOException {
+        return fillAndExec(body, new HttpPost(buildURI(method, params)));
+    }
+
+    private void processMessage(String body, String roomId, String sender) {
         for (MessagePlugin plugin : plugins) {
             Pattern pattern = plugin.getPattern();
             if (pattern != null) {
                 Matcher matcher = pattern.matcher(body);
                 if (matcher.find()) {
                     try {
-                        String result = plugin.process(new MatrixMessage(stateManager, body, room, sender), matcher);
+                        String result = plugin.process(new MatrixMessage(stateManager, body, roomId, sender), matcher);
                         if (result != null && !result.isEmpty()) {
-                            sendMessage(StringEscapeUtils.unescapeHtml4(result), room);
+                            sendMessage(StringEscapeUtils.unescapeHtml4(result), roomId);
                             break;
                         }
                     } catch (Exception e) {
@@ -207,8 +235,8 @@ public class MatrixBot extends BotBase {
 
     @Override
     public void sendMessage(String message) {
-        for (String roomName : stateManager.listRooms()) {
-            sendMessage(message, roomName);
+        for (String roomId : stateManager.listRooms()) {
+            sendMessage(message, roomId);
         }
     }
 
