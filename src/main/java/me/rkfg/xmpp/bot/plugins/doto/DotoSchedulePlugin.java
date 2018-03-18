@@ -43,6 +43,7 @@ public class DotoSchedulePlugin extends DotoCommandPlugin
 
     Options opts;
 
+    @Override
     public void init()
     {
         buildOptions();
@@ -77,7 +78,7 @@ public class DotoSchedulePlugin extends DotoCommandPlugin
         catch(InvalidInputException e)
         {
             str = e.getLocalizedMessage();
-            e.printStackTrace();
+            log.warn("{}", e);
             return str;
         }
         str = handleBasePage(doc, commandLine);
@@ -85,12 +86,12 @@ public class DotoSchedulePlugin extends DotoCommandPlugin
     }
     private String handleBasePage(Document rootPage, CommandLine commandLine)
     {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         Elements boxes = rootPage.select(".box");
         for (Element gameTypeFrame : boxes)
         {
             Elements frameHeader = gameTypeFrame.select("h2");
-            if (frameHeader.size() == 0) {
+            if (frameHeader.isEmpty()) {
                 frameHeader = gameTypeFrame.select("h1");
             }
             String frameTitle = frameHeader.first().ownText();
@@ -102,11 +103,11 @@ public class DotoSchedulePlugin extends DotoCommandPlugin
 
                 if(frameTitle.contains(description) && commandLine.hasOption(param))
                 {
-                    result += format(description, gameTypeFrame, commandLine);
+                    result.append(format(description, gameTypeFrame, commandLine));
                 }
             }
         }
-        return result;
+        return result.toString();
     }
     private String format(String title,  Element matchList, CommandLine cl)
     {
@@ -125,7 +126,7 @@ public class DotoSchedulePlugin extends DotoCommandPlugin
             String matchDescription;
             if (title.equals(LIVE_MATCHES))
             {
-                matchDescription = String.format("\n%s [%s]", games.get(i), names.get(i));
+                matchDescription = String.format("%n%s [%s]", games.get(i), names.get(i));
 
                 if(cl.hasOption(SHOW_STREAMS_OPTION))
                 {
@@ -134,7 +135,7 @@ public class DotoSchedulePlugin extends DotoCommandPlugin
             }
             else
             {
-                matchDescription = String.format("\n[%s] %s [%s]", comments.get(i), games.get(i), names.get(i));
+                matchDescription = String.format("%n[%s] %s [%s]", comments.get(i), games.get(i), names.get(i));
             }
             if(!cl.hasOption(GREP_OPTION) || Pattern.compile(cl.getOptionValue(GREP_OPTION)).matcher(matchDescription).find())
             {
@@ -153,7 +154,9 @@ public class DotoSchedulePlugin extends DotoCommandPlugin
             {
                 num = Integer.parseInt(commandLine.getOptionValue(QUERY_LEN_PARAM));
             }
-            catch(NumberFormatException e){}
+            catch(NumberFormatException e) {
+                log.warn("{}", e);
+            }
         }
         return num;
     }
@@ -226,13 +229,13 @@ public class DotoSchedulePlugin extends DotoCommandPlugin
         {
             String matchURL = match.attr("href");
             Elements streamTabs = getStreamTabsFromMatchPage(BASEURL + matchURL);
-            String matchURLs = "";
+            StringBuilder matchURLs = new StringBuilder();
             for(Element streamTab : streamTabs)
             {
                 String streamURLs = makeStreamURL(streamTab);
-                matchURLs = matchURLs + "\n" + streamURLs;
+                matchURLs.append("\n").append(streamURLs);
             }
-            links.add(matchURLs);
+            links.add(matchURLs.toString());
         }
         return links;
     }
@@ -247,7 +250,7 @@ public class DotoSchedulePlugin extends DotoCommandPlugin
         }
         catch(InvalidInputException e)
         {
-            e.printStackTrace();
+            log.warn("{}", e);
             streamTabs = new Elements();
         }
         return streamTabs;
@@ -297,21 +300,21 @@ public class DotoSchedulePlugin extends DotoCommandPlugin
 
     private String findText(Element element)
     {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         Elements children = element.children();
-        if(children.size()>0)
+        if(!children.isEmpty())
         {
             for(Element child : children)
             {
                 if(!child.ownText().equals("") && !child.hasClass("hidden"))
                 {
-                    result+=child.ownText() + " ";
+                    result.append(child.ownText()).append(" ");
                     continue;
                 }
-                result+= findText(child);
+                result.append(findText(child));
             }
         }
-        return result;
+        return result.toString();
     }
 
     @Override

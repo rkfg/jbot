@@ -15,11 +15,11 @@ import java.util.Map;
 public class Result {
 
     @JsonProperty("games")
-    private List<Game> games = new ArrayList<Game>();
+    private List<Game> games = new ArrayList<>();
     @JsonProperty("status")
     private Integer status;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new HashMap<>();
 
     @JsonProperty("games")
     public List<Game> getGames() {

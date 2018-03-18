@@ -19,7 +19,7 @@ public class TeamInfo
     @JsonProperty("complete")
     private Boolean complete;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new HashMap<>();
 
     @JsonProperty("team_name")
     public String getTeamName()

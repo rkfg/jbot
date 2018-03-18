@@ -32,7 +32,7 @@ import java.util.Map;
         "position_y",
         "net_worth"
 })
-public class Player_ {
+public class Player2 {
 
     @JsonProperty("player_slot")
     private Integer playerSlot;
@@ -83,7 +83,7 @@ public class Player_ {
     @JsonProperty("net_worth")
     private Integer netWorth;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new HashMap<>();
 
     @JsonProperty("player_slot")
     public Integer getPlayerSlot() {

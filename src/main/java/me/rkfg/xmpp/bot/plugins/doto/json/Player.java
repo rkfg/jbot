@@ -17,7 +17,7 @@ public class Player {
     @JsonProperty("team")
     private Integer team;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new HashMap<>();
 
     @JsonProperty("account_id")
     public Integer getAccountId() {

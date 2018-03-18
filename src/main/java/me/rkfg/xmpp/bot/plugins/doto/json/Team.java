@@ -20,15 +20,15 @@ public class Team
     @JsonProperty("barracks_state")
     private Integer barracksState;
     @JsonProperty("picks")
-    private List<Pick> picks = new ArrayList<Pick>();
+    private List<Pick> picks = new ArrayList<>();
     @JsonProperty("bans")
-    private List<Ban> bans = new ArrayList<Ban>();
+    private List<Ban> bans = new ArrayList<>();
     @JsonProperty("players")
-    private List<Player_> players = new ArrayList<Player_>();
+    private List<Player2> players = new ArrayList<>();
     @JsonProperty("abilities")
-    private List<Ability> abilities = new ArrayList<Ability>();
+    private List<Ability> abilities = new ArrayList<>();
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new HashMap<>();
 
     @JsonProperty("score")
     public Integer getScore() {
@@ -81,12 +81,12 @@ public class Team
     }
 
     @JsonProperty("players")
-    public List<Player_> getPlayers() {
+    public List<Player2> getPlayers() {
         return players;
     }
 
     @JsonProperty("players")
-    public void setPlayers(List<Player_> players) {
+    public void setPlayers(List<Player2> players) {
         this.players = players;
     }
 

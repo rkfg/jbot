@@ -14,7 +14,7 @@ public class LiveGames {
     @JsonProperty("result")
     private Result result;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new HashMap<>();
 
     @JsonProperty("result")
     public Result getResult() {

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 
 import org.apache.commons.cli.CommandLine;
@@ -29,20 +30,22 @@ public class TwitchTwitcher extends DotoCommandPlugin
 {
     private TwitchStreamObserver observer;
     Options opts;
-    String client_id;
+    String clientId;
     ArrayList<String> subscriptions;
-    HashMap<String, String> streamStatus;
+    Map<String, String> streamStatus;
     private static final String CHANNEL_ADD_PARAM = "a";
     private static final String CHANNEL_REMOVE_PARAM = "d";
     private static final String CHANNELS_SHOW_PARAM = "s";
     private static final String TWITCH_CLIENT_ID = "twitch_id";
     private static final String TWITCH_SUBSCRIPTIONS = "twitch_subscriptions";
+    
+    @Override
     public void init()
     {
-        client_id = getSettingsManager().getStringSetting(TWITCH_CLIENT_ID);
-        if(client_id == null)
+        clientId = getSettingsManager().getStringSetting(TWITCH_CLIENT_ID);
+        if(clientId == null)
         {
-            client_id = "";
+            clientId = "";
         }
         streamStatus = new HashMap<>();
         buildOptions();
@@ -65,12 +68,12 @@ public class TwitchTwitcher extends DotoCommandPlugin
         {
             subs = "";
         }
-        subscriptions = new ArrayList<String>(Arrays.asList(subs.split(",\\s?")));
+        subscriptions = new ArrayList<>(Arrays.asList(subs.split(",\\s?")));
     }
 
     private void setupObserver()
     {
-        observer = new TwitchStreamObserver(client_id);
+        observer = new TwitchStreamObserver(clientId);
         for (String sub: subscriptions)
         {
             observer.addChannel(sub);
@@ -116,7 +119,7 @@ public class TwitchTwitcher extends DotoCommandPlugin
             }
         });
 
-        if (subscriptions.size() > 0)
+        if (!subscriptions.isEmpty())
         {
             observer.start();
         }
@@ -132,13 +135,13 @@ public class TwitchTwitcher extends DotoCommandPlugin
         }
         catch(InvalidInputException e)
         {
-            e.printStackTrace();
+            log.warn("{}", e);
             return e.getLocalizedMessage();
         }
 
         if (cl.hasOption(CHANNELS_SHOW_PARAM))
         {
-             return getSubscriptions(cl);
+             return getSubscriptions();
         }
         if (cl.hasOption(CHANNEL_ADD_PARAM))
         {
@@ -151,14 +154,14 @@ public class TwitchTwitcher extends DotoCommandPlugin
         return "try %man twitch";
     }
 
-    private String getSubscriptions(CommandLine cl)
+    private String getSubscriptions()
     {
-        String subscriptions = joinSubscriptions();
-        if(subscriptions.equals(""))
+        String subscriptionsJoined = joinSubscriptions();
+        if(subscriptionsJoined.equals(""))
         {
             return "no subscriptions";
         }
-        return subscriptions;
+        return subscriptionsJoined;
     }
 
     private String addSubscription(CommandLine cl)
@@ -212,7 +215,7 @@ public class TwitchTwitcher extends DotoCommandPlugin
         }
         catch(IOException e)
         {
-            e.printStackTrace();
+            log.warn("{}", e);
         }
     }
 
@@ -225,10 +228,10 @@ public class TwitchTwitcher extends DotoCommandPlugin
     @Override
     public String getManual()
     {
-        String PREFIX_ = PREFIX + "twitch";
+        final String PREFIX_ = PREFIX + "twitch";
         return "Твитчеплагин.\nПараметры:\n" +
-               String.format("%s - подписаться на канал; %s -%s example_channel\n", CHANNEL_ADD_PARAM, PREFIX_, CHANNEL_ADD_PARAM) +
-               String.format("%s - отписаться от канала; %s -%s example_channel\n", CHANNEL_REMOVE_PARAM, PREFIX_, CHANNEL_REMOVE_PARAM) +
-               String.format("%s - показать подписки; %s -%s\n", CHANNELS_SHOW_PARAM, PREFIX_, CHANNELS_SHOW_PARAM);
+               String.format("%s - подписаться на канал; %s -%s example_channel%n", CHANNEL_ADD_PARAM, PREFIX_, CHANNEL_ADD_PARAM) +
+               String.format("%s - отписаться от канала; %s -%s example_channel%n", CHANNEL_REMOVE_PARAM, PREFIX_, CHANNEL_REMOVE_PARAM) +
+               String.format("%s - показать подписки; %s -%s%n", CHANNELS_SHOW_PARAM, PREFIX_, CHANNELS_SHOW_PARAM);
     }
 }

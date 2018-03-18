@@ -23,7 +23,7 @@ public class Scoreboard {
     @JsonProperty("dire")
     private Team dire;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new HashMap<>();
 
     @JsonProperty("duration")
     public Double getDuration() {

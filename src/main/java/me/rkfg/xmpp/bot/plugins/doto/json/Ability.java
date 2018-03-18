@@ -15,7 +15,7 @@ public class Ability
     @JsonProperty("ability_level")
     private Integer abilityLevel;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new HashMap<>();
 
     @JsonProperty("ability_id")
     public Integer getAbilityId()

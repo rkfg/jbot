@@ -27,7 +27,7 @@ import me.rkfg.xmpp.bot.plugins.doto.json.Ban;
 import me.rkfg.xmpp.bot.plugins.doto.json.Game;
 import me.rkfg.xmpp.bot.plugins.doto.json.LiveGames;
 import me.rkfg.xmpp.bot.plugins.doto.json.Pick;
-import me.rkfg.xmpp.bot.plugins.doto.json.Player_;
+import me.rkfg.xmpp.bot.plugins.doto.json.Player2;
 import me.rkfg.xmpp.bot.plugins.doto.json.Scoreboard;
 import me.rkfg.xmpp.bot.plugins.doto.json.Team;
 import ru.ppsrk.gwt.client.ClientAuthenticationException;
@@ -40,11 +40,11 @@ import ru.ppsrk.gwt.client.LogicException;
  */
 public class DotoApiPlugin extends DotoCommandPlugin
 {
-    private final static int LIVE = 570;
-    private final static String INTERFACE_PREFIX = "IDOTA2Match_";
-    private final static String HERO_PREFIX = "IEconDOTA2_";
-    private final static String API_BASE_PATH = "https://api.steampowered.com/";
-    private final static String API_VERSION = "v1";
+    private static final int LIVE = 570;
+    private static final String INTERFACE_PREFIX = "IDOTA2Match_";
+    private static final String HERO_PREFIX = "IEconDOTA2_";
+    private static final String API_BASE_PATH = "https://api.steampowered.com/";
+    private static final String API_VERSION = "v1";
 
     private static final String STEAM_API_KEY_STRING = "steam_api_key";
     private static final int QUERY_LEN = 3;
@@ -67,6 +67,7 @@ public class DotoApiPlugin extends DotoCommandPlugin
     private String apikey;
     private Map<Integer, String> heroes;
 
+    @Override
     public void init()
     {
         buildOptions();
@@ -99,13 +100,13 @@ public class DotoApiPlugin extends DotoCommandPlugin
         catch(InvalidInputException e)
         {
             response = e.getLocalizedMessage();
-            e.printStackTrace();
+            log.warn("{}", e);
         }
         return response;
     }
     private String getLiveLeagueGames(CommandLine commandLine) throws InvalidInputException
     {
-        String resultString = "";
+        StringBuilder resultString = new StringBuilder();
 
         boolean grepSet = commandLine.hasOption(GREP_PARAM);
         int num = getNumParam(QUERY_LEN, QUERY_LEN_PARAM,commandLine);
@@ -120,12 +121,11 @@ public class DotoApiPlugin extends DotoCommandPlugin
             String gameInfo = handleGame(game, commandLine);
             if((!grepSet || Pattern.compile(commandLine.getOptionValue(GREP_PARAM)).matcher(gameInfo).find()) && gameInfo.length() != 0)
             {
-                resultString += "\n" + gameInfo;
+                resultString.append("\n").append(gameInfo);
                 count++;
             }
-            i++;
         }
-        return resultString;
+        return resultString.toString();
     }
     private List<Game> getGames() throws InvalidInputException
     {
@@ -156,7 +156,9 @@ public class DotoApiPlugin extends DotoCommandPlugin
             {
                 num = Integer.parseInt(commandLine.getOptionValue(optionName));
             }
-            catch(NumberFormatException e){}
+            catch(NumberFormatException e) {
+                log.warn("{}", e);
+            }
         }
         return num;
     }
@@ -170,13 +172,13 @@ public class DotoApiPlugin extends DotoCommandPlugin
         {
             return "";
         }
-        String radiant_team_name = "Noname";
+        String radiantTeamName = "Noname";
         if(game.getRadiantTeam() != null)
-            radiant_team_name = game.getRadiantTeam().getTeamName();
+            radiantTeamName = game.getRadiantTeam().getTeamName();
 
-        String dire_team_name = "Noname";
+        String direTeamName = "Noname";
         if(game.getDireTeam() != null)
-            dire_team_name = game.getDireTeam().getTeamName();
+            direTeamName = game.getDireTeam().getTeamName();
 
         Scoreboard scoreboard = game.getScoreboard();
         String duration = getDurationString(scoreboard.getDuration().intValue());
@@ -184,18 +186,18 @@ public class DotoApiPlugin extends DotoCommandPlugin
         Team radiant = scoreboard.getRadiant();
         Team dire = scoreboard.getDire();
 
-        resultString += String.format("«%s» vs «%s» [%s] [%d:%d]", radiant_team_name, dire_team_name, duration, radiant.getScore(), dire.getScore());
+        resultString += String.format("«%s» vs «%s» [%s] [%d:%d]", radiantTeamName, direTeamName, duration, radiant.getScore(), dire.getScore());
         if(commandLine.hasOption(VERBOSE_PARAM))
         {
             resultString += String.format("[$%d : $%d] [%s / %s]", getSumNetWorth(radiant), getSumNetWorth(dire), getTowerState(radiant, false), getTowerState(dire, true));
         }
         if(commandLine.hasOption(PICKS_PARAM))
         {
-            resultString += String.format("\n[%s] vs [%s]", getPicks(radiant), getPicks(dire));
+            resultString += String.format("%n[%s] vs [%s]", getPicks(radiant), getPicks(dire));
         }
         if(commandLine.hasOption(BANS_PARAM))
         {
-            resultString += String.format("\n[%s] vs [%s]", getBans(radiant),getBans(dire));
+            resultString += String.format("%n[%s] vs [%s]", getBans(radiant),getBans(dire));
         }
         return resultString;
     }
@@ -211,7 +213,7 @@ public class DotoApiPlugin extends DotoCommandPlugin
         {
             return "00";
         }
-        if(number / 10==0)
+        if(number < 10)
         {
             return "0" + number;
         }
@@ -233,7 +235,7 @@ public class DotoApiPlugin extends DotoCommandPlugin
 
     private String getPicks(Team team)
     {
-        String s = "";
+        StringBuilder s = new StringBuilder();
         for(Pick p : team.getPicks())
         {
             String hero = heroes.get(p.getHeroId());
@@ -241,14 +243,14 @@ public class DotoApiPlugin extends DotoCommandPlugin
             {
                 break;
             }
-            s += hero + ", ";
+            s.append(hero).append(", ");
         }
         return s.substring(0, s.length() - 2);
     }
 
     private String getBans(Team team)
     {
-        String s = "";
+        StringBuilder s = new StringBuilder();
         for(Ban p : team.getBans())
         {
             String hero = heroes.get(p.getHeroId());
@@ -256,7 +258,7 @@ public class DotoApiPlugin extends DotoCommandPlugin
             {
                 break;
             }
-            s += hero + ", ";
+            s.append(hero).append(", ");
         }
         return s.substring(0, s.length() - 2);
     }
@@ -267,16 +269,16 @@ public class DotoApiPlugin extends DotoCommandPlugin
         try
         {
             JSONObject jo = new JSONObject(sendGet(getHeroesUri()));
-            JSONArray heroes = jo.getJSONObject("result").getJSONArray("heroes");
-            for(int i = 0; i < heroes.length(); i++)
+            JSONArray heroesArr = jo.getJSONObject("result").getJSONArray("heroes");
+            for(int i = 0; i < heroesArr.length(); i++)
             {
-                JSONObject hero = heroes.getJSONObject(i);
+                JSONObject hero = heroesArr.getJSONObject(i);
                 m.put(hero.getInt("id"), hero.getString("name").replaceFirst("npc_dota_hero_(.*)", "$1"));
             }
         }
         catch(Exception e)
         {
-            e.printStackTrace();
+            log.warn("{}", e);
         }
         return m;
     }
@@ -289,9 +291,9 @@ public class DotoApiPlugin extends DotoCommandPlugin
     private int getSumNetWorth(Team team)
     {
         int sumNetWorth = 0;
-        List<Player_> players = team.getPlayers();
+        List<Player2> players = team.getPlayers();
 
-        for(Player_ p : players)
+        for(Player2 p : players)
         {
             sumNetWorth += p.getNetWorth();
         }
@@ -331,9 +333,9 @@ public class DotoApiPlugin extends DotoCommandPlugin
 
     private void makeTierRepresentation()
     {
-        String ONE_TOWER = "┃";
-        String TWO_TOWERS = "╏";
-        String THREE_TOWERS = "┇";
+        final String ONE_TOWER = "┃";
+        final String TWO_TOWERS = "╏";
+        final String THREE_TOWERS = "┇";
         tierMap = new HashMap<>();
         tierMap.put(0b111, THREE_TOWERS);
         tierMap.put(0b101, TWO_TOWERS);
@@ -376,9 +378,9 @@ public class DotoApiPlugin extends DotoCommandPlugin
     private String getBarracksPairState(int b)
     {
         String s = "";
-        String BARRACK_MISSING = "-";
-        String RANGED_BARRACK = "R";
-        String MELEE_BARRACK = "M";
+        final String BARRACK_MISSING = "-";
+        final String RANGED_BARRACK = "R";
+        final String MELEE_BARRACK = "M";
 
         int ranged = b & 0b10;
         int melee = b & 0b1;
@@ -405,7 +407,7 @@ public class DotoApiPlugin extends DotoCommandPlugin
     private String sendGet(String url) throws InvalidInputException
     {
         String inputLine;
-        StringBuffer response = new StringBuffer();
+        StringBuilder response = new StringBuilder();
 
         URL obj;
         try

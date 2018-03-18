@@ -12,9 +12,9 @@ import java.util.regex.Matcher;
  */
 public abstract class DotoCommandPlugin extends CommandPlugin
 {
-    public CommandLine parseParams(Options opts, Matcher _matcher) throws InvalidInputException
+    public CommandLine parseParams(Options opts, Matcher matcher) throws InvalidInputException
     {
-        String commandParams = _matcher.group(2);
+        String commandParams = matcher.group(2);
         CommandLineParser clp = new PosixParser();
         CommandLine commandLine;
         try

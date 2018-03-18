@@ -11,7 +11,7 @@ import java.util.Map;
 public class Game {
 
     @JsonProperty("players")
-    private List<Player> players = new ArrayList<Player>();
+    private List<Player> players = new ArrayList<>();
     @JsonProperty("radiant_team")
     private TeamInfo radiantTeam;
     @JsonProperty("dire_team")
@@ -37,7 +37,7 @@ public class Game {
     @JsonProperty("scoreboard")
     private Scoreboard scoreboard;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new HashMap<>();
 
     @JsonProperty("players")
     public List<Player> getPlayers() {
