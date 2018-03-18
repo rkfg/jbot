@@ -20,6 +20,7 @@ import org.jsoup.select.Elements;
 import me.rkfg.xmpp.bot.message.Message;
 import ru.ppsrk.gwt.client.ClientAuthenticationException;
 import ru.ppsrk.gwt.client.LogicException;
+import ru.ppsrk.gwt.server.SettingsManager;
 
 /**
  * User: violetta
@@ -41,13 +42,17 @@ public class DotoSchedulePlugin extends DotoCommandPlugin
     private static final String GREP_OPTION = "g";
     private static final String SHOW_STREAMS_OPTION = "s";
 
-    Options opts;
+    private Options opts;
+    private String cfClearance;
+    private String cfUserAgent;
 
     @Override
     public void init()
     {
         buildOptions();
-
+        SettingsManager sm = getSettingsManager();
+        cfClearance = sm.getStringSetting("hatsCFClearance");
+        cfUserAgent = sm.getStringSetting("hatsUA");
     }
     @SuppressWarnings("static-access")
     void buildOptions()
@@ -339,7 +344,12 @@ public class DotoSchedulePlugin extends DotoCommandPlugin
     private Document getDocument(String url) throws InvalidInputException
     {
         Connection c =  Jsoup.connect(url);
-        c.userAgent("Mozilla/5.0 (X11; Linux x86_64; rv:35.0) Gecko/20100101 Firefox/35.0");
+        if (cfUserAgent != null) {
+            c.userAgent(cfUserAgent);
+        }
+        if (cfClearance != null) {
+            c.cookie("enable_cookies", "true").cookie("cf_clearance", cfClearance);
+        }
         c.timeout(10000);
         Document doc;
         try

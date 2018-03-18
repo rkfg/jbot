@@ -24,3 +24,5 @@ imgurApiKey=
 matrixToken=access_token_for_matrix
 apiServer=matrix.org
 mxid=@bot:matrix.org
+hatsUA=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.124 Safari/537.36
+hatsCFClearance=cf_clearance_cookie_value
