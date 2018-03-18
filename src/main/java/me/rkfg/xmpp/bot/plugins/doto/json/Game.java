@@ -19,7 +19,7 @@ public class Game {
     @JsonProperty("lobby_id")
     private Long lobbyId;
     @JsonProperty("match_id")
-    private Integer matchId;
+    private Long matchId;
     @JsonProperty("spectators")
     private Integer spectators;
     @JsonProperty("league_id")
@@ -80,12 +80,12 @@ public class Game {
     }
 
     @JsonProperty("match_id")
-    public Integer getMatchId() {
+    public Long getMatchId() {
         return matchId;
     }
 
     @JsonProperty("match_id")
-    public void setMatchId(Integer matchId) {
+    public void setMatchId(Long matchId) {
         this.matchId = matchId;
     }
 
