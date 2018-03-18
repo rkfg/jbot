@@ -160,8 +160,8 @@ public class MatrixBot extends BotBase {
     public String sendMessage(String body, String room) {
         try {
             JSONObject resp = put("rooms/" + room + "/send/m.room.message/jbot" + System.currentTimeMillis(),
-                    new JSONObject().put("msgtype", "m.text").put("formatted_body", body).put("format", "org.matrix.custom.html")
-                            .put("body", body.replaceAll("<[^>]*>([^<]*)</[^>]*>", "$1")));
+                    new JSONObject().put("msgtype", "m.text").put("formatted_body", body.replaceAll("\n", "<br/>"))
+                            .put("format", "org.matrix.custom.html").put("body", body.replaceAll("<[^>]*>([^<]*)</[^>]*>", "$1")));
             String eventId = resp.optString("event_id");
             pendingEvents.put(eventId, new Transaction(eventId, new MatrixMessage(stateManager, body, room, null)));
             return eventId;
