@@ -21,3 +21,6 @@ steam_api_key=
 twitch_client_id=
 twitch_subscriptions=
 imgurApiKey=
+matrixToken=access_token_for_matrix
+apiServer=matrix.org
+mxid=@bot:matrix.org
