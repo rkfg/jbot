@@ -13,9 +13,9 @@ public class TeamInfo
     @JsonProperty("team_name")
     private String teamName;
     @JsonProperty("team_id")
-    private Integer teamId;
+    private String teamId;
     @JsonProperty("team_logo")
-    private Long teamLogo;
+    private String teamLogo;
     @JsonProperty("complete")
     private Boolean complete;
     @JsonIgnore
@@ -38,25 +38,25 @@ public class TeamInfo
     }
 
     @JsonProperty("team_id")
-    public Integer getTeamId()
+    public String getTeamId()
     {
         return teamId;
     }
 
     @JsonProperty("team_id")
-    public void setTeamId(Integer teamId)
+    public void setTeamId(String teamId)
     {
         this.teamId = teamId;
     }
 
     @JsonProperty("team_logo")
-    public Long getTeamLogo()
+    public String getTeamLogo()
     {
         return teamLogo;
     }
 
     @JsonProperty("team_logo")
-    public void setTeamLogo(Long teamLogo)
+    public void setTeamLogo(String teamLogo)
     {
         this.teamLogo = teamLogo;
     }

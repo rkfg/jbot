@@ -11,20 +11,20 @@ public class Ability
 {
 
     @JsonProperty("ability_id")
-    private Integer abilityId;
+    private String abilityId;
     @JsonProperty("ability_level")
     private Integer abilityLevel;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<>();
 
     @JsonProperty("ability_id")
-    public Integer getAbilityId()
+    public String getAbilityId()
     {
         return abilityId;
     }
 
     @JsonProperty("ability_id")
-    public void setAbilityId(Integer abilityId)
+    public void setAbilityId(String abilityId)
     {
         this.abilityId = abilityId;
     }

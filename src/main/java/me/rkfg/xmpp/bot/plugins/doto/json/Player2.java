@@ -37,9 +37,9 @@ public class Player2 {
     @JsonProperty("player_slot")
     private Integer playerSlot;
     @JsonProperty("account_id")
-    private Integer accountId;
+    private String accountId;
     @JsonProperty("hero_id")
-    private Integer heroId;
+    private String heroId;
     @JsonProperty("kills")
     private Integer kills;
     @JsonProperty("death")
@@ -96,22 +96,22 @@ public class Player2 {
     }
 
     @JsonProperty("account_id")
-    public Integer getAccountId() {
+    public String getAccountId() {
         return accountId;
     }
 
     @JsonProperty("account_id")
-    public void setAccountId(Integer accountId) {
+    public void setAccountId(String accountId) {
         this.accountId = accountId;
     }
 
     @JsonProperty("hero_id")
-    public Integer getHeroId() {
+    public String getHeroId() {
         return heroId;
     }
 
     @JsonProperty("hero_id")
-    public void setHeroId(Integer heroId) {
+    public void setHeroId(String heroId) {
         this.heroId = heroId;
     }
 

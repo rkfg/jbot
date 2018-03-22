@@ -12,17 +12,17 @@ import java.util.Map;
 public class Pick {
 
     @JsonProperty("hero_id")
-    private Integer heroId;
+    private String heroId;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<>();
 
     @JsonProperty("hero_id")
-    public Integer getHeroId() {
+    public String getHeroId() {
         return heroId;
     }
 
     @JsonProperty("hero_id")
-    public void setHeroId(Integer heroId) {
+    public void setHeroId(String heroId) {
         this.heroId = heroId;
     }
 

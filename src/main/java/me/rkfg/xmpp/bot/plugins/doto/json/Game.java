@@ -17,13 +17,13 @@ public class Game {
     @JsonProperty("dire_team")
     private TeamInfo direTeam;
     @JsonProperty("lobby_id")
-    private Long lobbyId;
+    private String lobbyId;
     @JsonProperty("match_id")
-    private Long matchId;
+    private String matchId;
     @JsonProperty("spectators")
     private Integer spectators;
     @JsonProperty("league_id")
-    private Integer leagueId;
+    private String leagueId;
     @JsonProperty("stream_delay_s")
     private Integer streamDelayS;
     @JsonProperty("radiant_series_wins")
@@ -70,22 +70,22 @@ public class Game {
     }
 
     @JsonProperty("lobby_id")
-    public Long getLobbyId() {
+    public String getLobbyId() {
         return lobbyId;
     }
 
     @JsonProperty("lobby_id")
-    public void setLobbyId(Long lobbyId) {
+    public void setLobbyId(String lobbyId) {
         this.lobbyId = lobbyId;
     }
 
     @JsonProperty("match_id")
-    public Long getMatchId() {
+    public String getMatchId() {
         return matchId;
     }
 
     @JsonProperty("match_id")
-    public void setMatchId(Long matchId) {
+    public void setMatchId(String matchId) {
         this.matchId = matchId;
     }
 
@@ -100,12 +100,12 @@ public class Game {
     }
 
     @JsonProperty("league_id")
-    public Integer getLeagueId() {
+    public String getLeagueId() {
         return leagueId;
     }
 
     @JsonProperty("league_id")
-    public void setLeagueId(Integer leagueId) {
+    public void setLeagueId(String leagueId) {
         this.leagueId = leagueId;
     }
 
