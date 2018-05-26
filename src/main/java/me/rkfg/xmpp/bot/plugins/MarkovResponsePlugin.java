@@ -37,34 +37,28 @@ public class MarkovResponsePlugin extends MessagePluginImpl {
 
     @Override
     public void init() {
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        if (answersTimes.size() > answersLimit) {
-                            answersTimes.poll();
-                            Long first = answersTimes.peekFirst();
-                            Long last = answersTimes.peekLast();
-                            if (first != null && last != null) {
-                                if (last - first < answersLimitTime) {
-                                    cooldown = true;
-                                    Thread.sleep(random.nextInt(1000) + 1000);
-                                    sendMUCMessage("Устала вам отвечать. Отдохну.");
-                                    Thread.sleep(random.nextInt((cooldownHoursMax - cooldownHoursMin) * 3600000) + cooldownHoursMin
-                                            * 3600000);
-                                    cooldown = false;
-                                    sendMUCMessage("Отдохнула.");
-                                }
+        new Thread(() -> {
+            while (!Thread.interrupted()) {
+                try {
+                    if (answersTimes.size() > answersLimit) {
+                        answersTimes.poll();
+                        Long first = answersTimes.peekFirst();
+                        Long last = answersTimes.peekLast();
+                        if (first != null && last != null) {
+                            if (last - first < answersLimitTime) {
+                                cooldown = true;
+                                Thread.sleep(random.nextInt(1000) + 1000);
+                                sendMUCMessage("Устала вам отвечать. Отдохну.");
+                                Thread.sleep(random.nextInt((cooldownHoursMax - cooldownHoursMin) * 3600000) + cooldownHoursMin * 3600000);
+                                cooldown = false;
+                                sendMUCMessage("Отдохнула.");
                             }
-                        } else {
-                            Thread.sleep(1000);
                         }
-                    } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                    } else {
+                        Thread.sleep(1000);
                     }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
             }
         }, "Cooldown thread").start();
@@ -97,7 +91,7 @@ public class MarkovResponsePlugin extends MessagePluginImpl {
                     Long min = (Long) minmax[0];
                     Long max = (Long) minmax[1];
                     Markov segment = null;
-                    List<String> result = new LinkedList<String>();
+                    List<String> result = new LinkedList<>();
                     String[] userWords = org.apache.commons.lang3.StringUtils.split(matcher.group(1));
                     int userWordLength = 0;
                     // find the longest word in the user input
@@ -140,10 +134,8 @@ public class MarkovResponsePlugin extends MessagePluginImpl {
                 }
             });
         } catch (ClientAuthException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (LogicException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return "что-то пошло не так.";
