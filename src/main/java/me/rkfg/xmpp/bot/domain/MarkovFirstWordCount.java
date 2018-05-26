@@ -1,17 +1,15 @@
 package me.rkfg.xmpp.bot.domain;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
+import ru.ppsrk.gwt.dto.BasicDTO;
+
+@SuppressWarnings("serial")
 @Entity
-@Table(indexes = { @Index(columnList = "word") })
-public class MarkovFirstWordCount {
-    @Id
-    @GeneratedValue
-    Long id;
+@Table(indexes = { @Index(columnList = "word", unique = true) })
+public class MarkovFirstWordCount extends BasicDTO {
     String word;
     Long count;
 
@@ -22,14 +20,6 @@ public class MarkovFirstWordCount {
         super();
         this.word = word;
         count = 0L;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getWord() {

@@ -1,17 +1,15 @@
 package me.rkfg.xmpp.bot.domain;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
+import ru.ppsrk.gwt.dto.BasicDTO;
+
+@SuppressWarnings("serial")
 @Entity
 @Table(indexes = { @Index(columnList = "firstWord"), @Index(columnList = "lastWord"), @Index(columnList = "position") })
-public class Markov {
-    @Id
-    @GeneratedValue
-    Long id;
+public class Markov extends BasicDTO {
     String text;
     String firstWord;
     String lastWord;
@@ -26,14 +24,6 @@ public class Markov {
         this.position = position;
         this.firstWord = firstWord;
         this.lastWord = lastWord;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getText() {

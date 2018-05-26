@@ -1,23 +1,22 @@
 package me.rkfg.xmpp.bot.domain;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import ru.ppsrk.gwt.dto.BasicDTO;
+
+@SuppressWarnings("serial")
 @Entity
 @Table(indexes = { @Index(columnList = "number") })
-public class MarkovFirstWord {
-    @Id
-    @GeneratedValue
-    Long id;
-    @ManyToOne
+public class MarkovFirstWord extends BasicDTO {
+    @ManyToOne(cascade = { CascadeType.DETACH })
     MarkovFirstWordCount word;
     Long number;
-    @OneToOne
+    @OneToOne(cascade = { CascadeType.DETACH })
     Markov markov;
 
     public MarkovFirstWord() {
@@ -28,14 +27,6 @@ public class MarkovFirstWord {
         this.word = word;
         this.number = number;
         this.markov = markov;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public MarkovFirstWordCount getWord() {

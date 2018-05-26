@@ -1,17 +1,15 @@
 package me.rkfg.xmpp.bot.domain;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
+import ru.ppsrk.gwt.dto.BasicDTO;
+
+@SuppressWarnings("serial")
 @Entity
 @Table(indexes = { @Index(columnList = "author"), @Index(columnList = "name"), @Index(columnList = "opinion") })
-public class Opinion {
-    @Id
-    @GeneratedValue
-    Long id;
+public class Opinion extends BasicDTO {
     String author;
     String name;
     String opinion;
@@ -24,14 +22,6 @@ public class Opinion {
         this.author = author;
         this.name = name;
         this.opinion = opinion;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getAuthor() {
