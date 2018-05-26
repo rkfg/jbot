@@ -59,4 +59,9 @@ public class MatrixMessage implements Message {
     public String getBody() {
         return body;
     }
+
+    @Override
+    public Protocol getProtocol() {
+        return Protocol.MATRIX;
+    }
 }

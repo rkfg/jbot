@@ -50,4 +50,9 @@ public class XMPPMessage implements Message {
         return msg.getBody();
     }
 
+    @Override
+    public Protocol getProtocol() {
+        return Protocol.XMPP;
+    }
+
 }
