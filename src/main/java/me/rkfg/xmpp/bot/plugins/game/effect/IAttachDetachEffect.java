@@ -4,6 +4,6 @@ public interface IAttachDetachEffect {
 
     void attachEffect(IEffect effect);
 
-    void detachEffect(String name);
+    void detachEffect(String type);
     
 }

@@ -9,20 +9,21 @@ import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 import me.rkfg.xmpp.bot.plugins.game.misc.AbstractAttributesStorage;
 
 public abstract class AbstractEffect extends AbstractAttributesStorage implements IEffect {
-    private String name;
+
+    private String type;
     protected IGameObject source;
     protected IGameObject target;
     private String localizedName;
 
-    public AbstractEffect(String name, String localizedName, IGameObject source) {
-        this.name = name;
+    public AbstractEffect(String type, String localizedName, IGameObject source) {
+        this.type = type;
         this.localizedName = localizedName;
         this.source = source;
     }
 
     @Override
-    public String getName() {
-        return name;
+    public String getType() {
+        return type;
     }
 
     @Override

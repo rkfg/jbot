@@ -8,7 +8,7 @@ import me.rkfg.xmpp.bot.plugins.game.misc.AbstractAttributesStorage;
 
 public abstract class AbstractEvent extends AbstractAttributesStorage implements IEvent {
 
-    protected String type;
+    private String type;
     protected IGameObject source;
     protected IGameObject target;
     protected Logger log = LoggerFactory.getLogger(getClass());

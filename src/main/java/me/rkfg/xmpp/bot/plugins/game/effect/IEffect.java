@@ -8,7 +8,7 @@ import me.rkfg.xmpp.bot.plugins.game.misc.IHasAttributes;
 
 public interface IEffect extends IHasAttributes {
 
-    String getName();
+    String getType();
 
     Collection<IEvent> processEvent(IEvent event);
 

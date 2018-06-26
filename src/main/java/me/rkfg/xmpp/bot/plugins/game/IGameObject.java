@@ -8,13 +8,13 @@ import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 
 public interface IGameObject extends IGameBase {
 
-    boolean hasEffect(String name);
+    boolean hasEffect(String type);
 
     void enqueueEvent(IEvent event);
 
     void processEvents();
 
-    Optional<IEffect> findEffect(String name);
+    Optional<IEffect> findEffect(String type);
 
     void enqueueEvents(Collection<? extends IEvent> attachEffectEvents);
 

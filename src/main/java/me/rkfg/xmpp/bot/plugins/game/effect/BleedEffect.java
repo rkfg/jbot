@@ -11,11 +11,11 @@ import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 
 public class BleedEffect extends AbstractEffect {
 
-    public static final String BLEED_EFFECT = "bleed";
+    public static final String TYPE = "bleed";
     public static final TypedAttribute<Integer> BLEED_RATE_ATTR = TypedAttribute.of("bleedrate");
 
     public BleedEffect(IGameObject source, int bleedRate) {
-        super(BLEED_EFFECT, "истекает кровью", source);
+        super(TYPE, "истекает кровью", source);
         setAttribute(BLEED_RATE_ATTR, bleedRate);
     }
 

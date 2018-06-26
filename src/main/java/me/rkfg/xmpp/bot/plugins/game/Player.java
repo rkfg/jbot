@@ -84,7 +84,7 @@ public class Player extends AbstractEffectReceiver implements IPlayer, IMutableP
             stats.get(attr).ifPresent(stat -> sb.append(attr.getName()).append(": ").append(stat).append(" | "));
         }
         sb.append("\nЭффекты: ");
-        listEffects().forEach(effect -> sb.append(effect.getName()).append(String.format(" [%s] | ", effect.getLocalizedName())));
+        listEffects().forEach(effect -> sb.append(effect.getType()).append(String.format(" [%s] | ", effect.getLocalizedName())));
         log(sb.toString());
     }
 

@@ -76,18 +76,18 @@ public abstract class AbstractEffectReceiver implements IGameObject, IAttachDeta
     }
 
     @Override
-    public Optional<IEffect> findEffect(String name) {
-        return effects.stream().filter(e -> e.getName().equals(name)).findFirst();
+    public Optional<IEffect> findEffect(String type) {
+        return effects.stream().filter(e -> e.getType().equals(type)).findFirst();
     }
 
     @Override
-    public boolean hasEffect(String name) {
-        return findEffect(name).isPresent();
+    public boolean hasEffect(String type) {
+        return findEffect(type).isPresent();
     }
 
     @Override
     public void attachEffect(IEffect effect) {
-        Optional<IEffect> oldEffect = findEffect(effect.getName());
+        Optional<IEffect> oldEffect = findEffect(effect.getType());
         if (oldEffect.map(e -> !e.isReplacementAllowed(effect)).orElse(false)) {
             return;
         }
@@ -101,8 +101,8 @@ public abstract class AbstractEffectReceiver implements IGameObject, IAttachDeta
     }
 
     @Override
-    public void detachEffect(String name) {
-        Optional<IEffect> effect = findEffect(name);
+    public void detachEffect(String type) {
+        Optional<IEffect> effect = findEffect(type);
         effect.ifPresent(e -> {
             effects.remove(e);
             e.onDetach();

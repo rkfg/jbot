@@ -80,7 +80,7 @@ public class GamePlugin extends CommandPlugin {
                 String cmd = args.get(0);
                 if ("спать".equals(cmd)) {
                     if (args.size() == 1) {
-                        player.findEffect(SleepEffect.SLEEP_EFFECT).ifPresent(e -> player.log("Выбранный режим сна: "
+                        player.findEffect(SleepEffect.TYPE).ifPresent(e -> player.log("Выбранный режим сна: "
                                 + e.getAttribute(SleepEffect.SLEEP_TYPE_ATTR).map(SleepType::getLocalized).orElse("")));
                     }
                     if (args.size() == 2) {

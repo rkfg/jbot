@@ -9,7 +9,7 @@ import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 
 public class SleepEffect extends AbstractEffect {
 
-    public static final String SLEEP_EFFECT = "sleep";
+    public static final String TYPE = "sleep";
     public static final TypedAttribute<SleepType> SLEEP_TYPE_ATTR = TypedAttribute.of("sleeptype");
 
     public enum SleepType {
@@ -28,9 +28,9 @@ public class SleepEffect extends AbstractEffect {
         }
     }
 
-    public SleepEffect(SleepType type, IGameObject source) {
-        super(SLEEP_EFFECT, "может спать по ночам", source);
-        setAttribute(SLEEP_TYPE_ATTR, type);
+    public SleepEffect(SleepType sleepType, IGameObject source) {
+        super(TYPE, "может спать по ночам", source);
+        setAttribute(SLEEP_TYPE_ATTR, sleepType);
     }
 
     @Override
