@@ -9,5 +9,8 @@ public interface IEvent extends IHasAttributes {
 
     public String getType();
 
+    public IGameObject getTarget();
+
     public void setTarget(IGameObject target);
+
 }

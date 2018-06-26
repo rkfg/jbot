@@ -24,8 +24,13 @@ public abstract class AbstractEvent extends AbstractAttributesStorage implements
     }
 
     @Override
+    public IGameObject getTarget() {
+        return target;
+    }
+
+    @Override
     public void setTarget(IGameObject target) {
         this.target = target;
     }
-    
+
 }

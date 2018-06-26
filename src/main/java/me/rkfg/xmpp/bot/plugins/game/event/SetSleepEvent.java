@@ -8,12 +8,12 @@ import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 
 public class SetSleepEvent extends AbstractEvent {
 
-    public static final String SETSLEEP_EVENT_TYPE = "setsleep";
+    public static final String TYPE = "setsleep";
 
     public static final TypedAttribute<SleepType> SLEEP_ATTR = TypedAttribute.of("sleeptype");
 
     public SetSleepEvent(SleepType type, IGameObject source) {
-        super(SETSLEEP_EVENT_TYPE, source);
+        super(TYPE, source);
         setAttribute(SLEEP_ATTR, type);
     }
 

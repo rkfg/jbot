@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 
 import me.rkfg.xmpp.bot.message.Message;
 import me.rkfg.xmpp.bot.plugins.CommandPlugin;
+import me.rkfg.xmpp.bot.plugins.game.effect.BleedEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.NoGuardSleepEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.SleepEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.SleepEffect.SleepType;
@@ -57,35 +58,40 @@ public class GamePlugin extends CommandPlugin {
             args = Stream.of(argsStr.split(" ")).filter(c -> !c.isEmpty()).collect(Collectors.toList());
         }
         IPlayer player = getCurrentPlayer(message);
-        if (state == GameState.GATHER && player.listEffects().isEmpty()) {
-            ((Player) player).setName("Test name");
-            StatsEffect statsEffect = new StatsEffect("fat", "жиробасина", Player.WORLD);
-            statsEffect.setStatChange(Player.ATK, 1);
-            statsEffect.setStatChange(Player.DEF, -1);
-            StatsEffect statsEffectAlco = new StatsEffect("alcoholic", "алкашня", Player.WORLD);
-            statsEffectAlco.setStatChange(Player.DEF, -1);
-            statsEffectAlco.setStatChange(Player.PRT, -1);
-            statsEffectAlco.addEffect(new NoGuardSleepEffect(Player.WORLD));
-            player.enqueueEvents(new EffectEvent(statsEffect), new EffectEvent(statsEffectAlco),
-                    new SetSleepEvent(SleepType.DEEP, Player.WORLD));
-        }
-        if (args.isEmpty()) {
+        if (!player.isAlive()) {
             player.dumpStats();
+            player.log("Вы умерли и не можете играть далее.");
         } else {
-            String cmd = args.get(0);
-            if ("спать".equals(cmd)) {
-                if (args.size() == 1) {
-                    player.findEffect(SleepEffect.SLEEP_EFFECT).ifPresent(e -> player.log(
-                            "Выбранный режим сна: " + e.getAttribute(SleepEffect.SLEEP_TYPE_ATTR).map(SleepType::getLocalized).orElse("")));
-                }
-                if (args.size() == 2) {
-                    try {
-                        Integer sleepInt = Integer.valueOf(args.get(1));
-                        if (sleepInt < 0 || sleepInt > 2) {
-                            return "неверный режим сна";
+            if (state == GameState.GATHER && player.listEffects().isEmpty()) {
+                ((Player) player).setName("Test name");
+                StatsEffect statsEffectFat = new StatsEffect("fat", "жиробасина", Player.WORLD);
+                statsEffectFat.setStatChange(Player.ATK, 1);
+                statsEffectFat.setStatChange(Player.DEF, -1);
+                StatsEffect statsEffectAlco = new StatsEffect("alcoholic", "алкашня", Player.WORLD);
+                statsEffectAlco.setStatChange(Player.DEF, -1);
+                statsEffectAlco.setStatChange(Player.PRT, -1);
+                statsEffectAlco.addEffect(new NoGuardSleepEffect(Player.WORLD));
+                player.enqueueEvents(new EffectEvent(statsEffectFat), new EffectEvent(statsEffectAlco),
+                        new SetSleepEvent(SleepType.DEEP, Player.WORLD), new EffectEvent(new BleedEffect(player, 2)));
+            }
+            if (args.isEmpty()) {
+                player.dumpStats();
+            } else {
+                String cmd = args.get(0);
+                if ("спать".equals(cmd)) {
+                    if (args.size() == 1) {
+                        player.findEffect(SleepEffect.SLEEP_EFFECT).ifPresent(e -> player.log("Выбранный режим сна: "
+                                + e.getAttribute(SleepEffect.SLEEP_TYPE_ATTR).map(SleepType::getLocalized).orElse("")));
+                    }
+                    if (args.size() == 2) {
+                        try {
+                            Integer sleepInt = Integer.valueOf(args.get(1));
+                            if (sleepInt < 0 || sleepInt > 2) {
+                                return "неверный режим сна";
+                            }
+                            player.enqueueEvent(new SetSleepEvent(SleepType.values()[sleepInt], player));
+                        } catch (NumberFormatException e) {
                         }
-                        player.enqueueEvent(new SetSleepEvent(SleepType.values()[sleepInt], player));
-                    } catch (NumberFormatException e) {
                     }
                 }
             }

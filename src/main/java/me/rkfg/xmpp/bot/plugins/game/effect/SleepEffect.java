@@ -35,9 +35,8 @@ public class SleepEffect extends AbstractEffect {
 
     @Override
     public Collection<IEvent> processEvent(IEvent event) {
-        if (event.getType().equals(TickEvent.TICK_EVENT_TYPE)) {
-            target.log("Checking if it's time to sleep... Our type is "
-                    + getAttribute(SLEEP_TYPE_ATTR).map(SleepType::getLocalized).orElse(""));
+        if (event.getType().equals(TickEvent.TYPE)) {
+            // add sleep logic
         }
         return super.processEvent(event);
     }

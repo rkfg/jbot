@@ -57,9 +57,11 @@ public abstract class AbstractEffectReceiver implements IGameObject, IAttachDeta
                 for (IEffect effect : effects) {
                     Collection<IEvent> result = effect.processEvent(event);
                     if (result != null) {
-                        if (result.stream().anyMatch(e -> CancelEvent.CANCEL.equals(e.getType()))) {
+                        if (result.stream().anyMatch(e -> CancelEvent.TYPE.equals(e.getType()))) {
                             eiter.remove();
                         }
+                        // set ourselves as a target by default as most events are directed to us
+                        result.stream().filter(e -> e.getTarget() == null).forEach(e -> e.setTarget(this));
                         processedEvents.addAll(result);
                     }
                 }

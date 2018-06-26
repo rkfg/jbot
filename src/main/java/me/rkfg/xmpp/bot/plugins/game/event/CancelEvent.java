@@ -4,10 +4,10 @@ import me.rkfg.xmpp.bot.plugins.game.Player;
 
 public class CancelEvent extends AbstractEvent {
 
-    public static final String CANCEL = "cancel";
+    public static final String TYPE = "cancel";
 
     public CancelEvent() {
-        super(CANCEL, Player.WORLD);
+        super(TYPE, Player.WORLD);
     }
 
     @Override

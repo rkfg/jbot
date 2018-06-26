@@ -1,6 +1,5 @@
 package me.rkfg.xmpp.bot.plugins.game;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,7 +8,7 @@ import me.rkfg.xmpp.bot.plugins.game.effect.AbstractEffectReceiver;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
-public class Player extends AbstractEffectReceiver implements IPlayer {
+public class Player extends AbstractEffectReceiver implements IPlayer, IMutablePlayer {
 
     private class LogEntry {
         String message;
@@ -27,19 +26,6 @@ public class Player extends AbstractEffectReceiver implements IPlayer {
     }
 
     private List<LogEntry> log = new LinkedList<>();
-
-    public static final TypedAttribute<Integer> STM = TypedAttribute.of("Stamina");
-    public static final TypedAttribute<Integer> LCK = TypedAttribute.of("Luck");
-    public static final TypedAttribute<Integer> PRT = TypedAttribute.of("Protection");
-    public static final TypedAttribute<Integer> STR = TypedAttribute.of("Strength");
-    public static final TypedAttribute<Integer> DEF = TypedAttribute.of("Defense");
-    public static final TypedAttribute<Integer> ATK = TypedAttribute.of("Attack");
-    public static final TypedAttribute<Integer> HP = TypedAttribute.of("Hitpoints");
-
-    public static final List<TypedAttribute<Integer>> STATS = Arrays.asList(HP, STM, ATK, DEF, STR, PRT, LCK);
-
-    public static final Player WORLD = new Player("ZAWARUDO") {
-    }; // dummy object for placeholder and log purposes
 
     private TypedAttributeMap stats = new TypedAttributeMap();
     private String id;
@@ -62,10 +48,16 @@ public class Player extends AbstractEffectReceiver implements IPlayer {
     }
 
     @Override
+    public Integer getStat(TypedAttribute<Integer> attr) {
+        return stats.get(attr).orElse(-1);
+    }
+
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public void setId(String id) {
         this.id = id;
     }
@@ -75,10 +67,12 @@ public class Player extends AbstractEffectReceiver implements IPlayer {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public void changeStat(TypedAttribute<Integer> attr, Integer diff) {
         stats.get(attr).ifPresent(s -> stats.put(attr, Math.max(s + diff, 0))); // clamped to zero
     }

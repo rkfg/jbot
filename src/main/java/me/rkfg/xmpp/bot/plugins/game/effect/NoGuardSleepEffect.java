@@ -17,7 +17,7 @@ public class NoGuardSleepEffect extends AbstractEffect {
 
     @Override
     public Collection<IEvent> processEvent(IEvent event) {
-        if (event.getType().equals(SetSleepEvent.SETSLEEP_EVENT_TYPE)
+        if (event.getType().equals(SetSleepEvent.TYPE)
                 && event.getAttribute(SetSleepEvent.SLEEP_ATTR).orElse(SleepType.DEEP) == SleepType.GUARD) {
             target.log("Этот персонаж не может спать вполглаза");
             return Arrays.asList(new CancelEvent());
