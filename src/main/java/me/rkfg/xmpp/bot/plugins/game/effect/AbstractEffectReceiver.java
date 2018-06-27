@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
+import me.rkfg.xmpp.bot.plugins.game.World;
 import me.rkfg.xmpp.bot.plugins.game.event.CancelEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.EffectEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
@@ -29,6 +30,9 @@ public abstract class AbstractEffectReceiver implements IGameObject, IAttachDeta
     private void addEvent(IEvent event) {
         if (event.getTarget() == null) {
             event.setTarget(this);
+        }
+        if (event.getSource() == null) {
+            event.setSource(World.THIS);
         }
         incomingEvents.add(event);
     }
@@ -96,6 +100,9 @@ public abstract class AbstractEffectReceiver implements IGameObject, IAttachDeta
             oe.onDetach();
         });
         effect.setTarget(this);
+        if (effect.getSource() == null) {
+            effect.setSource(World.THIS);
+        }
         effect.onAttach();
         effects.add(effect);
     }

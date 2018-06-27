@@ -32,6 +32,11 @@ public abstract class AbstractEvent implements IEvent {
     }
 
     @Override
+    public void setSource(IGameObject source) {
+        this.source = source;
+    }
+
+    @Override
     public IGameObject getTarget() {
         return target;
     }

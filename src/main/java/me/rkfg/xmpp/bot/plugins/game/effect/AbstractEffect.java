@@ -38,6 +38,11 @@ public abstract class AbstractEffect implements IEffect {
     }
 
     @Override
+    public void setSource(IGameObject source) {
+        this.source = source;
+    }
+    
+    @Override
     public IGameObject getTarget() {
         return target;
     }
