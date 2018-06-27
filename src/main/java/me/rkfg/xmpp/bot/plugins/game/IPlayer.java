@@ -14,6 +14,7 @@ public interface IPlayer extends IGameObject {
     public static final TypedAttribute<Integer> STR = TypedAttribute.of("Strength");
     public static final TypedAttribute<Integer> DEF = TypedAttribute.of("Defense");
     public static final TypedAttribute<Integer> ATK = TypedAttribute.of("Attack");
+    public static final TypedAttribute<Boolean> DEAD = TypedAttribute.of("Dead");
     public static final List<TypedAttribute<Integer>> STATS = Arrays.asList(HP, STM, ATK, DEF, STR, PRT, LCK);
 
     public static final Player WORLD = new Player("ZAWARUDO"); // dummy object for placeholder and log purposes

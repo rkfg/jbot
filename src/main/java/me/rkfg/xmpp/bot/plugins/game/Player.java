@@ -40,11 +40,12 @@ public class Player extends AbstractEffectReceiver implements IPlayer, IMutableP
         stats.put(PRT, 10);
         stats.put(LCK, 10);
         stats.put(STM, 10);
+        stats.put(DEAD, false);
     }
 
     @Override
     public boolean isAlive() {
-        return stats.get(HP).orElse(0) > 0;
+        return !stats.get(DEAD).orElse(false);
     }
 
     @Override
@@ -101,5 +102,13 @@ public class Player extends AbstractEffectReceiver implements IPlayer, IMutableP
     @Override
     public void log(String message) {
         log.add(new LogEntry(message));
+    }
+
+    @Override
+    public void setDead(boolean dead) {
+        stats.get(DEAD).filter(v -> !v.equals(dead)).ifPresent(v -> {
+            log(dead ? "Вы умерли." : "Вы воскресли.");
+            stats.put(DEAD, dead);
+        });
     }
 }
