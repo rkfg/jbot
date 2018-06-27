@@ -1,7 +1,6 @@
 package me.rkfg.xmpp.bot.plugins.game.event;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
-import me.rkfg.xmpp.bot.plugins.game.effect.IAttachDetachEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.SleepEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.SleepEffect.SleepType;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
@@ -21,7 +20,7 @@ public class SetSleepEvent extends AbstractEvent {
     @Override
     public void apply() {
         getAttribute(SLEEP_ATTR).ifPresent(st -> {
-            ((IAttachDetachEffect) target).attachEffect(new SleepEffect(st, source));
+            target.enqueueAttachEffect(new SleepEffect(st, source));
             super.apply();
         });
     }
