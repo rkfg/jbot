@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BinaryOperator;
 
 import me.rkfg.xmpp.bot.plugins.game.effect.AbstractEffectReceiver;
 import me.rkfg.xmpp.bot.plugins.game.effect.DeadEffect;
@@ -32,6 +33,8 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
     private TypedAttributeMap stats = new TypedAttributeMap();
     private String id;
     private String name;
+
+    private BinaryOperator<String> pipeReducer = (acc, v) -> acc + " | " + v;
 
     public Player(String id) {
         this.id = id;
@@ -82,11 +85,11 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
     @Override
     public void dumpStats() {
         StringBuilder sb = new StringBuilder("Статы: ");
-        for (TypedAttribute<Integer> attr : STATS) {
-            stats.get(attr).ifPresent(stat -> sb.append(attr.getName()).append(": ").append(stat).append(" | "));
-        }
-        sb.append("\nЭффекты: ");
-        listEffects().forEach(effect -> sb.append(effect.getType()).append(String.format(" [%s] | ", effect.getLocalizedName())));
+        sb.append(STATS.stream().map(attr -> stats.get(attr).map(stat -> attr.getName() + ": " + stat)).filter(Optional::isPresent)
+                .map(Optional::get).reduce(pipeReducer).orElse("нет стат"));
+        sb.append("\nЭффекты: ")
+                .append(listEffects().stream().map(effect -> effect.getType() + String.format(" [%s]", effect.getLocalizedName()))
+                        .reduce(pipeReducer).orElse("нет эффектов"));
         log(sb.toString());
     }
 
@@ -121,7 +124,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
     public Optional<IPlayer> asPlayer() {
         return Optional.of(this);
     }
-    
+
     @Override
     public Optional<IMutablePlayer> asMutablePlayer() {
         return Optional.of(this);
