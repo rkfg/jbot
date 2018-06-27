@@ -10,9 +10,4 @@ public class TickEvent extends AbstractEvent {
         super(TYPE, Player.WORLD);
     }
 
-    @Override
-    public void apply() {
-        source.log("Tick-tock");
-    }
-
 }

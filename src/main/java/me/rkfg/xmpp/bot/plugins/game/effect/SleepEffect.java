@@ -35,7 +35,7 @@ public class SleepEffect extends AbstractEffect {
 
     @Override
     public Collection<IEvent> processEvent(IEvent event) {
-        if (event.getType().equals(TickEvent.TYPE)) {
+        if (event.isOfType(TickEvent.TYPE)) {
             // add sleep logic
         }
         return super.processEvent(event);

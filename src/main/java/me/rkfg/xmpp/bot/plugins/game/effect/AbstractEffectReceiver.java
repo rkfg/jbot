@@ -81,11 +81,6 @@ public abstract class AbstractEffectReceiver implements IGameObject, IAttachDeta
     }
 
     @Override
-    public boolean hasEffect(String type) {
-        return findEffect(type).isPresent();
-    }
-
-    @Override
     public void attachEffect(IEffect effect) {
         Optional<IEffect> oldEffect = findEffect(effect.getType());
         if (oldEffect.map(e -> !e.isReplacementAllowed(effect)).orElse(false)) {
@@ -113,4 +108,5 @@ public abstract class AbstractEffectReceiver implements IGameObject, IAttachDeta
     public Collection<IEffect> listEffects() {
         return Collections.unmodifiableSet(effects);
     }
+
 }

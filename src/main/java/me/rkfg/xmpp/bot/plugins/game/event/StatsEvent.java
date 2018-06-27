@@ -8,7 +8,6 @@ import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 public class StatsEvent extends AbstractEvent {
 
     public static final String TYPE = "statchange";
-    public static final TypedAttribute<String> COMMENT = TypedAttribute.of("comment");
 
     public StatsEvent(IGameObject source) {
         super(TYPE, source);
@@ -26,7 +25,7 @@ public class StatsEvent extends AbstractEvent {
                 int oldStat = player.getStat(attr);
                 player.changeStat(attr, s);
                 if (player.getStat(attr) != oldStat) {
-                    getAttribute(COMMENT).ifPresent(m -> target.log(m));
+                    super.apply();
                 }
             });
         }

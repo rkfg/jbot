@@ -15,13 +15,14 @@ public class SetSleepEvent extends AbstractEvent {
     public SetSleepEvent(SleepType type, IGameObject source) {
         super(TYPE, source);
         setAttribute(SLEEP_ATTR, type);
+        setAttribute(COMMENT, "Персонаж выбирает стратегию сна: " + type.getLocalized());
     }
 
     @Override
     public void apply() {
         getAttribute(SLEEP_ATTR).ifPresent(st -> {
-            target.log("Персонаж выбирает стратегию сна: " + st.getLocalized());
             ((IAttachDetachEffect) target).attachEffect(new SleepEffect(st, source));
+            super.apply();
         });
     }
 

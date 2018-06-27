@@ -19,12 +19,18 @@ public class NoGuardSleepEffect extends AbstractEffect {
 
     @Override
     public Collection<IEvent> processEvent(IEvent event) {
-        if (event.getType().equals(SetSleepEvent.TYPE)
-                && event.getAttribute(SetSleepEvent.SLEEP_ATTR).orElse(SleepType.DEEP) == SleepType.GUARD) {
+        if (event.matchByTypeAttr(SetSleepEvent.TYPE, SetSleepEvent.SLEEP_ATTR, SleepType.GUARD)) {
             target.log("Этот персонаж не может спать вполглаза");
             return Arrays.asList(new CancelEvent());
         }
         return super.processEvent(event);
+    }
+
+    @Override
+    public void onAttach() {
+        if (target.hasMatchingEffect(SleepEffect.TYPE, SleepEffect.SLEEP_TYPE_ATTR, SleepType.GUARD)) {
+            target.enqueueEvent(new SetSleepEvent(SleepType.AWAKE, source));
+        }
     }
 
 }

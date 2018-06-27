@@ -2,18 +2,18 @@ package me.rkfg.xmpp.bot.plugins.game.effect;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
-import me.rkfg.xmpp.bot.plugins.game.misc.AbstractAttributesStorage;
+import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
-public abstract class AbstractEffect extends AbstractAttributesStorage implements IEffect {
+public abstract class AbstractEffect implements IEffect {
 
     private String type;
     protected IGameObject source;
     protected IGameObject target;
     private String localizedName;
+    TypedAttributeMap attrs = new TypedAttributeMap();
 
     public AbstractEffect(String type, String localizedName, IGameObject source) {
         this.type = type;
@@ -29,26 +29,6 @@ public abstract class AbstractEffect extends AbstractAttributesStorage implement
     @Override
     public String getLocalizedName() {
         return localizedName;
-    }
-
-    @Override
-    public void onAttach() {
-
-    }
-
-    @Override
-    public void onDetach() {
-
-    }
-
-    @Override
-    public boolean isReplacementAllowed(IEffect replacement) {
-        return true;
-    }
-
-    @Override
-    public Collection<IEvent> processEvent(IEvent event) {
-        return Collections.emptySet();
     }
 
     @Override
@@ -68,5 +48,14 @@ public abstract class AbstractEffect extends AbstractAttributesStorage implement
 
     protected Collection<IEvent> singleEvent(IEvent event) {
         return Arrays.asList(event);
+    }
+
+    protected Collection<IEvent> multipleEvents(IEvent... events) {
+        return Arrays.asList(events);
+    }
+
+    @Override
+    public TypedAttributeMap getAttrs() {
+        return attrs;
     }
 }

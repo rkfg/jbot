@@ -64,6 +64,7 @@ public class GamePlugin extends CommandPlugin {
         } else {
             if (state == GameState.GATHER && player.listEffects().isEmpty()) {
                 ((Player) player).setName("Test name");
+                player.enqueueEvent(new SetSleepEvent(SleepType.DEEP, Player.WORLD));
                 StatsEffect statsEffectFat = new StatsEffect("fat", "жиробасина", Player.WORLD);
                 statsEffectFat.setStatChange(Player.ATK, 1);
                 statsEffectFat.setStatChange(Player.DEF, -1);
@@ -72,7 +73,7 @@ public class GamePlugin extends CommandPlugin {
                 statsEffectAlco.setStatChange(Player.PRT, -1);
                 statsEffectAlco.addEffect(new NoGuardSleepEffect(Player.WORLD));
                 player.enqueueEvents(new EffectEvent(statsEffectFat), new EffectEvent(statsEffectAlco),
-                        new SetSleepEvent(SleepType.DEEP, Player.WORLD), new EffectEvent(new BleedEffect(player, 2)));
+                        new EffectEvent(new BleedEffect(player, 2)));
             }
             if (args.isEmpty()) {
                 player.dumpStats();

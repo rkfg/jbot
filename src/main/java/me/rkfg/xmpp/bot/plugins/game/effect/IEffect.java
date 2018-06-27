@@ -1,20 +1,26 @@
 package me.rkfg.xmpp.bot.plugins.game.effect;
 
 import java.util.Collection;
+import java.util.Collections;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 import me.rkfg.xmpp.bot.plugins.game.misc.IHasAttributes;
+import me.rkfg.xmpp.bot.plugins.game.misc.IHasType;
 
-public interface IEffect extends IHasAttributes {
+public interface IEffect extends IHasAttributes, IHasType {
 
-    String getType();
+    default Collection<IEvent> processEvent(IEvent event) {
+        return Collections.emptySet();
+    }
 
-    Collection<IEvent> processEvent(IEvent event);
+    default void onAttach() {
 
-    void onAttach();
+    }
 
-    void onDetach();
+    default void onDetach() {
+
+    }
 
     IGameObject getSource();
 
@@ -24,6 +30,8 @@ public interface IEffect extends IHasAttributes {
 
     String getLocalizedName();
 
-    boolean isReplacementAllowed(IEffect replacement);
+    default boolean isReplacementAllowed(IEffect replacement) {
+        return true;
+    }
 
 }
