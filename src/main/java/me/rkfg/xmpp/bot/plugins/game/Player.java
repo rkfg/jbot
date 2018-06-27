@@ -3,12 +3,14 @@ package me.rkfg.xmpp.bot.plugins.game;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import me.rkfg.xmpp.bot.plugins.game.effect.AbstractEffectReceiver;
+import me.rkfg.xmpp.bot.plugins.game.effect.DeadEffect;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
-public class Player extends AbstractEffectReceiver implements IPlayer, IMutablePlayer {
+public class Player extends AbstractEffectReceiver implements IMutablePlayer {
 
     private class LogEntry {
         String message;
@@ -36,21 +38,20 @@ public class Player extends AbstractEffectReceiver implements IPlayer, IMutableP
         stats.put(HP, 10);
         stats.put(ATK, 10);
         stats.put(DEF, 10);
-        stats.put(STR, 10);
-        stats.put(PRT, 10);
+        stats.put(STR, 5);
+        stats.put(PRT, 5);
         stats.put(LCK, 10);
         stats.put(STM, 10);
-        stats.put(DEAD, false);
     }
 
     @Override
     public boolean isAlive() {
-        return !stats.get(DEAD).orElse(false);
+        return !hasEffect(DeadEffect.TYPE);
     }
 
     @Override
     public Integer getStat(TypedAttribute<Integer> attr) {
-        return stats.get(attr).orElse(-1);
+        return stats.get(attr).orElse(0);
     }
 
     @Override
@@ -106,9 +107,23 @@ public class Player extends AbstractEffectReceiver implements IPlayer, IMutableP
 
     @Override
     public void setDead(boolean dead) {
-        stats.get(DEAD).filter(v -> !v.equals(dead)).ifPresent(v -> {
-            log(dead ? "Вы умерли." : "Вы воскресли.");
-            stats.put(DEAD, dead);
-        });
+        final boolean alreadyDead = hasEffect(DeadEffect.TYPE);
+        if (alreadyDead != dead) {
+            if (dead) {
+                enqueueAttachEffect(new DeadEffect());
+            } else {
+                enqueueDetachEffect(DeadEffect.TYPE, World.THIS);
+            }
+        }
+    }
+
+    @Override
+    public Optional<IPlayer> asPlayer() {
+        return Optional.of(this);
+    }
+    
+    @Override
+    public Optional<IMutablePlayer> asMutablePlayer() {
+        return Optional.of(this);
     }
 }

@@ -31,7 +31,15 @@ public class StatsEvent extends AbstractEvent {
                 if (player.getStat(IPlayer.HP) < 1) {
                     player.setDead(true);
                 }
+                if (player.getStat(IPlayer.STM) > 15) {
+                    player.changeStat(IPlayer.STM, Math.min(15 - player.getStat(IPlayer.STM), 0));
+                }
             });
         }
+    }
+
+    public <T> StatsEvent setAttributeChain(TypedAttribute<T> attr, T value) {
+        super.setAttribute(attr, value);
+        return this;
     }
 }

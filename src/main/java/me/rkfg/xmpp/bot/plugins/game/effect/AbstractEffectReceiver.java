@@ -9,6 +9,7 @@ import java.util.Set;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.event.CancelEvent;
+import me.rkfg.xmpp.bot.plugins.game.event.EffectEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 
 public abstract class AbstractEffectReceiver implements IGameObject, IAttachDetachEffect {
@@ -19,13 +20,16 @@ public abstract class AbstractEffectReceiver implements IGameObject, IAttachDeta
     private boolean processingEvents = false;
 
     @Override
-    public void enqueueEvent(IEvent event) {
+    public boolean enqueueEvent(IEvent event) {
         addEvent(event);
         processEvents();
+        return !event.isCancelled();
     }
 
     private void addEvent(IEvent event) {
-        event.setTarget(this);
+        if (event.getTarget() == null) {
+            event.setTarget(this);
+        }
         incomingEvents.add(event);
     }
 
@@ -58,6 +62,7 @@ public abstract class AbstractEffectReceiver implements IGameObject, IAttachDeta
                     Collection<IEvent> result = effect.processEvent(event);
                     if (result != null) {
                         if (result.stream().anyMatch(e -> CancelEvent.TYPE.equals(e.getType()))) {
+                            event.setCancelled();
                             eiter.remove();
                         }
                         // set ourselves as a target by default as most events are directed to us
@@ -109,4 +114,13 @@ public abstract class AbstractEffectReceiver implements IGameObject, IAttachDeta
         return Collections.unmodifiableSet(effects);
     }
 
+    @Override
+    public void enqueueAttachEffect(IEffect effect) {
+        enqueueEvent(new EffectEvent(effect));
+    }
+
+    @Override
+    public void enqueueDetachEffect(String effectType, IGameObject source) {
+        enqueueEvent(new EffectEvent(effectType, source));
+    }
 }

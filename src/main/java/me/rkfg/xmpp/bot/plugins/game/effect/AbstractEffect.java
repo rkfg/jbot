@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
+import me.rkfg.xmpp.bot.plugins.game.event.CancelEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
@@ -52,6 +53,10 @@ public abstract class AbstractEffect implements IEffect {
 
     protected Collection<IEvent> multipleEvents(IEvent... events) {
         return Arrays.asList(events);
+    }
+
+    protected Collection<IEvent> cancelEvent() {
+        return singleEvent(new CancelEvent());
     }
 
     @Override

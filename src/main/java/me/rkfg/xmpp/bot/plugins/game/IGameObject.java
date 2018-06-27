@@ -13,7 +13,7 @@ public interface IGameObject extends IGameBase {
         return findEffect(type).isPresent();
     }
 
-    void enqueueEvent(IEvent event);
+    boolean enqueueEvent(IEvent event);
 
     void processEvents();
 
@@ -30,5 +30,13 @@ public interface IGameObject extends IGameBase {
     void log(String message);
 
     void enqueueEvents(IEvent... events);
+
+    Optional<IPlayer> asPlayer();
+
+    Optional<IMutablePlayer> asMutablePlayer();
+
+    void enqueueAttachEffect(IEffect effect);
+
+    void enqueueDetachEffect(String effectType, IGameObject source);
 
 }
