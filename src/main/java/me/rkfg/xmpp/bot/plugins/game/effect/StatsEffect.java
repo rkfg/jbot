@@ -15,8 +15,8 @@ public class StatsEffect extends AbstractEffect {
     private StatsEvent detachStatsEvent;
     private Set<EffectEvent> detachEffectEvents = new HashSet<>();
 
-    public StatsEffect(String type, String localizedName, IGameObject source) {
-        super(type, localizedName, source);
+    public StatsEffect(String type, String description, IGameObject source) {
+        super(type, description, source);
         attachStatsEvent = new StatsEvent(source);
         detachStatsEvent = new StatsEvent(source);
     }

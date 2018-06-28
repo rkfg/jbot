@@ -42,8 +42,8 @@ public class SleepEffect extends AbstractEffect {
     }
 
     @Override
-    public String getLocalizedName() {
-        return super.getLocalizedName() + getAttribute(SLEEP_TYPE_ATTR).map(st -> ", режим " + st.getLocalized()).orElse("");
+    public String getDescription() {
+        return super.getDescription() + getAttribute(SLEEP_TYPE_ATTR).map(st -> ", режим " + st.getLocalized()).orElse("");
     }
 
 }

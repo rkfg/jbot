@@ -90,7 +90,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
         sb.append(STATS.stream().map(attr -> stats.get(attr).map(stat -> attr.getName() + ": " + stat)).filter(Optional::isPresent)
                 .map(Optional::get).reduce(pipeReducer).orElse("нет стат"));
         sb.append("\nЭффекты: ")
-                .append(listEffects().stream().map(effect -> effect.getType() + String.format(" [%s]", effect.getLocalizedName()))
+                .append(listEffects().stream().map(effect -> effect.getType() + String.format(" [%s]", effect.getDescription()))
                         .reduce(pipeReducer).orElse("нет эффектов"));
         log(sb.toString());
     }

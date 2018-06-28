@@ -13,12 +13,12 @@ public abstract class AbstractEffect implements IEffect {
     private String type;
     protected IGameObject source;
     protected IGameObject target;
-    private String localizedName;
+    private String description;
     TypedAttributeMap attrs = new TypedAttributeMap();
 
-    public AbstractEffect(String type, String localizedName, IGameObject source) {
+    public AbstractEffect(String type, String description, IGameObject source) {
         this.type = type;
-        this.localizedName = localizedName;
+        this.description = description;
         this.source = source;
     }
 
@@ -28,8 +28,8 @@ public abstract class AbstractEffect implements IEffect {
     }
 
     @Override
-    public String getLocalizedName() {
-        return localizedName;
+    public String getDescription() {
+        return description;
     }
 
     @Override

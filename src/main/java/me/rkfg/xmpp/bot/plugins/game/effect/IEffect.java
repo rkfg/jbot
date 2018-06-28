@@ -22,7 +22,7 @@ public interface IEffect extends IHasAttributes, IHasType, IHasDirection {
 
     }
 
-    String getLocalizedName();
+    String getDescription();
 
     default boolean isReplacementAllowed(IEffect replacement) {
         return true;
