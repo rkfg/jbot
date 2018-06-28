@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -36,10 +36,11 @@ public class GamePlugin extends CommandPlugin {
     @Override
     public void init() {
         World.THIS.init();
+        setupHandlers();
     }
 
-    private Map<String, Function<Stream<String>, Optional<String>>> handlers = new HashMap<>();
-    private Map<String, Function<Stream<String>, Optional<String>>> deadHandlers = new HashMap<>();
+    private Map<String, BiFunction<IPlayer, Stream<String>, Optional<String>>> handlers = new HashMap<>();
+    private Map<String, BiFunction<IPlayer, Stream<String>, Optional<String>>> deadHandlers = new HashMap<>();
 
     @Override
     public synchronized String processCommand(Message message, Matcher matcher) throws LogicException, ClientAuthException {
@@ -49,29 +50,28 @@ public class GamePlugin extends CommandPlugin {
             args = Stream.of(argsStr.split(" ")).filter(c -> !c.isEmpty()).collect(Collectors.toList());
         }
         IPlayer player = World.THIS.getCurrentPlayer(message);
-        setupHandlers(player);
         if (!player.isAlive()) {
             return processCommand(deadHandlers, args, player).map(m -> m + "\n" + DEAD_MESSAGE).orElse(COMMAND_HELP_DEAD);
         }
         return processCommand(handlers, args, player).orElse(processCommand(deadHandlers, args, player).orElse(COMMAND_HELP));
     }
 
-    public Optional<String> processCommand(Map<String, Function<Stream<String>, Optional<String>>> handlerMap, List<String> args,
+    public Optional<String> processCommand(Map<String, BiFunction<IPlayer, Stream<String>, Optional<String>>> handlerMap, List<String> args,
             IPlayer player) {
         String cmd = args.stream().findFirst().map(String::toLowerCase).orElse("");
-        Function<Stream<String>, Optional<String>> f = handlerMap.get(cmd);
+        BiFunction<IPlayer, Stream<String>, Optional<String>> f = handlerMap.get(cmd);
         if (f == null) {
             return Optional.empty();
         }
-        return Optional.of(f.apply(args.stream().skip(1)).orElseGet(player::getLog));
+        return Optional.of(f.apply(player, args.stream().skip(1)).orElseGet(player::getLog));
     }
 
-    public void setupHandlers(IPlayer player) {
-        deadHandlers.put("", a -> {
+    public void setupHandlers() {
+        deadHandlers.put("", (player, a) -> {
             player.dumpStats();
             return NORESULT;
         });
-        handlers.put("спать", a -> {
+        handlers.put("спать", (player, a) -> {
             Optional<String> arg = a.findFirst();
             if (arg.isPresent()) {
                 try {
@@ -87,7 +87,7 @@ public class GamePlugin extends CommandPlugin {
             }
             return NORESULT;
         });
-        deadHandlers.put("игроки", a -> {
+        deadHandlers.put("игроки", (player, a) -> {
             List<IPlayer> playersList = World.THIS.listPlayers();
             if (playersList.isEmpty()) {
                 return Optional.of("Игроков нет.");
@@ -97,7 +97,7 @@ public class GamePlugin extends CommandPlugin {
                 return "" + (i + 1) + ": " + p.getName() + (p.isAlive() ? "" : " [мёртв]");
             }).reduce((acc, p) -> acc + ", " + p).map(list -> "Игроки: " + list);
         });
-        handlers.put("атака", a -> {
+        handlers.put("атака", (player, a) -> {
             try {
                 List<IPlayer> playersList = World.THIS.listPlayers();
                 IPlayer target = a.findFirst().map(Integer::valueOf).filter(v -> v > 0 && v <= playersList.size())
