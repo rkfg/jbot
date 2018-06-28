@@ -31,9 +31,7 @@ public interface IGameObject extends IGameBase {
 
     void enqueueEvents(IEvent... events);
 
-    Optional<IPlayer> asPlayer();
-
-    Optional<IMutablePlayer> asMutablePlayer();
+    <T extends IGameObject> Optional<T> as(TypedAttribute<T> type);
 
     void enqueueAttachEffect(IEffect effect);
 

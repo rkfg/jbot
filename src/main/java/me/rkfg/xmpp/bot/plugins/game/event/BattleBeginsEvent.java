@@ -1,7 +1,8 @@
 package me.rkfg.xmpp.bot.plugins.game.event;
 
+import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
+
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
-import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.misc.Utils;
 
 public class BattleBeginsEvent extends AbstractEvent {
@@ -34,7 +35,7 @@ public class BattleBeginsEvent extends AbstractEvent {
             if (attackEvent.isSuccessful()) {
                 srcPlayer.log("Атака достигает цели и наносит " + attackEvent.getDamage() + " урона!");
                 tgtPlayer.log("Соперник наносит вам " + attackEvent.getDamage() + " урона!");
-                tgtPlayer.enqueueEvent(new StatsEvent(srcPlayer).setAttributeChain(IPlayer.HP, -attackEvent.getDamage()));
+                tgtPlayer.enqueueEvent(new StatsEvent(srcPlayer).setAttributeChain(HP, -attackEvent.getDamage()));
             } else {
                 srcPlayer.log("Вы пытаетесь поразить соперника, но промахиваетесь!");
                 tgtPlayer.log("Соперник пытается нанести удар, но промахивается!");

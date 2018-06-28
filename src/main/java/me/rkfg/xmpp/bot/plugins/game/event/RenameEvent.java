@@ -1,5 +1,7 @@
 package me.rkfg.xmpp.bot.plugins.game.event;
 
+import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
+
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 import me.rkfg.xmpp.bot.plugins.game.misc.Utils;
@@ -16,7 +18,7 @@ public class RenameEvent extends AbstractEvent {
 
     @Override
     public void apply() {
-        target.asMutablePlayer().ifPresent(p -> p.setName(getAttribute(NAME).orElse(p.getName())));
+        target.as(MUTABLEPLAYER_OBJ).ifPresent(p -> p.setName(getAttribute(NAME).orElse(p.getName())));
         target.log("Персонажа теперь зовут " + Utils.getPlayerName(target));
     }
 

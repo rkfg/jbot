@@ -1,9 +1,11 @@
 package me.rkfg.xmpp.bot.plugins.game.effect;
 
-public interface IAttachDetachEffect {
+import me.rkfg.xmpp.bot.plugins.game.IGameBase;
+
+public interface IAttachDetachEffect extends IGameBase {
 
     void attachEffect(IEffect effect);
 
     void detachEffect(String type);
-    
+
 }

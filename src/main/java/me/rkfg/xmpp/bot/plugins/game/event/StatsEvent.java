@@ -1,8 +1,8 @@
 package me.rkfg.xmpp.bot.plugins.game.event;
 
+import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
+
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
-import me.rkfg.xmpp.bot.plugins.game.IPlayer;
-import me.rkfg.xmpp.bot.plugins.game.Player;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 
 public class StatsEvent extends AbstractEvent {
@@ -15,18 +15,18 @@ public class StatsEvent extends AbstractEvent {
 
     @Override
     public void apply() {
-        for (TypedAttribute<Integer> attr : Player.STATS) {
-            getAttribute(attr).ifPresent(s -> target.asMutablePlayer().ifPresent(player -> {
+        for (TypedAttribute<Integer> attr : STATS) {
+            getAttribute(attr).ifPresent(s -> target.as(MUTABLEPLAYER_OBJ).ifPresent(player -> {
                 int oldStat = player.getStat(attr);
                 player.changeStat(attr, s);
                 if (player.getStat(attr) != oldStat) {
                     super.apply();
                 }
-                if (player.getStat(IPlayer.HP) < 1) {
+                if (player.getStat(HP) < 1) {
                     player.setDead(true);
                 }
-                if (player.getStat(IPlayer.STM) > 15) {
-                    player.changeStat(IPlayer.STM, Math.min(15 - player.getStat(IPlayer.STM), 0));
+                if (player.getStat(STM) > 15) {
+                    player.changeStat(STM, Math.min(15 - player.getStat(STM), 0));
                 }
             }));
         }

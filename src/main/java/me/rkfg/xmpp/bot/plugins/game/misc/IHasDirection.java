@@ -1,8 +1,9 @@
 package me.rkfg.xmpp.bot.plugins.game.misc;
 
+import me.rkfg.xmpp.bot.plugins.game.IGameBase;
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 
-public interface IHasDirection {
+public interface IHasDirection extends IGameBase {
 
     public IGameObject getSource();
 

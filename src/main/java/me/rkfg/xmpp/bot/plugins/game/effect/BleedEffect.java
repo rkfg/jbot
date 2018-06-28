@@ -1,9 +1,10 @@
 package me.rkfg.xmpp.bot.plugins.game.effect;
 
+import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
+
 import java.util.Collection;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
-import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.StatsEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
@@ -28,7 +29,7 @@ public class BleedEffect extends AbstractEffect {
         if (event.getType().equals(TickEvent.TYPE)) {
             final StatsEvent bleedEvent = new StatsEvent(source);
             final Integer bleedRate = getAttribute(BLEED_RATE_ATTR).orElse(1);
-            bleedEvent.setAttribute(IPlayer.HP, -bleedRate);
+            bleedEvent.setAttribute(HP, -bleedRate);
             bleedEvent.setAttribute(StatsEvent.COMMENT, "Персонаж теряет " + bleedRate + " hp, истекая кровью");
             return singleEvent(bleedEvent);
         }

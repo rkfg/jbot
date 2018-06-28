@@ -1,9 +1,10 @@
 package me.rkfg.xmpp.bot.plugins.game.effect;
 
+import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
+
 import java.util.Collection;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
-import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.StatsEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
@@ -28,7 +29,7 @@ public class StaminaRegenEffect extends AbstractEffect {
         if (!event.isOfType(TickEvent.TYPE)) {
             return super.processEvent(event);
         }
-        return singleEvent(new StatsEvent(source).setAttributeChain(IPlayer.STM, getAttribute(REGEN).orElse(0)));
+        return singleEvent(new StatsEvent(source).setAttributeChain(STM, getAttribute(REGEN).orElse(0)));
     }
 
 }

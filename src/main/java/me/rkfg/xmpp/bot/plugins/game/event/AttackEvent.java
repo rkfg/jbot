@@ -1,5 +1,7 @@
 package me.rkfg.xmpp.bot.plugins.game.event;
 
+import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
+
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
@@ -15,19 +17,19 @@ public class AttackEvent extends AbstractEvent {
         super(TYPE, source);
         setTarget(target);
         try {
-            IPlayer srcPlayer = source.asPlayer().orElseThrow(() -> new RuntimeException("Неверный источник атаки"));
-            IPlayer tgtPlayer = target.asPlayer().orElseThrow(() -> new RuntimeException("Неверная цель атаки"));
-            final int attack = srcPlayer.getStat(IPlayer.ATK) + Utils.drn();
-            setAttribute(IPlayer.ATK, attack);
-            final int defence = tgtPlayer.getStat(IPlayer.DEF) + Utils.drn();
-            setAttribute(IPlayer.DEF, defence);
-            final int strength = srcPlayer.getStat(IPlayer.STR) + Utils.drn();
-            setAttribute(IPlayer.STR, strength);
-            final int protection = tgtPlayer.getStat(IPlayer.PRT) + Utils.drn();
-            setAttribute(IPlayer.PRT, protection);
+            IPlayer srcPlayer = source.as(PLAYER_OBJ).orElseThrow(() -> new RuntimeException("Неверный источник атаки"));
+            IPlayer tgtPlayer = target.as(PLAYER_OBJ).orElseThrow(() -> new RuntimeException("Неверная цель атаки"));
+            final int attack = srcPlayer.getStat(ATK) + Utils.drn();
+            setAttribute(ATK, attack);
+            final int defence = tgtPlayer.getStat(DEF) + Utils.drn();
+            setAttribute(DEF, defence);
+            final int strength = srcPlayer.getStat(STR) + Utils.drn();
+            setAttribute(STR, strength);
+            final int protection = tgtPlayer.getStat(PRT) + Utils.drn();
+            setAttribute(PRT, protection);
             final int damage = Math.max(strength - protection, 0);
             setAttribute(SUCCESSFUL, attack > defence && damage > 0);
-            setAttribute(IPlayer.HP, damage);
+            setAttribute(HP, damage);
         } catch (RuntimeException e) {
             log.warn(e.getMessage());
         }
@@ -38,7 +40,7 @@ public class AttackEvent extends AbstractEvent {
     }
 
     public int getDamage() {
-        return getAttribute(IPlayer.HP).orElse(0);
+        return getAttribute(HP).orElse(0);
     }
 
 }

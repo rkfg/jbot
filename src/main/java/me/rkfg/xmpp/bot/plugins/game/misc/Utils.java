@@ -1,5 +1,7 @@
 package me.rkfg.xmpp.bot.plugins.game.misc;
 
+import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
+
 import java.security.SecureRandom;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
@@ -25,6 +27,6 @@ public class Utils {
     }
     
     public static String getPlayerName(IGameObject obj) {
-        return obj.asPlayer().map(IPlayer::getName).orElse(UNKNOWN);
+        return obj.as(PLAYER_OBJ).map(IPlayer::getName).orElse(UNKNOWN);
     }
 }

@@ -2,7 +2,9 @@ package me.rkfg.xmpp.bot.plugins.game.misc;
 
 import java.util.Optional;
 
-public interface IHasAttributes {
+import me.rkfg.xmpp.bot.plugins.game.IGameBase;
+
+public interface IHasAttributes extends IGameBase {
 
     TypedAttributeMap getAttrs();
 

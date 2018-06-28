@@ -1,5 +1,7 @@
 package me.rkfg.xmpp.bot.plugins.game.effect;
 
+import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
+
 import java.util.Collection;
 import java.util.Optional;
 
@@ -22,9 +24,9 @@ public class BattleFatigueEffect extends AbstractEffect {
     @Override
     public Collection<IEvent> processEvent(IEvent event) {
         if (event.isOfType(BattleBeginsEvent.TYPE) && target == event.getSource()) {
-            Optional<IPlayer> player = target.asPlayer().filter(p -> p.getStat(IPlayer.STM) >= stmCost);
+            Optional<IPlayer> player = target.as(PLAYER_OBJ).filter(p -> p.getStat(STM) >= stmCost);
             if (player.isPresent()) {
-                player.get().enqueueEvent(new StatsEvent(target).setAttributeChain(IPlayer.STM, -stmCost));
+                player.get().enqueueEvent(new StatsEvent(target).setAttributeChain(STM, -stmCost));
             } else {
                 target.log("Вы слишком устали, чтобы сражаться.");
                 return cancelEvent();

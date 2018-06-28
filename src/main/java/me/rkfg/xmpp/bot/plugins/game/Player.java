@@ -1,5 +1,7 @@
 package me.rkfg.xmpp.bot.plugins.game;
 
+import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
+
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -120,13 +122,12 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Optional<IPlayer> asPlayer() {
-        return Optional.of(this);
-    }
-
-    @Override
-    public Optional<IMutablePlayer> asMutablePlayer() {
-        return Optional.of(this);
+    public <T extends IGameObject> Optional<T> as(TypedAttribute<T> type) {
+        if (type == PLAYER_OBJ || type == MUTABLEPLAYER_OBJ) {
+            return Optional.of((T) this);
+        }
+        return Optional.empty();
     }
 }

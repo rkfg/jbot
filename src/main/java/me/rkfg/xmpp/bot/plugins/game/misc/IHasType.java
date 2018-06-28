@@ -1,6 +1,8 @@
 package me.rkfg.xmpp.bot.plugins.game.misc;
 
-public interface IHasType {
+import me.rkfg.xmpp.bot.plugins.game.IGameBase;
+
+public interface IHasType extends IGameBase {
 
     public String getType();
 

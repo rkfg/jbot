@@ -1,5 +1,7 @@
 package me.rkfg.xmpp.bot.plugins.game;
 
+import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,11 +64,11 @@ public class World extends Player {
             player.enqueueAttachEffect(new BattleFatigueEffect(this, 5));
             player.enqueueAttachEffect(new StaminaRegenEffect(this));
             StatsEffect statsEffectFat = new StatsEffect("fat", "жиробасина", this);
-            statsEffectFat.setStatChange(Player.ATK, 1);
-            statsEffectFat.setStatChange(Player.DEF, -1);
+            statsEffectFat.setStatChange(ATK, 1);
+            statsEffectFat.setStatChange(DEF, -1);
             StatsEffect statsEffectAlco = new StatsEffect("alcoholic", "алкашня", this);
-            statsEffectAlco.setStatChange(Player.DEF, -1);
-            statsEffectAlco.setStatChange(Player.PRT, -1);
+            statsEffectAlco.setStatChange(DEF, -1);
+            statsEffectAlco.setStatChange(PRT, -1);
             statsEffectAlco.addEffect(new NoGuardSleepEffect(World.THIS));
             player.enqueueAttachEffect(statsEffectFat);
             player.enqueueAttachEffect(statsEffectAlco);
