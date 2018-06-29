@@ -23,6 +23,7 @@ public class DeadEffect extends AbstractEffect {
     public void onAttach() {
         World.THIS.announce(Utils.getPlayerName(target) + " погиб!");
         target.log("Вы умерли.");
+        World.THIS.checkVictory();
     }
 
     @Override
