@@ -2,8 +2,12 @@ package me.rkfg.xmpp.bot.plugins.game.event;
 
 import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
+import java.util.Optional;
+
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
+import me.rkfg.xmpp.bot.plugins.game.item.IArmor;
+import me.rkfg.xmpp.bot.plugins.game.item.IWeapon;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 import me.rkfg.xmpp.bot.plugins.game.misc.Utils;
 
@@ -19,13 +23,15 @@ public class AttackEvent extends AbstractEvent {
         try {
             IPlayer srcPlayer = source.as(PLAYER_OBJ).orElseThrow(() -> new RuntimeException("Неверный источник атаки"));
             IPlayer tgtPlayer = target.as(PLAYER_OBJ).orElseThrow(() -> new RuntimeException("Неверная цель атаки"));
-            final int attack = srcPlayer.getStat(ATK) + Utils.drn();
+            final Optional<IWeapon> weapon = srcPlayer.getWeapon();
+            final int attack = srcPlayer.getStat(ATK) + weapon.map(IWeapon::getAttack).orElse(0) + Utils.drn();
             setAttribute(ATK, attack);
-            final int defence = tgtPlayer.getStat(DEF) + Utils.drn();
+            final Optional<IArmor> armor = tgtPlayer.getArmor();
+            final int defence = tgtPlayer.getStat(DEF) + armor.map(IArmor::getDefence).orElse(0) + Utils.drn();
             setAttribute(DEF, defence);
-            final int strength = srcPlayer.getStat(STR) + Utils.drn();
+            final int strength = srcPlayer.getStat(STR) + weapon.map(IWeapon::getStrength).orElse(0) + Utils.drn();
             setAttribute(STR, strength);
-            final int protection = tgtPlayer.getStat(PRT) + Utils.drn();
+            final int protection = tgtPlayer.getStat(PRT) + armor.map(IArmor::getProtection).orElse(0) + Utils.drn();
             setAttribute(PRT, protection);
             final int damage = Math.max(strength - protection, 0);
             setAttribute(SUCCESSFUL, attack > defence && damage > 0);

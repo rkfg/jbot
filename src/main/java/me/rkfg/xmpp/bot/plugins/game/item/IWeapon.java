@@ -7,8 +7,21 @@ import java.util.Optional;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 
 public interface IWeapon extends IItem {
+
     @Override
     default Optional<TypedAttribute<ISlot>> getFittingSlot() {
         return Optional.of(WEAPON_SLOT);
+    }
+
+    default Integer getAttack() {
+        return getAttribute(ATK).orElse(0);
+    }
+
+    default Integer getDefence() {
+        return getAttribute(DEF).orElse(0);
+    }
+
+    default Integer getStrength() {
+        return getAttribute(STR).orElse(0);
     }
 }

@@ -11,8 +11,12 @@ import java.util.function.BinaryOperator;
 import me.rkfg.xmpp.bot.plugins.game.effect.AbstractEffectReceiver;
 import me.rkfg.xmpp.bot.plugins.game.effect.DeadEffect;
 import me.rkfg.xmpp.bot.plugins.game.exception.NotEquippableException;
+import me.rkfg.xmpp.bot.plugins.game.item.IArmor;
 import me.rkfg.xmpp.bot.plugins.game.item.IItem;
+import me.rkfg.xmpp.bot.plugins.game.item.IMutableSlot;
 import me.rkfg.xmpp.bot.plugins.game.item.ISlot;
+import me.rkfg.xmpp.bot.plugins.game.item.IWeapon;
+import me.rkfg.xmpp.bot.plugins.game.item.Slot;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
@@ -51,6 +55,8 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
         stats.put(PRT, 5);
         stats.put(LCK, 10);
         stats.put(STM, 10);
+        equipment.put(WEAPON_SLOT, new Slot("оружие"));
+        equipment.put(ARMOR_SLOT, new Slot("броня"));
     }
 
     @Override
@@ -91,10 +97,19 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
     @Override
     public void dumpStats() {
         StringBuilder sb = new StringBuilder("Статы: ");
-        sb.append(STATS.stream().map(attr -> stats.get(attr).map(stat -> attr.getName() + ": " + stat)).filter(Optional::isPresent)
-                .map(Optional::get).reduce(pipeReducer).orElse("нет стат"));
-        sb.append("\nЭффекты: ").append(listEffects().stream().map(effect -> effect.getDescription().orElse(effect.getType()))
-                .reduce(pipeReducer).orElse("нет эффектов"));
+        final String statsStr = STATS.stream().map(attr -> stats.get(attr).map(stat -> attr.getName() + ": " + stat))
+                .filter(Optional::isPresent).map(Optional::get).reduce(pipeReducer).orElse("нет стат");
+        sb.append(statsStr);
+        final String effectsStr = listEffects().stream().map(effect -> effect.getDescription().orElse(effect.getType())).reduce(pipeReducer)
+                .orElse("нет эффектов");
+        sb.append("\nЭффекты: ").append(effectsStr);
+        final String slotsStr = SLOTS.stream()
+                .map(slotAttr -> equipment.get(slotAttr)
+                        .map(s -> String.format("%s: [%s]", s.getDescription().orElse(""),
+                                s.getItem().flatMap(IItem::getDescription).orElse("пусто")))
+                        .orElse(""))
+                .reduce(pipeReducer).orElse("нет слотов");
+        sb.append("\nСлоты: ").append(slotsStr);
         log(sb.toString());
     }
 
@@ -135,10 +150,39 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
     }
 
     @Override
-    public void equipItem(IItem item, boolean equip) {
-        TypedAttribute<ISlot> slot = item.getFittingSlot().orElseThrow(NotEquippableException::new);
-        if (equipment.containsAttr(slot)) {
-            throw new NotEquippableException(id);
+    public Optional<ISlot> getSlot(TypedAttribute<ISlot> slot) {
+        return equipment.get(slot);
+    }
+
+    @Override
+    public void equipItem(IItem item) {
+        TypedAttribute<ISlot> slotAttr = item.getFittingSlot().orElseThrow(NotEquippableException::new);
+        Optional<IMutableSlot> slot = equipment.get(slotAttr).map(s -> (s instanceof IMutableSlot) ? (IMutableSlot) s : null);
+        if (!slot.isPresent()) {
+            throw new NotEquippableException(String.format("слот [%s] не найден", slotAttr.getName()));
         }
+        slot.ifPresent(s -> {
+            Optional<IItem> itemInSlot = s.getItem();
+            itemInSlot.ifPresent(i -> {
+                throw new NotEquippableException(String.format("слот [%s] уже занят предметом [%s]",
+                        s.getDescription().orElse("неизвестный"), i.getDescription().orElse("неизвестно")));
+            });
+            s.setItem(item);
+        });
+    }
+
+    @Override
+    public void unequipItem(TypedAttribute<ISlot> slotAttr) {
+        equipment.get(slotAttr).map(s -> (s instanceof IMutableSlot) ? (IMutableSlot) s : null).ifPresent(s -> s.setItem(null));
+    }
+
+    @Override
+    public Optional<IWeapon> getWeapon() {
+        return getSlot(WEAPON_SLOT).flatMap(ISlot::getItem).flatMap(i -> i.as(WEAPON_OBJ));
+    }
+
+    @Override
+    public Optional<IArmor> getArmor() {
+        return getSlot(ARMOR_SLOT).flatMap(ISlot::getItem).flatMap(i -> i.as(ARMOR_OBJ));
     }
 }

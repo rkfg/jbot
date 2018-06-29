@@ -16,9 +16,12 @@ import me.rkfg.xmpp.bot.plugins.game.effect.NoGuardSleepEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.SleepEffect.SleepType;
 import me.rkfg.xmpp.bot.plugins.game.effect.StaminaRegenEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.StatsEffect;
+import me.rkfg.xmpp.bot.plugins.game.event.EquipEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.RenameEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.SetSleepEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
+import me.rkfg.xmpp.bot.plugins.game.item.armor.WoodenArmor;
+import me.rkfg.xmpp.bot.plugins.game.item.weapon.StickWeapon;
 
 public class World extends Player {
 
@@ -72,6 +75,8 @@ public class World extends Player {
             statsEffectAlco.addEffect(new NoGuardSleepEffect(World.THIS));
             player.enqueueAttachEffect(statsEffectFat);
             player.enqueueAttachEffect(statsEffectAlco);
+            player.enqueueEvent(new EquipEvent(new StickWeapon(null)));
+            player.enqueueEvent(new EquipEvent(new WoodenArmor(null)));
         }
     }
 
