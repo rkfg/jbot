@@ -32,13 +32,13 @@ public class StatsEffect extends AbstractEffect {
     }
 
     @Override
-    public void onAttach() {
+    public void onBeforeAttach() {
         target.enqueueEvent(attachStatsEvent);
         target.enqueueEvents(attachEffectEvents);
     }
 
     @Override
-    public void onDetach() {
+    public void onAfterDetach() {
         target.enqueueEvent(detachStatsEvent);
         target.enqueueEvents(detachEffectEvents);
     }

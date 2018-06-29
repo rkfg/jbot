@@ -96,23 +96,26 @@ public abstract class AbstractEffectReceiver implements IGameObject, IAttachDeta
             return;
         }
         oldEffect.ifPresent(oe -> {
+            oe.onBeforeDetach();
             effects.remove(oe);
-            oe.onDetach();
+            oe.onAfterDetach();
         });
         effect.setTarget(this);
         if (effect.getSource() == null) {
             effect.setSource(World.THIS);
         }
-        effect.onAttach();
+        effect.onBeforeAttach();
         effects.add(effect);
+        effect.onAfterAttach();
     }
 
     @Override
     public void detachEffect(String type) {
         Optional<IEffect> effect = findEffect(type);
         effect.ifPresent(e -> {
+            e.onBeforeDetach();
             effects.remove(e);
-            e.onDetach();
+            e.onAfterDetach();
         });
     }
 

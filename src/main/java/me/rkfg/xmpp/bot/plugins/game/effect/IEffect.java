@@ -15,11 +15,19 @@ public interface IEffect extends IHasAttributes, IHasType, IHasDirection, IHasDe
         return Collections.emptySet();
     }
 
-    default void onAttach() {
+    default void onBeforeAttach() {
 
     }
 
-    default void onDetach() {
+    default void onAfterAttach() {
+
+    }
+
+    default void onAfterDetach() {
+
+    }
+
+    default void onBeforeDetach() {
 
     }
 

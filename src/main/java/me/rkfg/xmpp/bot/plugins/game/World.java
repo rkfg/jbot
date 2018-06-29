@@ -86,7 +86,7 @@ public class World extends Player {
 
     public void checkVictory() {
         List<IPlayer> alive = players.values().stream().filter(IPlayer::isAlive).collect(Collectors.toList());
-        if (alive.size() == 2) { // actually 1 because this is checked before the dead effect is attached
+        if (alive.size() == 1) {
             final IPlayer winner = alive.get(0);
             announce("Игра завершена, последний выживший — " + winner.getName() + " aka " + winner.getId());
             state = GameState.FINISHED;
