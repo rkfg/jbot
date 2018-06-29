@@ -1,5 +1,7 @@
 package me.rkfg.xmpp.bot.plugins.game.item;
 
+import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
+
 import java.util.Optional;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
@@ -13,4 +15,14 @@ public interface IItem extends IGameObject, IHasDescription, IHasAttributes {
     IGameObject getOwner();
 
     void setOwner(IGameObject owner);
+
+    @SuppressWarnings("unchecked")
+    @Override
+    default <T extends IGameObject> Optional<T> as(TypedAttribute<T> type) {
+        if (type == ITEM_OBJ) {
+            return Optional.of((T) this);
+        }
+        return Optional.empty();
+    }
+
 }

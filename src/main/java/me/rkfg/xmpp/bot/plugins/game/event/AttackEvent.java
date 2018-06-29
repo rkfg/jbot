@@ -23,15 +23,17 @@ public class AttackEvent extends AbstractEvent {
         try {
             IPlayer srcPlayer = source.as(PLAYER_OBJ).orElseThrow(() -> new RuntimeException("Неверный источник атаки"));
             IPlayer tgtPlayer = target.as(PLAYER_OBJ).orElseThrow(() -> new RuntimeException("Неверная цель атаки"));
-            final Optional<IWeapon> weapon = srcPlayer.getWeapon();
-            final int attack = srcPlayer.getStat(ATK) + weapon.map(IWeapon::getAttack).orElse(0) + Utils.drn();
+            final Optional<IWeapon> atkWeapon = srcPlayer.getWeapon();
+            final Optional<IWeapon> defWeapon = tgtPlayer.getWeapon();
+            final Optional<IArmor> defArmor = tgtPlayer.getArmor();
+            final int attack = srcPlayer.getStat(ATK) + atkWeapon.map(IWeapon::getAttack).orElse(0) + Utils.drn();
             setAttribute(ATK, attack);
-            final Optional<IArmor> armor = tgtPlayer.getArmor();
-            final int defence = tgtPlayer.getStat(DEF) + armor.map(IArmor::getDefence).orElse(0) + Utils.drn();
+            final int defence = tgtPlayer.getStat(DEF) + defWeapon.map(IWeapon::getDefence).orElse(0)
+                    + defArmor.map(IArmor::getDefence).orElse(0) + Utils.drn();
             setAttribute(DEF, defence);
-            final int strength = srcPlayer.getStat(STR) + weapon.map(IWeapon::getStrength).orElse(0) + Utils.drn();
+            final int strength = srcPlayer.getStat(STR) + atkWeapon.map(IWeapon::getStrength).orElse(0) + Utils.drn();
             setAttribute(STR, strength);
-            final int protection = tgtPlayer.getStat(PRT) + armor.map(IArmor::getProtection).orElse(0) + Utils.drn();
+            final int protection = tgtPlayer.getStat(PRT) + defArmor.map(IArmor::getProtection).orElse(0) + Utils.drn();
             setAttribute(PRT, protection);
             final int damage = Math.max(strength - protection, 0);
             setAttribute(SUCCESSFUL, attack > defence && damage > 0);

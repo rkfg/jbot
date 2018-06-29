@@ -4,6 +4,7 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
 import java.util.Optional;
 
+import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 
 public interface IArmor extends IItem {
@@ -18,5 +19,14 @@ public interface IArmor extends IItem {
 
     default Integer getProtection() {
         return getAttribute(PRT).orElse(0);
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    default <T extends IGameObject> Optional<T> as(TypedAttribute<T> type) {
+        if (type == ARMOR_OBJ) {
+            return Optional.of((T) this);
+        }
+        return Optional.empty();
     }
 }

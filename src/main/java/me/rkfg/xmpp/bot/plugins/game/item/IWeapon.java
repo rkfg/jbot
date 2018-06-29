@@ -4,6 +4,7 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
 import java.util.Optional;
 
+import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 
 public interface IWeapon extends IItem {
@@ -23,5 +24,14 @@ public interface IWeapon extends IItem {
 
     default Integer getStrength() {
         return getAttribute(STR).orElse(0);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    default <T extends IGameObject> Optional<T> as(TypedAttribute<T> type) {
+        if (type == WEAPON_OBJ) {
+            return Optional.of((T) this);
+        }
+        return Optional.empty();
     }
 }
