@@ -7,7 +7,7 @@ import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 public interface IUsable extends IItem {
 
     @Override
-    default Optional<TypedAttribute<IItem>> getFittingSlot() {
+    default Optional<TypedAttribute<ISlot>> getFittingSlot() {
         return Optional.empty();
     }
 }

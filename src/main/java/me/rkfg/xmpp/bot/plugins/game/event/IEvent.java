@@ -1,13 +1,12 @@
 package me.rkfg.xmpp.bot.plugins.game.event;
 
 import me.rkfg.xmpp.bot.plugins.game.misc.IHasAttributes;
+import me.rkfg.xmpp.bot.plugins.game.misc.IHasDescription;
 import me.rkfg.xmpp.bot.plugins.game.misc.IHasDirection;
 import me.rkfg.xmpp.bot.plugins.game.misc.IHasType;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 
-public interface IEvent extends IHasAttributes, IHasType, IHasDirection {
-
-    public static final TypedAttribute<String> COMMENT = TypedAttribute.of("comment");
+public interface IEvent extends IHasAttributes, IHasType, IHasDirection, IHasDescription {
 
     public void apply();
 
@@ -18,9 +17,5 @@ public interface IEvent extends IHasAttributes, IHasType, IHasDirection {
     public void setCancelled();
 
     public boolean isCancelled();
-
-    default void setComment(String comment) {
-        setAttribute(COMMENT, comment);
-    }
 
 }

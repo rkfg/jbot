@@ -6,9 +6,9 @@ public class BattleEndsEvent extends AbstractEvent {
 
     private static final String TYPE = "battleends";
 
-    public BattleEndsEvent(IGameObject source, String battleComment) {
+    public BattleEndsEvent(IGameObject source, String battleDescription) {
         super(TYPE, source);
-        setComment(battleComment + " завершён.");
+        setDescription(battleDescription + " завершён.");
     }
 
 }

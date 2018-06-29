@@ -19,14 +19,14 @@ public class BattleBeginsEvent extends AbstractEvent {
             return;
         }
         // enemy agreed to start the battle
-        final String baseBattleComment = "Бой между " + Utils.getPlayerName(source) + " и " + Utils.getPlayerName(target);
-        setComment(baseBattleComment + " начинается.");
+        final String baseBattleDescription = "Бой между " + Utils.getPlayerName(source) + " и " + Utils.getPlayerName(target);
+        setDescription(baseBattleDescription + " начинается.");
         logTargetComment();
         logSourceComment();
         battleTurn(source, target);
         battleTurn(target, source);
-        source.enqueueEvent(new BattleEndsEvent(source, baseBattleComment));
-        target.enqueueEvent(new BattleEndsEvent(source, baseBattleComment));
+        source.enqueueEvent(new BattleEndsEvent(source, baseBattleDescription));
+        target.enqueueEvent(new BattleEndsEvent(source, baseBattleDescription));
     }
 
     private void battleTurn(IGameObject srcPlayer, IGameObject tgtPlayer) {

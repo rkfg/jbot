@@ -30,7 +30,7 @@ public class BleedEffect extends AbstractEffect {
             final StatsEvent bleedEvent = new StatsEvent(source);
             final Integer bleedRate = getAttribute(BLEED_RATE_ATTR).orElse(1);
             bleedEvent.setAttribute(HP, -bleedRate);
-            bleedEvent.setAttribute(StatsEvent.COMMENT, "Персонаж теряет " + bleedRate + " hp, истекая кровью");
+            bleedEvent.setDescription("Персонаж теряет " + bleedRate + " hp, истекая кровью");
             return singleEvent(bleedEvent);
         }
         return super.processEvent(event);

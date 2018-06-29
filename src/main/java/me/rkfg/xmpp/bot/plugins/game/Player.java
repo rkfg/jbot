@@ -10,6 +10,9 @@ import java.util.function.BinaryOperator;
 
 import me.rkfg.xmpp.bot.plugins.game.effect.AbstractEffectReceiver;
 import me.rkfg.xmpp.bot.plugins.game.effect.DeadEffect;
+import me.rkfg.xmpp.bot.plugins.game.exception.NotEquippableException;
+import me.rkfg.xmpp.bot.plugins.game.item.IItem;
+import me.rkfg.xmpp.bot.plugins.game.item.ISlot;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
@@ -33,6 +36,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
     private List<LogEntry> log = new LinkedList<>();
 
     private TypedAttributeMap stats = new TypedAttributeMap();
+    private TypedAttributeMap equipment = new TypedAttributeMap();
     private String id;
     private String name;
 
@@ -89,9 +93,8 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
         StringBuilder sb = new StringBuilder("Статы: ");
         sb.append(STATS.stream().map(attr -> stats.get(attr).map(stat -> attr.getName() + ": " + stat)).filter(Optional::isPresent)
                 .map(Optional::get).reduce(pipeReducer).orElse("нет стат"));
-        sb.append("\nЭффекты: ")
-                .append(listEffects().stream().map(effect -> effect.getType() + String.format(" [%s]", effect.getDescription()))
-                        .reduce(pipeReducer).orElse("нет эффектов"));
+        sb.append("\nЭффекты: ").append(listEffects().stream().map(effect -> effect.getDescription().orElse(effect.getType()))
+                .reduce(pipeReducer).orElse("нет эффектов"));
         log(sb.toString());
     }
 
@@ -129,5 +132,13 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
             return Optional.of((T) this);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public void equipItem(IItem item, boolean equip) {
+        TypedAttribute<ISlot> slot = item.getFittingSlot().orElseThrow(NotEquippableException::new);
+        if (equipment.containsAttr(slot)) {
+            throw new NotEquippableException(id);
+        }
     }
 }

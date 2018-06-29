@@ -8,7 +8,7 @@ import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 
 public interface IArmor extends IItem {
     @Override
-    default Optional<TypedAttribute<IItem>> getFittingSlot() {
+    default Optional<TypedAttribute<ISlot>> getFittingSlot() {
         return Optional.of(ARMOR_SLOT);
     }
 }

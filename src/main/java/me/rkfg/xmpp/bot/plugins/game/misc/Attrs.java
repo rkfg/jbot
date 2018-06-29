@@ -6,6 +6,7 @@ import java.util.List;
 import me.rkfg.xmpp.bot.plugins.game.IMutablePlayer;
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.item.IItem;
+import me.rkfg.xmpp.bot.plugins.game.item.ISlot;
 
 public class Attrs {
     private Attrs() {
@@ -20,8 +21,8 @@ public class Attrs {
     public static final TypedAttribute<Integer> ATK = TypedAttribute.of("Attack");
     public static final List<TypedAttribute<Integer>> STATS = Arrays.asList(HP, STM, ATK, DEF, STR, PRT, LCK);
 
-    public static final TypedAttribute<IItem> WEAPON_SLOT = TypedAttribute.of("Weapon slot");
-    public static final TypedAttribute<IItem> ARMOR_SLOT = TypedAttribute.of("Armor slot");
+    public static final TypedAttribute<ISlot> WEAPON_SLOT = TypedAttribute.of("Weapon slot");
+    public static final TypedAttribute<ISlot> ARMOR_SLOT = TypedAttribute.of("Armor slot");
     public static final TypedAttribute<List<IItem>> BACKPACK = TypedAttribute.of("Backpack");
     
     // --- use in IGameObject::as to optionally downcast ---

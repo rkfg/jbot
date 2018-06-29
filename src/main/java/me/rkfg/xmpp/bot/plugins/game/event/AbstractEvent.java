@@ -1,5 +1,7 @@
 package me.rkfg.xmpp.bot.plugins.game.event;
 
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +17,7 @@ public abstract class AbstractEvent implements IEvent {
     TypedAttributeMap attrs = new TypedAttributeMap();
 
     private boolean cancelled = false;
+    private String description ;
 
     public AbstractEvent(String type, IGameObject source) {
         this.type = type;
@@ -52,11 +55,11 @@ public abstract class AbstractEvent implements IEvent {
     }
 
     protected void logTargetComment() {
-        getAttribute(COMMENT).ifPresent(m -> target.log(m));
+        getDescription().ifPresent(m -> target.log(m));
     }
 
     protected void logSourceComment() {
-        getAttribute(COMMENT).ifPresent(m -> source.log(m));
+        getDescription().ifPresent(m -> source.log(m));
     }
 
     @Override
@@ -72,5 +75,14 @@ public abstract class AbstractEvent implements IEvent {
     @Override
     public boolean isCancelled() {
         return cancelled;
+    }
+    
+    @Override
+    public Optional<String> getDescription() {
+        return Optional.ofNullable(description);
+    }
+    
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

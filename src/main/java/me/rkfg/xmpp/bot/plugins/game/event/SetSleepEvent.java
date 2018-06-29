@@ -14,7 +14,7 @@ public class SetSleepEvent extends AbstractEvent {
     public SetSleepEvent(SleepType type, IGameObject source) {
         super(TYPE, source);
         setAttribute(SLEEP_ATTR, type);
-        setAttribute(COMMENT, "Персонаж выбирает стратегию сна: " + type.getLocalized());
+        setDescription("Персонаж выбирает стратегию сна: " + type.getLocalized());
     }
 
     @Override

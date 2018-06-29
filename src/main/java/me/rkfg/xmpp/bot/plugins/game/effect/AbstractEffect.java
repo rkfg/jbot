@@ -2,6 +2,7 @@ package me.rkfg.xmpp.bot.plugins.game.effect;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.event.CancelEvent;
@@ -28,8 +29,8 @@ public abstract class AbstractEffect implements IEffect {
     }
 
     @Override
-    public String getDescription() {
-        return description;
+    public Optional<String> getDescription() {
+        return Optional.ofNullable(description);
     }
 
     @Override

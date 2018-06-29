@@ -1,6 +1,7 @@
 package me.rkfg.xmpp.bot.plugins.game.effect;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
@@ -42,8 +43,8 @@ public class SleepEffect extends AbstractEffect {
     }
 
     @Override
-    public String getDescription() {
-        return super.getDescription() + getAttribute(SLEEP_TYPE_ATTR).map(st -> ", режим " + st.getLocalized()).orElse("");
+    public Optional<String> getDescription() {
+        return super.getDescription().map(m -> m + getAttribute(SLEEP_TYPE_ATTR).map(st -> ", режим " + st.getLocalized()).orElse(""));
     }
 
 }
