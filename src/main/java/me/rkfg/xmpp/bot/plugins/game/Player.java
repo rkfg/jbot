@@ -42,7 +42,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
     private TypedAttributeMap stats = new TypedAttributeMap();
     private TypedAttributeMap equipment = new TypedAttributeMap();
     private String id;
-    private String name;
+    private String name = "<безымянный>";
 
     private BinaryOperator<String> pipeReducer = (acc, v) -> acc + " | " + v;
 
