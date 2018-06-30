@@ -8,7 +8,7 @@ import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 import me.rkfg.xmpp.bot.plugins.game.repository.AbstractContentRepository.IndexPointer;
 
 public interface IContentRepository extends IGameBase {
-    
+
     void loadContent();
 
     <T> Collection<TypedAttributeMap> getContent(IndexPointer<T> indexPtr, T value);
@@ -18,4 +18,6 @@ public interface IContentRepository extends IGameBase {
     <T> Optional<TypedAttributeMap> getRandomContent(IndexPointer<T> indexPtr, T value);
 
     Optional<TypedAttributeMap> getRandomContent();
+
+    Optional<TypedAttributeMap> getContentById(String name);
 }

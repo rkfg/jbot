@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.event.CancelEvent;
+import me.rkfg.xmpp.bot.plugins.game.event.EffectEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
@@ -17,10 +18,9 @@ public abstract class AbstractEffect implements IEffect {
     private String description;
     TypedAttributeMap attrs = new TypedAttributeMap();
 
-    public AbstractEffect(String type, String description, IGameObject source) {
+    public AbstractEffect(String type, String description) {
         this.type = type;
         this.description = description;
-        this.source = source;
     }
 
     @Override
@@ -42,7 +42,7 @@ public abstract class AbstractEffect implements IEffect {
     public void setSource(IGameObject source) {
         this.source = source;
     }
-    
+
     @Override
     public IGameObject getTarget() {
         return target;
@@ -51,6 +51,14 @@ public abstract class AbstractEffect implements IEffect {
     @Override
     public void setTarget(IGameObject target) {
         this.target = target;
+    }
+
+    protected Collection<IEvent> detachEffect(String effectType) {
+        return singleEvent(new EffectEvent(effectType, source));
+    }
+
+    protected Collection<IEvent> attachEffect(IEffect effect) {
+        return singleEvent(new EffectEvent(effect));
     }
 
     protected Collection<IEvent> singleEvent(IEvent event) {

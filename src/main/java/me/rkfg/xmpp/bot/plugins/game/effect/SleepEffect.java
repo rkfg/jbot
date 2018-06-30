@@ -3,7 +3,6 @@ package me.rkfg.xmpp.bot.plugins.game.effect;
 import java.util.Collection;
 import java.util.Optional;
 
-import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
@@ -29,9 +28,13 @@ public class SleepEffect extends AbstractEffect {
         }
     }
 
-    public SleepEffect(SleepType sleepType, IGameObject source) {
-        super(TYPE, "может спать по ночам", source);
+    public SleepEffect(SleepType sleepType) {
+        super(TYPE, "может спать по ночам");
         setAttribute(SLEEP_TYPE_ATTR, sleepType);
+    }
+
+    public SleepEffect() {
+        this(SleepType.DEEP);
     }
 
     @Override

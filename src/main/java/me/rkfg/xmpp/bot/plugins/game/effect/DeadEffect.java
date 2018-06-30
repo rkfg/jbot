@@ -11,7 +11,7 @@ public class DeadEffect extends AbstractEffect {
     public static final String TYPE = "dead";
 
     public DeadEffect() {
-        super(TYPE, "мёртв", World.THIS);
+        super(TYPE, "мёртв");
     }
 
     @Override

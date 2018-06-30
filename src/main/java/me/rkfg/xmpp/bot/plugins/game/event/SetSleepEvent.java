@@ -20,7 +20,7 @@ public class SetSleepEvent extends AbstractEvent {
     @Override
     public void apply() {
         getAttribute(SLEEP_ATTR).ifPresent(st -> {
-            target.enqueueAttachEffect(new SleepEffect(st, source));
+            target.enqueueAttachEffect(new SleepEffect(st));
             super.apply();
         });
     }

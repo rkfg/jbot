@@ -37,5 +37,6 @@ public class Attrs {
     // --- use in IGameObject::as to optionally downcast ---
     
     public static final TypedAttribute<String> CONTENT_ID = TypedAttribute.of("contentid");
+    public static final TypedAttribute<Integer> LIFETIME = TypedAttribute.of("lifetime");
     
 }

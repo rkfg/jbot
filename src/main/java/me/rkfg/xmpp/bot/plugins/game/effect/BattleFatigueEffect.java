@@ -5,7 +5,6 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 import java.util.Collection;
 import java.util.Optional;
 
-import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.event.BattleBeginsEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
@@ -13,12 +12,16 @@ import me.rkfg.xmpp.bot.plugins.game.event.StatsEvent;
 
 public class BattleFatigueEffect extends AbstractEffect {
 
-    private static final String TYPE = "battlefatigue";
+    public static final String TYPE = "battlefatigue";
     private int stmCost;
 
-    public BattleFatigueEffect(IGameObject source, int stmCost) {
-        super(TYPE, "устаёт в бою", source);
+    public BattleFatigueEffect(int stmCost) {
+        super(TYPE, "устаёт в бою");
         this.stmCost = stmCost;
+    }
+
+    public BattleFatigueEffect() {
+        this(5);
     }
 
     @Override

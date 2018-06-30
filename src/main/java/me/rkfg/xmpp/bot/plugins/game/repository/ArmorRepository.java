@@ -4,9 +4,19 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
 import java.util.Optional;
 
+import me.rkfg.xmpp.bot.plugins.game.item.IArmor;
+import me.rkfg.xmpp.bot.plugins.game.item.armor.AbstractArmor;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
-public class ArmorRepository extends AbstractContentRepository {
+public class ArmorRepository extends AbstractContentRepository<IArmor> {
+
+    public class Armor extends AbstractArmor {
+
+        public Armor(TypedAttributeMap content) {
+            super(null, content.get(DEF).orElse(0), content.get(PRT).orElse(0), content.get(ArmorRepository.DESC_CNT).orElse(null));
+        }
+
+    }
 
     @Override
     public void loadContent() {
@@ -43,4 +53,8 @@ public class ArmorRepository extends AbstractContentRepository {
         indexAttr(item, TIER_CNT, TIER_IDX);
     }
 
+    @Override
+    protected Optional<IArmor> contentToObject(TypedAttributeMap content) {
+        return Optional.of(new Armor(content));
+    }
 }

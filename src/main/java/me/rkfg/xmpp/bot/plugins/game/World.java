@@ -22,9 +22,8 @@ import me.rkfg.xmpp.bot.plugins.game.event.EquipEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.RenameEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.SetSleepEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
-import me.rkfg.xmpp.bot.plugins.game.item.armor.RepositoryArmor;
-import me.rkfg.xmpp.bot.plugins.game.item.weapon.RepositoryWeapon;
 import me.rkfg.xmpp.bot.plugins.game.repository.ArmorRepository;
+import me.rkfg.xmpp.bot.plugins.game.repository.EffectRepository;
 import me.rkfg.xmpp.bot.plugins.game.repository.NameRepository;
 import me.rkfg.xmpp.bot.plugins.game.repository.WeaponRepository;
 
@@ -42,6 +41,7 @@ public class World extends Player {
     private List<String> names;
     private WeaponRepository weaponRepository;
     private ArmorRepository armorRepository;
+    private EffectRepository effectRepository;
 
     public World() {
         super("ZAWARUDO");
@@ -61,7 +61,9 @@ public class World extends Player {
         nameRepository.loadContent();
         names = nameRepository.getAllContent().stream().map(tm -> tm.get(NameRepository.DESC_CNT)).map(Optional::get)
                 .collect(Collectors.toList());
-        weaponRepository = new WeaponRepository();
+        effectRepository = new EffectRepository();
+        effectRepository.loadContent();
+        weaponRepository = new WeaponRepository(effectRepository);
         weaponRepository.loadContent();
         armorRepository = new ArmorRepository();
         armorRepository.loadContent();
@@ -89,21 +91,20 @@ public class World extends Player {
             }
             player.enqueueEvent(new RenameEvent(this, name));
             player.enqueueEvents(new SetSleepEvent(SleepType.DEEP, this));
-            player.enqueueAttachEffect(new BattleFatigueEffect(this, 5));
-            player.enqueueAttachEffect(new StaminaRegenEffect(this));
-            StatsEffect statsEffectFat = new StatsEffect("fat", "жиробасина", this);
+            effectRepository.getObjectById(BattleFatigueEffect.TYPE).ifPresent(player::enqueueAttachEffect);
+            player.enqueueAttachEffect(new StaminaRegenEffect());
+            StatsEffect statsEffectFat = new StatsEffect("fat", "жиробасина");
             statsEffectFat.setStatChange(ATK, 1);
             statsEffectFat.setStatChange(DEF, -1);
-            StatsEffect statsEffectAlco = new StatsEffect("alcoholic", "алкашня", this);
+            StatsEffect statsEffectAlco = new StatsEffect("alcoholic", "алкашня");
             statsEffectAlco.setStatChange(DEF, -1);
             statsEffectAlco.setStatChange(PRT, -1);
-            statsEffectAlco.addEffect(new NoGuardSleepEffect(World.THIS));
+            statsEffectAlco.addEffect(new NoGuardSleepEffect());
             player.enqueueAttachEffect(statsEffectFat);
             player.enqueueAttachEffect(statsEffectAlco);
-            weaponRepository.getRandomContent(WeaponRepository.TIER_IDX, 1)
-                    .ifPresent(wc -> player.enqueueEvent(new EquipEvent(new RepositoryWeapon(wc))));
-            armorRepository.getRandomContent(ArmorRepository.TIER_IDX, 1)
-                    .ifPresent(wc -> player.enqueueEvent(new EquipEvent(new RepositoryArmor(wc))));
+            weaponRepository.getObjectById("pen").ifPresent(w -> player.enqueueEvent(new EquipEvent(w)));
+            // weaponRepository.getRandomObjectByTier(1).ifPresent(w -> player.enqueueEvent(new EquipEvent(w)));
+            armorRepository.getRandomObjectByTier(1).ifPresent(a -> player.enqueueEvent(new EquipEvent(a)));
         }
     }
 

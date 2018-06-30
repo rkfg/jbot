@@ -3,6 +3,7 @@ package me.rkfg.xmpp.bot.plugins.game.event;
 import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
+import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.misc.Utils;
 
 public class BattleBeginsEvent extends AbstractEvent {
@@ -20,9 +21,8 @@ public class BattleBeginsEvent extends AbstractEvent {
         }
         // enemy agreed to start the battle
         final String baseBattleDescription = "Бой между " + Utils.getPlayerName(source) + " и " + Utils.getPlayerName(target);
-        setDescription(baseBattleDescription + " начинается.");
-        logTargetComment();
-        logSourceComment();
+        source.log(String.format("Вы нападаете на %s!", Utils.getPlayerName(target)));
+        target.log(String.format("%s нападает на вас!", Utils.getPlayerName(source)));
         battleTurn(source, target);
         battleTurn(target, source);
         source.enqueueEvent(new BattleEndsEvent(source, baseBattleDescription));
@@ -31,7 +31,10 @@ public class BattleBeginsEvent extends AbstractEvent {
 
     private void battleTurn(IGameObject srcPlayer, IGameObject tgtPlayer) {
         AttackEvent attackEvent = new AttackEvent(srcPlayer, tgtPlayer);
-        if (tgtPlayer.enqueueEvent(attackEvent) && srcPlayer.enqueueEvent(attackEvent)) {
+        if (tgtPlayer.enqueueEvent(attackEvent)
+                && tgtPlayer.as(PLAYER_OBJ).flatMap(IPlayer::getArmor).map(a -> a.enqueueEvent(attackEvent)).orElse(true)
+                && srcPlayer.as(PLAYER_OBJ).flatMap(IPlayer::getWeapon).map(a -> a.enqueueEvent(attackEvent)).orElse(true)
+                && srcPlayer.enqueueEvent(attackEvent)) {
             if (attackEvent.isSuccessful()) {
                 srcPlayer.log("Атака достигает цели и наносит " + attackEvent.getDamage() + " урона!");
                 tgtPlayer.log("Соперник наносит вам " + attackEvent.getDamage() + " урона!");

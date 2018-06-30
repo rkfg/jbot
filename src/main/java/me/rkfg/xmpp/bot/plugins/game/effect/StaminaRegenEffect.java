@@ -4,7 +4,6 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
 import java.util.Collection;
 
-import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.StatsEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
@@ -15,13 +14,13 @@ public class StaminaRegenEffect extends AbstractEffect {
     public static final String TYPE = "stmregen";
     public static final TypedAttribute<Integer> REGEN = TypedAttribute.of("regen");
 
-    public StaminaRegenEffect(IGameObject source, int regenPerTick) {
-        super(TYPE, "регенерация стамины", source);
+    public StaminaRegenEffect(int regenPerTick) {
+        super(TYPE, "регенерация стамины");
         setAttribute(REGEN, regenPerTick);
     }
 
-    public StaminaRegenEffect(IGameObject source) {
-        this(source, 1);
+    public StaminaRegenEffect() {
+        this(1);
     }
 
     @Override

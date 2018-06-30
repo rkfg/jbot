@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
-public abstract class AbstractContentRepository implements IContentRepository {
+public abstract class AbstractContentRepository<O> implements IContentRepository {
 
     public static final TypedAttribute<Integer> TIER_CNT = TypedAttribute.of("tiercnt");
     public static final IndexPointer<Integer> TIER_IDX = IndexPointer.named("tieridx");
@@ -36,7 +36,7 @@ public abstract class AbstractContentRepository implements IContentRepository {
     private Random rnd = new SecureRandom();
 
     // unique id => content map
-    private Map<String, TypedAttributeMap> content = new HashMap<>();
+    protected Map<String, TypedAttributeMap> content = new HashMap<>();
 
     public static class IndexPointer<T> extends TypedAttribute<Map<T, Set<String>>> {
 
@@ -100,6 +100,29 @@ public abstract class AbstractContentRepository implements IContentRepository {
         item.get(CONTENT_ID).ifPresent(cntid -> index.get(indexPtr, k -> new HashMap<>())
                 .ifPresent(map -> item.get(itemAttr).ifPresent(cnt -> map.computeIfAbsent(cnt, k -> new HashSet<>()).add(cntid))));
     }
+
+    @Override
+    public Optional<TypedAttributeMap> getContentById(String id) {
+        return Optional.ofNullable(content.get(id));
+    }
+
+    public Optional<O> getObjectById(String id) {
+        return getContentById(id).flatMap(this::contentToObject);
+    }
+
+    public Optional<O> getRandomObject() {
+        return getRandomContent().flatMap(this::contentToObject);
+    }
+
+    public <T> Optional<O> getRandomObject(IndexPointer<T> indexPtr, T value) {
+        return getRandomContent(indexPtr, value).flatMap(this::contentToObject);
+    }
+
+    public Optional<O> getRandomObjectByTier(int tier) {
+        return getRandomObject(TIER_IDX, tier);
+    }
+
+    protected abstract Optional<O> contentToObject(TypedAttributeMap content);
 
     protected abstract Optional<TypedAttributeMap> parse(String[] parts);
 

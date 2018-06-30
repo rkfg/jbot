@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
-public class NameRepository extends AbstractContentRepository {
+public class NameRepository extends AbstractContentRepository<String> {
 
     private int counter = 1;
 
@@ -37,6 +37,21 @@ public class NameRepository extends AbstractContentRepository {
     @Override
     public void loadContent() {
         loadContent("names.txt");
+    }
+
+    @Override
+    protected Optional<String> contentToObject(TypedAttributeMap content) {
+        return content.get(DESC_CNT);
+    }
+
+    @Override
+    public Optional<String> getObjectById(String id) {
+        return getContentById(id).flatMap(c -> c.get(DESC_CNT));
+    }
+
+    @Override
+    public Optional<String> getRandomObject() {
+        return getRandomContent().flatMap(c -> c.get(DESC_CNT));
     }
 
 }

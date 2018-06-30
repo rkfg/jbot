@@ -4,7 +4,6 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
 import java.util.Collection;
 
-import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.StatsEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
@@ -15,13 +14,13 @@ public class BleedEffect extends AbstractEffect {
     public static final String TYPE = "bleed";
     public static final TypedAttribute<Integer> BLEED_RATE_ATTR = TypedAttribute.of("bleedrate");
 
-    public BleedEffect(IGameObject source, int bleedRate) {
-        super(TYPE, "истекает кровью", source);
+    public BleedEffect(int bleedRate) {
+        super(TYPE, "истекает кровью");
         setAttribute(BLEED_RATE_ATTR, bleedRate);
     }
 
-    public BleedEffect(IGameObject source) {
-        this(source, 1);
+    public BleedEffect() {
+        this(1);
     }
 
     @Override

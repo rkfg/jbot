@@ -3,7 +3,6 @@ package me.rkfg.xmpp.bot.plugins.game.effect;
 import java.util.Arrays;
 import java.util.Collection;
 
-import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.effect.SleepEffect.SleepType;
 import me.rkfg.xmpp.bot.plugins.game.event.CancelEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
@@ -13,8 +12,8 @@ public class NoGuardSleepEffect extends AbstractEffect {
 
     public static final String TYPE = "noguardsleep";
 
-    public NoGuardSleepEffect(IGameObject source) {
-        super(TYPE, "не может спать вполглаза", source);
+    public NoGuardSleepEffect() {
+        super(TYPE, "не может спать вполглаза");
     }
 
     @Override

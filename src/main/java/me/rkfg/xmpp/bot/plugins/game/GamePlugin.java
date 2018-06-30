@@ -32,14 +32,16 @@ public class GamePlugin extends CommandPlugin {
     private Map<String, ICommandHandler> handlers = new HashMap<>();
 
     @Override
-    public synchronized String processCommand(Message message, Matcher matcher) throws LogicException, ClientAuthException {
-        List<String> args = new ArrayList<>();
-        final String argsStr = matcher.group(COMMAND_GROUP);
-        if (argsStr != null) {
-            args = Stream.of(argsStr.split(" ")).filter(c -> !c.isEmpty()).collect(Collectors.toList());
+    public String processCommand(Message message, Matcher matcher) throws LogicException, ClientAuthException {
+        synchronized (World.THIS) {
+            List<String> args = new ArrayList<>();
+            final String argsStr = matcher.group(COMMAND_GROUP);
+            if (argsStr != null) {
+                args = Stream.of(argsStr.split(" ")).filter(c -> !c.isEmpty()).collect(Collectors.toList());
+            }
+            IPlayer player = World.THIS.getCurrentPlayer(message);
+            return processCommand(args, player).orElse("Используйте %гм ман [команда] для получения справки");
         }
-        IPlayer player = World.THIS.getCurrentPlayer(message);
-        return processCommand(args, player).orElse("Используйте %гм ман [команда] для получения справки");
     }
 
     public Optional<String> processCommand(List<String> args, IPlayer player) {
