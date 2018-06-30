@@ -113,9 +113,14 @@ public class World extends Player {
 
     public void checkVictory() {
         List<IPlayer> alive = players.values().stream().filter(IPlayer::isAlive).collect(Collectors.toList());
+        if (alive.isEmpty()) {
+            announce("Игра завершена, выживших нет.");
+            state = GameState.FINISHED;
+        }
         if (alive.size() == 1) {
             final IPlayer winner = alive.get(0);
             announce("Игра завершена, последний выживший — " + winner.getName() + " aka " + winner.getId());
+            winner.log("Вы победили!");
             state = GameState.FINISHED;
         }
     }
