@@ -75,8 +75,8 @@ public class World extends Player {
             statsEffectAlco.addEffect(new NoGuardSleepEffect(World.THIS));
             player.enqueueAttachEffect(statsEffectFat);
             player.enqueueAttachEffect(statsEffectAlco);
-            player.enqueueEvent(new EquipEvent(new StickWeapon(null)));
-            player.enqueueEvent(new EquipEvent(new WoodenArmor(null)));
+            player.enqueueEvent(new EquipEvent(new StickWeapon()));
+            player.enqueueEvent(new EquipEvent(new WoodenArmor()));
         }
     }
 
