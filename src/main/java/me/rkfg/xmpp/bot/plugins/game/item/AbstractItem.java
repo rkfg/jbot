@@ -1,5 +1,7 @@
 package me.rkfg.xmpp.bot.plugins.game.item;
 
+import java.util.Optional;
+
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.World;
 import me.rkfg.xmpp.bot.plugins.game.effect.AbstractEffectReceiver;
@@ -9,12 +11,14 @@ public abstract class AbstractItem extends AbstractEffectReceiver implements IIt
 
     private IGameObject owner;
     private TypedAttributeMap attrs = new TypedAttributeMap();
+    private String description;
 
-    public AbstractItem(IGameObject owner) {
+    public AbstractItem(IGameObject owner, String description) {
         if (owner == null) {
             owner = World.THIS;
         }
         this.owner = owner;
+        this.description = description;
     }
 
     public IGameObject getOwner() {
@@ -33,6 +37,11 @@ public abstract class AbstractItem extends AbstractEffectReceiver implements IIt
     @Override
     public TypedAttributeMap getAttrs() {
         return attrs;
+    }
+    
+    @Override
+    public Optional<String> getDescription() {
+        return Optional.ofNullable(description);
     }
     
 }

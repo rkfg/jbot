@@ -35,4 +35,7 @@ public class Attrs {
     public static final TypedAttribute<IWeapon> WEAPON_OBJ = TypedAttribute.of("weaponobj");
     public static final TypedAttribute<IArmor> ARMOR_OBJ = TypedAttribute.of("armorobj");
     // --- use in IGameObject::as to optionally downcast ---
+    
+    public static final TypedAttribute<String> CONTENT_ID = TypedAttribute.of("contentid");
+    
 }

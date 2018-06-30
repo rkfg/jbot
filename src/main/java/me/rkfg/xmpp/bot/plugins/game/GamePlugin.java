@@ -94,7 +94,7 @@ public class GamePlugin extends CommandPlugin {
             }
             return IntStream.range(0, playersList.size()).mapToObj(i -> {
                 final IPlayer p = playersList.get(i);
-                return "" + (i + 1) + ": " + p.getName() + (p.isAlive() ? "" : " [мёртв]");
+                return "" + (i + 1) + ": " + p.getName() + (p.isAlive() ? "" : " [мёртв]") + (p == player ? " [вы]" : "");
             }).reduce((acc, p) -> acc + ", " + p).map(list -> "Игроки: " + list);
         });
         handlers.put("атака", (player, a) -> {

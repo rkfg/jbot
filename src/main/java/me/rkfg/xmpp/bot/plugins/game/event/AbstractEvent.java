@@ -17,7 +17,7 @@ public abstract class AbstractEvent implements IEvent {
     TypedAttributeMap attrs = new TypedAttributeMap();
 
     private boolean cancelled = false;
-    private String description ;
+    private String description;
 
     public AbstractEvent(String type, IGameObject source) {
         this.type = type;
@@ -76,12 +76,12 @@ public abstract class AbstractEvent implements IEvent {
     public boolean isCancelled() {
         return cancelled;
     }
-    
+
     @Override
     public Optional<String> getDescription() {
         return Optional.ofNullable(description);
     }
-    
+
     public void setDescription(String description) {
         this.description = description;
     }

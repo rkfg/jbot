@@ -1,6 +1,6 @@
 package me.rkfg.xmpp.bot.plugins.game.misc;
 
-public class TypedAttribute<T> {
+public class TypedAttribute<T> { // NOSONAR
     private String name;
 
     protected TypedAttribute(String name) {

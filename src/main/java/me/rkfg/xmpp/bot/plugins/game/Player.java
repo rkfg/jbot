@@ -48,7 +48,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
 
     public Player(String id) {
         this.id = id;
-        stats.put(HP, 10);
+        stats.put(HP, 30);
         stats.put(ATK, 10);
         stats.put(DEF, 10);
         stats.put(STR, 5);
@@ -97,8 +97,10 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
     @Override
     public void dumpStats() {
         StringBuilder sb = new StringBuilder("Статы: ");
-        final String statsStr = STATS.stream().map(attr -> stats.get(attr).map(stat -> attr.getName() + ": " + stat))
-                .filter(Optional::isPresent).map(Optional::get).reduce(pipeReducer).orElse("нет стат");
+        final String statsStr = STATS.stream().map(attr -> stats.get(attr).map(stat -> {
+            Integer modStat = applyWeaponArmorStats(stat, attr);
+            return attr.getName() + ": " + (modStat.equals(stat) ? stat : modStat + " (" + stat + ")");
+        })).filter(Optional::isPresent).map(Optional::get).reduce(pipeReducer).orElse("нет стат");
         sb.append(statsStr);
         final String effectsStr = listEffects().stream().map(effect -> effect.getDescription().orElse(effect.getType())).reduce(pipeReducer)
                 .orElse("нет эффектов");
@@ -111,6 +113,22 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
                 .reduce(pipeReducer).orElse("нет слотов");
         sb.append("\nСлоты: ").append(slotsStr);
         log(sb.toString());
+    }
+
+    private Integer applyWeaponArmorStats(Integer stat, TypedAttribute<Integer> attr) {
+        if (attr == ATK) {
+            stat += getWeapon().map(IWeapon::getAttack).orElse(0);
+        }
+        if (attr == DEF) {
+            stat += getWeapon().map(IWeapon::getDefence).orElse(0) + getArmor().map(IArmor::getDefence).orElse(0);
+        }
+        if (attr == STR) {
+            stat += getWeapon().map(IWeapon::getStrength).orElse(0);
+        }
+        if (attr == PRT) {
+            stat += getArmor().map(IArmor::getProtection).orElse(0);
+        }
+        return stat;
     }
 
     @Override

@@ -11,7 +11,7 @@ import me.rkfg.xmpp.bot.plugins.game.event.SetSleepEvent;
 
 public class NoGuardSleepEffect extends AbstractEffect {
 
-    private static final String TYPE = "noguardsleep";
+    public static final String TYPE = "noguardsleep";
 
     public NoGuardSleepEffect(IGameObject source) {
         super(TYPE, "не может спать вполглаза", source);
