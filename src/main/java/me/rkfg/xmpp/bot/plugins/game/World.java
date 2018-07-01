@@ -26,6 +26,7 @@ import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
 import me.rkfg.xmpp.bot.plugins.game.repository.ArmorRepository;
 import me.rkfg.xmpp.bot.plugins.game.repository.EffectRepository;
 import me.rkfg.xmpp.bot.plugins.game.repository.NameRepository;
+import me.rkfg.xmpp.bot.plugins.game.repository.UsableRepository;
 import me.rkfg.xmpp.bot.plugins.game.repository.WeaponRepository;
 
 public class World extends Player {
@@ -43,6 +44,7 @@ public class World extends Player {
     private WeaponRepository weaponRepository;
     private ArmorRepository armorRepository;
     private EffectRepository effectRepository;
+    private UsableRepository usableRepository;
 
     public World() {
         super("ZAWARUDO");
@@ -60,14 +62,15 @@ public class World extends Player {
         }, TimeUnit.SECONDS.toMillis(5), TimeUnit.SECONDS.toMillis(5));
         nameRepository = new NameRepository();
         nameRepository.loadContent();
-        names = nameRepository.getAllContent().stream().map(tm -> tm.get(NameRepository.DESC_CNT)).map(Optional::get)
-                .collect(Collectors.toList());
+        names = nameRepository.getAllContent().stream().map(tm -> tm.get(DESC_CNT)).map(Optional::get).collect(Collectors.toList());
         effectRepository = new EffectRepository();
         effectRepository.loadContent();
-        weaponRepository = new WeaponRepository(effectRepository);
+        weaponRepository = new WeaponRepository();
         weaponRepository.loadContent();
         armorRepository = new ArmorRepository();
         armorRepository.loadContent();
+        usableRepository = new UsableRepository();
+        usableRepository.loadContent();
     }
 
     public IPlayer getCurrentPlayer(Message message) {
@@ -106,6 +109,9 @@ public class World extends Player {
             weaponRepository.getObjectById("pen").ifPresent(w -> player.enqueueEvent(new EquipEvent(w)));
             // weaponRepository.getRandomObjectByTier(1).ifPresent(w -> player.enqueueEvent(new EquipEvent(w)));
             armorRepository.getRandomObjectByTier(1).ifPresent(a -> player.enqueueEvent(new EquipEvent(a)));
+            weaponRepository.getObjectById("dildo").ifPresent(w -> player.enqueueEvent(new ItemPickupEvent(w)));
+            weaponRepository.getObjectById("lasersaw").ifPresent(w -> player.enqueueEvent(new ItemPickupEvent(w)));
+            usableRepository.getObjectById("bandage").ifPresent(w -> player.enqueueEvent(new ItemPickupEvent(w)));
         }
     }
 
@@ -126,4 +132,25 @@ public class World extends Player {
             state = GameState.FINISHED;
         }
     }
+
+    public NameRepository getNameRepository() {
+        return nameRepository;
+    }
+
+    public WeaponRepository getWeaponRepository() {
+        return weaponRepository;
+    }
+
+    public ArmorRepository getArmorRepository() {
+        return armorRepository;
+    }
+
+    public EffectRepository getEffectRepository() {
+        return effectRepository;
+    }
+
+    public UsableRepository getUsableRepository() {
+        return usableRepository;
+    }
+
 }

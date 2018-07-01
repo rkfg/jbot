@@ -12,7 +12,7 @@ import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 public interface IItem extends IGameObject, IHasDescription, IHasAttributes {
     Optional<TypedAttribute<ISlot>> getFittingSlot();
 
-    IGameObject getOwner();
+    Optional<IGameObject> getOwner();
 
     void setOwner(IGameObject owner);
 
@@ -25,4 +25,8 @@ public interface IItem extends IGameObject, IHasDescription, IHasAttributes {
         return Optional.empty();
     }
 
+    default void onUse() {
+        
+    }
+    
 }

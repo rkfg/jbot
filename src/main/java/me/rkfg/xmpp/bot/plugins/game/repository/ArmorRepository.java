@@ -8,12 +8,12 @@ import me.rkfg.xmpp.bot.plugins.game.item.IArmor;
 import me.rkfg.xmpp.bot.plugins.game.item.armor.AbstractArmor;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
-public class ArmorRepository extends AbstractContentRepository<IArmor> {
+public class ArmorRepository extends AbstractContentRepository<IArmor> implements IHasEffects {
 
     public class Armor extends AbstractArmor {
 
         public Armor(TypedAttributeMap content) {
-            super(null, content.get(DEF).orElse(0), content.get(PRT).orElse(0), content.get(ArmorRepository.DESC_CNT).orElse(null));
+            super(content.get(DEF).orElse(0), content.get(PRT).orElse(0), content.get(DESC_CNT).orElse(null));
         }
 
     }
@@ -31,7 +31,12 @@ public class ArmorRepository extends AbstractContentRepository<IArmor> {
             result.put(DEF, Integer.valueOf(parts[1]));
             result.put(PRT, Integer.valueOf(parts[2]));
             result.put(TIER_CNT, Integer.valueOf(parts[3]));
-            result.put(DESC_CNT, parts[4]);
+            if (parts.length > 5) {
+                processEffects(result, parts[4]);
+                result.put(DESC_CNT, parts[5]);
+            } else {
+                result.put(DESC_CNT, parts[4]);
+            }
             return Optional.of(result);
         } catch (NumberFormatException e) {
             return Optional.empty();
@@ -40,7 +45,7 @@ public class ArmorRepository extends AbstractContentRepository<IArmor> {
 
     @Override
     protected int getMaxParts() {
-        return 5;
+        return 6;
     }
 
     @Override
@@ -54,7 +59,7 @@ public class ArmorRepository extends AbstractContentRepository<IArmor> {
     }
 
     @Override
-    protected Optional<IArmor> contentToObject(TypedAttributeMap content) {
-        return Optional.of(new Armor(content));
+    public Optional<IArmor> contentToObject(TypedAttributeMap content) {
+        return Optional.of(attachEffects(new Armor(content), content));
     }
 }

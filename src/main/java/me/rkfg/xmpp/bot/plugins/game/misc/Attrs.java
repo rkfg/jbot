@@ -2,32 +2,36 @@ package me.rkfg.xmpp.bot.plugins.game.misc;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import me.rkfg.xmpp.bot.plugins.game.IMutablePlayer;
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
+import me.rkfg.xmpp.bot.plugins.game.effect.IEffect;
 import me.rkfg.xmpp.bot.plugins.game.item.IArmor;
 import me.rkfg.xmpp.bot.plugins.game.item.IItem;
 import me.rkfg.xmpp.bot.plugins.game.item.ISlot;
 import me.rkfg.xmpp.bot.plugins.game.item.IWeapon;
+import me.rkfg.xmpp.bot.plugins.game.repository.AbstractContentRepository.IndexPointer;
 
 public class Attrs {
     private Attrs() {
     }
 
-    public static final TypedAttribute<Integer> HP = TypedAttribute.of("Hitpoints");
-    public static final TypedAttribute<Integer> STM = TypedAttribute.of("Stamina");
-    public static final TypedAttribute<Integer> LCK = TypedAttribute.of("Luck");
-    public static final TypedAttribute<Integer> PRT = TypedAttribute.of("Protection");
-    public static final TypedAttribute<Integer> STR = TypedAttribute.of("Strength");
-    public static final TypedAttribute<Integer> DEF = TypedAttribute.of("Defense");
-    public static final TypedAttribute<Integer> ATK = TypedAttribute.of("Attack");
+    public static final TypedAttribute<Integer> HP = TypedAttribute.of("Здоровье");
+    public static final TypedAttribute<Integer> STM = TypedAttribute.of("Энергия");
+    public static final TypedAttribute<Integer> LCK = TypedAttribute.of("Удача");
+    public static final TypedAttribute<Integer> PRT = TypedAttribute.of("Броня");
+    public static final TypedAttribute<Integer> STR = TypedAttribute.of("Сила");
+    public static final TypedAttribute<Integer> DEF = TypedAttribute.of("Защита");
+    public static final TypedAttribute<Integer> ATK = TypedAttribute.of("Атака");
     public static final List<TypedAttribute<Integer>> STATS = Arrays.asList(HP, STM, ATK, DEF, STR, PRT, LCK);
 
-    public static final TypedAttribute<ISlot> WEAPON_SLOT = TypedAttribute.of("Weapon slot");
-    public static final TypedAttribute<ISlot> ARMOR_SLOT = TypedAttribute.of("Armor slot");
-    public static final List<TypedAttribute<ISlot>> SLOTS = Arrays.asList(WEAPON_SLOT, ARMOR_SLOT); 
-    public static final TypedAttribute<List<IItem>> BACKPACK = TypedAttribute.of("Backpack");
-    
+    public static final TypedAttribute<ISlot> WEAPON_SLOT = TypedAttribute.of("оружие");
+    public static final TypedAttribute<ISlot> ARMOR_SLOT = TypedAttribute.of("броня", "броню");
+    public static final TypedAttribute<ISlot> ITEM_SLOT = TypedAttribute.of("предмет");
+    public static final List<TypedAttribute<ISlot>> SLOTS = Arrays.asList(WEAPON_SLOT, ARMOR_SLOT);
+    public static final TypedAttribute<List<IItem>> BACKPACK = TypedAttribute.of("рюкзак");
+
     // --- use in IGameObject::as to optionally downcast ---
     public static final TypedAttribute<IPlayer> PLAYER_OBJ = TypedAttribute.of("playerobj");
     public static final TypedAttribute<IMutablePlayer> MUTABLEPLAYER_OBJ = TypedAttribute.of("mutableplayerobj");
@@ -35,8 +39,19 @@ public class Attrs {
     public static final TypedAttribute<IWeapon> WEAPON_OBJ = TypedAttribute.of("weaponobj");
     public static final TypedAttribute<IArmor> ARMOR_OBJ = TypedAttribute.of("armorobj");
     // --- use in IGameObject::as to optionally downcast ---
-    
+
     public static final TypedAttribute<String> CONTENT_ID = TypedAttribute.of("contentid");
     public static final TypedAttribute<Integer> LIFETIME = TypedAttribute.of("lifetime");
+    public static final TypedAttribute<Integer> FATIGUE = TypedAttribute.of("fatigue");
+    public static final TypedAttribute<Set<IEffect>> EFFECTS = TypedAttribute.of("effects");
+
+    public static final TypedAttribute<Integer> TIER_CNT = TypedAttribute.of("tiercnt");
+    public static final IndexPointer<Integer> TIER_IDX = IndexPointer.named("tieridx");
+
+    public static final TypedAttribute<String> DESC_CNT = TypedAttribute.of("desccnt");
+    public static final IndexPointer<String> DESC_IDX = IndexPointer.named("descidx");
+
+    public static final TypedAttribute<List<String>> EFFECT_PARAMS = TypedAttribute.of("effectparams");
     
+    public static final TypedAttribute<Integer> USE_CNT = TypedAttribute.of("использования");
 }

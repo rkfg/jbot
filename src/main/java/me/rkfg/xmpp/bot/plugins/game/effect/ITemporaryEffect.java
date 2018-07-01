@@ -2,27 +2,28 @@ package me.rkfg.xmpp.bot.plugins.game.effect;
 
 import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
+import java.util.Collection;
+
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
-import me.rkfg.xmpp.bot.plugins.game.misc.IHasAttributes;
 
-public interface ITemporaryEffect extends IHasAttributes {
+public interface ITemporaryEffect extends IEffect {
 
     default void initTemporary(int ticks) {
         setAttribute(LIFETIME, ticks);
     }
-    
-    default boolean processTemporary(IEvent event) {
+
+    default Collection<IEvent> processTemporary(IEvent event, String type) {
         if (event.isOfType(TickEvent.TYPE)) {
             return getAttribute(LIFETIME).map(l -> {
                 if (--l < 1) {
-                    return false;
+                    return detachEffect(type);
                 } else {
                     setAttribute(LIFETIME, l);
                 }
-                return true;
-            }).orElse(true);
+                return null;
+            }).orElseGet(this::noEvent);
         }
-        return true;
+        return noEvent();
     }
 }

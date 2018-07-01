@@ -24,13 +24,7 @@ import org.slf4j.LoggerFactory;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
-public abstract class AbstractContentRepository<O> implements IContentRepository {
-
-    public static final TypedAttribute<Integer> TIER_CNT = TypedAttribute.of("tiercnt");
-    public static final IndexPointer<Integer> TIER_IDX = IndexPointer.named("tieridx");
-
-    public static final TypedAttribute<String> DESC_CNT = TypedAttribute.of("desccnt");
-    public static final IndexPointer<String> DESC_IDX = IndexPointer.named("descidx");
+public abstract class AbstractContentRepository<O> implements IContentRepository, IObjectRepository<O> {
 
     protected Logger log = LoggerFactory.getLogger(getClass());
     private Random rnd = new SecureRandom();
@@ -88,11 +82,17 @@ public abstract class AbstractContentRepository<O> implements IContentRepository
     @Override
     public <T> Optional<TypedAttributeMap> getRandomContent(IndexPointer<T> indexPtr, T value) {
         Collection<TypedAttributeMap> filteredContent = getContent(indexPtr, value);
+        if (filteredContent.isEmpty()) {
+            return Optional.empty();
+        }
         return filteredContent.stream().skip(rnd.nextInt(filteredContent.size())).findFirst();
     }
 
     @Override
     public Optional<TypedAttributeMap> getRandomContent() {
+        if (content.isEmpty()) {
+            return Optional.empty();
+        }
         return content.values().stream().skip(rnd.nextInt(content.size())).findFirst();
     }
 
@@ -105,24 +105,6 @@ public abstract class AbstractContentRepository<O> implements IContentRepository
     public Optional<TypedAttributeMap> getContentById(String id) {
         return Optional.ofNullable(content.get(id));
     }
-
-    public Optional<O> getObjectById(String id) {
-        return getContentById(id).flatMap(this::contentToObject);
-    }
-
-    public Optional<O> getRandomObject() {
-        return getRandomContent().flatMap(this::contentToObject);
-    }
-
-    public <T> Optional<O> getRandomObject(IndexPointer<T> indexPtr, T value) {
-        return getRandomContent(indexPtr, value).flatMap(this::contentToObject);
-    }
-
-    public Optional<O> getRandomObjectByTier(int tier) {
-        return getRandomObject(TIER_IDX, tier);
-    }
-
-    protected abstract Optional<O> contentToObject(TypedAttributeMap content);
 
     protected abstract Optional<TypedAttributeMap> parse(String[] parts);
 

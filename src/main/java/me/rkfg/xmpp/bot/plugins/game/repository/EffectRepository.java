@@ -12,6 +12,7 @@ import me.rkfg.xmpp.bot.plugins.game.effect.NoGuardSleepEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.SleepEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.StaminaRegenEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.StatsEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.item.RegenEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.RudeDrawEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.RudeDrawingsEffect;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
@@ -30,8 +31,10 @@ public class EffectRepository extends AbstractContentRepository<IEffect> {
         addEffect(SleepEffect.class);
         addEffect(StaminaRegenEffect.class);
         addEffect(StatsEffect.class);
+        addEffect(RegenEffect.class);
         addEffect(RudeDrawEffect.class);
         addEffect(RudeDrawingsEffect.class);
+        
     }
 
     private void addEffect(Class<? extends IEffect> clazz) {
@@ -68,7 +71,7 @@ public class EffectRepository extends AbstractContentRepository<IEffect> {
     }
 
     @Override
-    protected Optional<IEffect> contentToObject(TypedAttributeMap content) {
+    public Optional<IEffect> contentToObject(TypedAttributeMap content) {
         return content.get(EFFECT_CNT).map(t -> {
             try {
                 return t.newInstance();

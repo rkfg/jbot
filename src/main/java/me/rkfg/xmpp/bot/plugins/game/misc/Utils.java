@@ -3,6 +3,7 @@ package me.rkfg.xmpp.bot.plugins.game.misc;
 import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
 import java.security.SecureRandom;
+import java.util.Optional;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
@@ -25,8 +26,31 @@ public class Utils {
         }
         return sum;
     }
-    
+
+    public static int dice(String desc) {
+        try {
+            String[] vals = desc.toLowerCase().split("d", 2);
+            int count = Integer.parseInt(vals[0]);
+            int faces = Integer.parseInt(vals[1]);
+            int sum = 0;
+            for (int i = 0; i < count; ++i) {
+                sum += rnd.nextInt(faces) + 1;
+            }
+            return sum;
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
     public static String getPlayerName(IGameObject obj) {
         return obj.as(PLAYER_OBJ).map(IPlayer::getName).orElse(UNKNOWN);
+    }
+
+    public static <T> T unboxOptional(Optional<T> opt, T def) {
+        return opt.orElse(def);
+    }
+
+    public static String unboxString(Optional<String> opt) {
+        return unboxOptional(opt, "<неизвестно>");
     }
 }

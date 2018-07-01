@@ -4,14 +4,13 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
 import java.util.Optional;
 
-import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.item.AbstractItem;
 import me.rkfg.xmpp.bot.plugins.game.item.IArmor;
 
 public abstract class AbstractArmor extends AbstractItem implements IArmor {
 
-    public AbstractArmor(IGameObject owner, Integer defence, Integer protection, String description) {
-        super(owner, description);
+    public AbstractArmor(Integer defence, Integer protection, String description) {
+        super(description);
         setAttribute(DEF, defence);
         setAttribute(PRT, protection);
     }

@@ -29,6 +29,10 @@ public interface IGameObject extends IGameBase {
 
     void log(String message);
 
+    default void log(String message, Object... args) {
+        log(String.format(message, args));
+    }
+
     void enqueueEvents(IEvent... events);
 
     <T extends IGameObject> Optional<T> as(TypedAttribute<T> type);

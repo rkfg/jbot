@@ -4,14 +4,13 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
 import java.util.Optional;
 
-import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.item.AbstractItem;
 import me.rkfg.xmpp.bot.plugins.game.item.IWeapon;
 
 public abstract class AbstractWeapon extends AbstractItem implements IWeapon {
 
-    public AbstractWeapon(IGameObject owner, Integer attack, Integer defence, Integer strength, String description) {
-        super(owner, description);
+    public AbstractWeapon(Integer attack, Integer defence, Integer strength, String description) {
+        super(description);
         setAttribute(ATK, attack);
         setAttribute(DEF, defence);
         setAttribute(STR, strength);

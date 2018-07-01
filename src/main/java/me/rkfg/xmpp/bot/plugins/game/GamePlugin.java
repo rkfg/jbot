@@ -19,8 +19,10 @@ import me.rkfg.xmpp.bot.plugins.game.command.ICommandHandler;
 import me.rkfg.xmpp.bot.plugins.game.command.ListBackpackCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.ListPlayersCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.ManCommand;
+import me.rkfg.xmpp.bot.plugins.game.command.SearchCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.SleepCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.UnequipCommand;
+import me.rkfg.xmpp.bot.plugins.game.command.UseCommand;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 
@@ -64,6 +66,8 @@ public class GamePlugin extends CommandPlugin {
         registerHandler(new ListBackpackCommand());
         registerHandler(new EquipCommand());
         registerHandler(new UnequipCommand());
+        registerHandler(new SearchCommand());
+        registerHandler(new UseCommand());
         registerHandler(new ManCommand(handlers));
     }
 

@@ -21,8 +21,8 @@ public class AttackCommand implements ICommandHandler {
     public Optional<String> exec(IPlayer player, Stream<String> args) {
         try {
             List<IPlayer> playersList = World.THIS.listPlayers();
-            IPlayer target = args.findFirst().map(Integer::valueOf).filter(v -> v > 0 && v <= playersList.size())
-                    .map(i -> playersList.get(i - 1)).orElseThrow(NumberFormatException::new);
+            IPlayer target = getFirstIntegerArg(args).filter(v -> v > 0 && v <= playersList.size()).map(i -> playersList.get(i - 1))
+                    .orElseThrow(NumberFormatException::new);
             if (target == player) {
                 return Optional.of("нельзя атаковать себя");
             }
@@ -37,7 +37,8 @@ public class AttackCommand implements ICommandHandler {
 
     @Override
     public Optional<String> getHelp() {
-        return Optional.of("Атаковать противника из списка игроков по его номеру. Список можно посмотреть командой %гм игроки");
+        return Optional.of(
+                "Атаковать противника из списка игроков по его номеру (требует 5 единиц энергии). Список можно посмотреть командой %гм игроки");
     }
 
 }

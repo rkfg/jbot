@@ -40,7 +40,7 @@ public class NameRepository extends AbstractContentRepository<String> {
     }
 
     @Override
-    protected Optional<String> contentToObject(TypedAttributeMap content) {
+    public Optional<String> contentToObject(TypedAttributeMap content) {
         return content.get(DESC_CNT);
     }
 

@@ -15,8 +15,12 @@ public interface ICommandHandler {
     default Optional<String> getHelp() {
         return Optional.empty();
     }
-    
+
     default boolean deadAllowed() {
         return false;
+    }
+
+    default Optional<Integer> getFirstIntegerArg(Stream<String> args) {
+        return args.findFirst().map(Integer::valueOf);
     }
 }

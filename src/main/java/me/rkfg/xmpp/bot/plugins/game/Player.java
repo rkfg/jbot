@@ -216,6 +216,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
     @Override
     public void putItemToBackpack(IItem item) {
         backpack.add(item);
+        item.setOwner(this);
     }
 
     @Override

@@ -20,10 +20,7 @@ public class RudeDrawingsEffect extends StatsEffect implements ITemporaryEffect 
 
     @Override
     public Collection<IEvent> processEvent(IEvent event) {
-        if (!processTemporary(event)) {
-            detachEffect(TYPE);
-        }
-        return super.processEvent(event);
+        return processTemporary(event, TYPE);
     }
 
 }

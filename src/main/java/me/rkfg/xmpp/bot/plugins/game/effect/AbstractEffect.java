@@ -1,13 +1,8 @@
 package me.rkfg.xmpp.bot.plugins.game.effect;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Optional;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
-import me.rkfg.xmpp.bot.plugins.game.event.CancelEvent;
-import me.rkfg.xmpp.bot.plugins.game.event.EffectEvent;
-import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
 public abstract class AbstractEffect implements IEffect {
@@ -51,26 +46,6 @@ public abstract class AbstractEffect implements IEffect {
     @Override
     public void setTarget(IGameObject target) {
         this.target = target;
-    }
-
-    protected Collection<IEvent> detachEffect(String effectType) {
-        return singleEvent(new EffectEvent(effectType));
-    }
-
-    protected Collection<IEvent> attachEffect(IEffect effect) {
-        return singleEvent(new EffectEvent(effect));
-    }
-
-    protected Collection<IEvent> singleEvent(IEvent event) {
-        return Arrays.asList(event);
-    }
-
-    protected Collection<IEvent> multipleEvents(IEvent... events) {
-        return Arrays.asList(events);
-    }
-
-    protected Collection<IEvent> cancelEvent() {
-        return singleEvent(new CancelEvent());
     }
 
     @Override
