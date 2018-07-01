@@ -19,6 +19,7 @@ import me.rkfg.xmpp.bot.plugins.game.effect.SleepEffect.SleepType;
 import me.rkfg.xmpp.bot.plugins.game.effect.StaminaRegenEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.StatsEffect;
 import me.rkfg.xmpp.bot.plugins.game.event.EquipEvent;
+import me.rkfg.xmpp.bot.plugins.game.event.ItemPickupEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.RenameEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.SetSleepEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;

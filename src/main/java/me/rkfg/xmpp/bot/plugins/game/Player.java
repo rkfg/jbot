@@ -2,6 +2,8 @@ package me.rkfg.xmpp.bot.plugins.game;
 
 import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,6 +45,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
     private TypedAttributeMap equipment = new TypedAttributeMap();
     private String id;
     private String name = "<безымянный>";
+    private List<IItem> backpack = new ArrayList<>();
 
     private BinaryOperator<String> pipeReducer = (acc, v) -> acc + " | " + v;
 
@@ -202,5 +205,15 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
     @Override
     public Optional<IArmor> getArmor() {
         return getSlot(ARMOR_SLOT).flatMap(ISlot::getItem).flatMap(i -> i.as(ARMOR_OBJ));
+    }
+
+    @Override
+    public List<IItem> getBackpack() {
+        return Collections.unmodifiableList(backpack);
+    }
+    
+    @Override
+    public void putItemToBackpack(IItem item) {
+        backpack.add(item);
     }
 }

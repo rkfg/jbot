@@ -18,4 +18,6 @@ public interface IMutablePlayer extends IPlayer {
 
     void unequipItem(TypedAttribute<ISlot> slotAttr);
 
+    void putItemToBackpack(IItem item);
+
 }
