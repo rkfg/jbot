@@ -17,7 +17,7 @@ public class RudeDrawEffect extends AbstractBattleEffect {
 
     @Override
     protected Collection<IEvent> attackSuccess(IEvent event) {
-        if (Utils.drn() > 5) {
+        if (Utils.drn() > 13) {
             event.getSource().log("Вы ухитряетесь разрисовать соперника деморализующими нехорошими словами и рисунками");
             event.getTarget().log("Соперник рисует на вас нехорошие слова и рисунки, вы деморализованы");
             event.getTarget().as(PLAYER_OBJ).ifPresent(p -> p.enqueueAttachEffect(new RudeDrawingsEffect()));
