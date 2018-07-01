@@ -30,7 +30,7 @@ public class UnequipCommand implements ICommandHandler {
                 return null;
             }
         }).ifPresent(slot -> player.getSlot(slot).flatMap(ISlot::getItem).ifPresent(i -> {
-            if (player.enqueueEvent(new UnequipEvent(player, slot))) {
+            if (player.enqueueEvent(new UnequipEvent(slot))) {
                 player.as(MUTABLEPLAYER_OBJ).ifPresent(p -> p.putItemToBackpack(i));
             }
         }));

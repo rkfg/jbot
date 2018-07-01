@@ -25,7 +25,7 @@ public class EquipCommand implements ICommandHandler, IUsesBackpack {
         try {
             IItem item = getBackpackItem(args, player);
             item.getFittingSlot().ifPresent(slot -> player.getSlot(slot).flatMap(ISlot::getItem).ifPresent(equippedItem -> {
-                if (player.enqueueEvent(new UnequipEvent(player, slot))) {
+                if (player.enqueueEvent(new UnequipEvent(slot))) {
                     player.as(MUTABLEPLAYER_OBJ).ifPresent(p -> p.putItemToBackpack(equippedItem));
                 }
             }));

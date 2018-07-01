@@ -2,7 +2,6 @@ package me.rkfg.xmpp.bot.plugins.game.event;
 
 import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
-import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.exception.NotEquippableException;
 import me.rkfg.xmpp.bot.plugins.game.item.ISlot;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
@@ -12,7 +11,7 @@ public class UnequipEvent extends AbstractEvent {
     public static final String TYPE = "unequipevent";
     public static final TypedAttribute<TypedAttribute<ISlot>> SLOT_ATTR = TypedAttribute.of("slotattr");
 
-    public UnequipEvent(IGameObject source, TypedAttribute<ISlot> slot) {
+    public UnequipEvent(TypedAttribute<ISlot> slot) {
         super(TYPE);
         setAttribute(SLOT_ATTR, slot);
     }
