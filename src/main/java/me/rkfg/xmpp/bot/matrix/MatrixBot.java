@@ -6,8 +6,12 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,6 +48,8 @@ import ru.ppsrk.gwt.client.LogicException;
 
 public class MatrixBot extends BotBase {
 
+    private static final String RETRY_AFTER_MS = "retry_after_ms";
+    private static final String EVENT_ID = "event_id";
     private static final String ROOMS = "rooms/";
     private static final String EVENTS = "events";
     private static final int TIMEOUT = 40000;
@@ -57,6 +63,7 @@ public class MatrixBot extends BotBase {
     private StateManager stateManager = new StateManager();
     private RoomParticipantsManager roomParticipantsManager = null;
     private Map<String, Transaction> pendingEvents = new HashMap<>();
+    private List<MatrixMessage> failedEvents = new LinkedList<>();
 
     @Override
     public void run() throws LogicException {
@@ -79,11 +86,38 @@ public class MatrixBot extends BotBase {
             }
             JSONObject resp = get("sync", new BasicNameValuePair("timeout", "30000"));
             String next = resp.getString("next_batch");
+            startRetryLoop();
             parseSync(resp, true);
             loopSync(next);
         } catch (IOException | URISyntaxException e) {
             log.warn("{}", e);
         }
+    }
+
+    private void startRetryLoop() {
+        new Timer("message retry timer", true).scheduleAtFixedRate(new TimerTask() {
+
+            @Override
+            public void run() {
+                synchronized (failedEvents) {
+                    failedEvents.stream().filter(m -> m.getResendTS() < System.currentTimeMillis() && m.getRetryCount() > 0).forEach(m -> {
+                        log.info("Resent to {}, {}", m.getFromRoom(), m.getBody());
+                        final JSONObject resp = doSendMessage(m.getBody(), m.getFromRoom());
+                        if (resp != null && resp.has(EVENT_ID)) {
+                            log.info("Successfully resent to {}", m.getFromRoom());
+                            m.setRetryCount(0);
+                        } else {
+                            log.warn("Couldn't resend to {}, counter was {}", m.getFromRoom(), m.getRetryCount());
+                            m.decRetry();
+                            if (resp != null) {
+                                m.addResendTS(resp.optLong(RETRY_AFTER_MS));
+                            }
+                        }
+                    });
+                    failedEvents.removeIf(m -> m.getRetryCount() == 0);
+                }
+            }
+        }, 200, 200);
     }
 
     public void loopSync(String next) throws URISyntaxException, IOException {
@@ -171,7 +205,7 @@ public class MatrixBot extends BotBase {
 
     private boolean fromMyself(JSONObject event) {
         try {
-            String eventId = event.getString("event_id");
+            String eventId = event.getString(EVENT_ID);
             return pendingEvents.remove(eventId) != null;
         } catch (JSONException e) {
             // not found
@@ -197,17 +231,40 @@ public class MatrixBot extends BotBase {
                 .addParameter("access_token", token).build();
     }
 
-    @Override
-    public String sendMessage(String body, String roomId) {
+    private JSONObject doSendMessage(String body, String roomId) {
         try {
             JSONObject resp = put(ROOMS + roomId + "/send/m.room.message/jbot" + System.currentTimeMillis(),
                     new JSONObject().put("msgtype", "m.text").put("formatted_body", body.replaceAll("\n", "<br/>"))
                             .put("format", "org.matrix.custom.html").put("body", body.replaceAll("<[^>]*>([^<]*)</[^>]*>", "$1")));
-            String eventId = resp.optString("event_id");
-            pendingEvents.put(eventId, new Transaction(eventId, new MatrixMessage(stateManager, body, roomId, null)));
-            return eventId;
+            String eventId = resp.optString(EVENT_ID);
+            if (!eventId.isEmpty()) {
+                pendingEvents.put(eventId, new Transaction(eventId, new MatrixMessage(stateManager, body, roomId, null)));
+            }
+            return resp;
         } catch (JSONException | URISyntaxException | IOException e) {
             log.warn("{}", e);
+        }
+        return null;
+    }
+
+    @Override
+    public String sendMessage(String body, String roomId) {
+        final JSONObject resp = doSendMessage(body, roomId);
+        String eventId = null;
+        long retry = 0;
+        if (resp != null) {
+            retry = resp.optLong(RETRY_AFTER_MS);
+            eventId = resp.optString(EVENT_ID);
+        }
+        if (eventId != null && !eventId.isEmpty()) {
+            return eventId;
+        }
+        long resendTS = System.currentTimeMillis() + retry + 100;
+        synchronized (failedEvents) {
+            log.warn("Message failed, resend at {}", resendTS);
+            final MatrixMessage msg = new MatrixMessage(stateManager, body, roomId, null);
+            msg.setResendTS(resendTS);
+            failedEvents.add(msg);
         }
         return null;
     }

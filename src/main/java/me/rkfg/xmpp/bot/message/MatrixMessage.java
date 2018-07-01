@@ -8,6 +8,8 @@ public class MatrixMessage implements Message {
     private String fromRoom;
     private String from;
     private String body;
+    private int retryCount = 3;
+    private long resendTS = 0;
 
     public MatrixMessage(StateManager displayNames, String body, String fromRoom, String from) {
         this.displayNames = displayNames;
@@ -63,5 +65,29 @@ public class MatrixMessage implements Message {
     @Override
     public Protocol getProtocol() {
         return Protocol.MATRIX;
+    }
+
+    public int getRetryCount() {
+        return retryCount;
+    }
+
+    public void setRetryCount(int retryCount) {
+        this.retryCount = retryCount;
+    }
+
+    public void decRetry() {
+        retryCount--;
+    }
+
+    public long getResendTS() {
+        return resendTS;
+    }
+
+    public void setResendTS(long resendTS) {
+        this.resendTS = resendTS;
+    }
+
+    public void addResendTS(long shift) {
+        resendTS += shift;
     }
 }
