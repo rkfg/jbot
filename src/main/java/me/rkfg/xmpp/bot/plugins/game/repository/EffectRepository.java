@@ -12,6 +12,7 @@ import me.rkfg.xmpp.bot.plugins.game.effect.NoGuardSleepEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.SleepEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.StaminaRegenEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.StatsEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.item.CursedEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.RegenEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.RudeDrawEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.RudeDrawingsEffect;
@@ -26,6 +27,7 @@ public class EffectRepository extends AbstractContentRepository<IEffect> {
     public void loadContent() {
         addEffect(BattleFatigueEffect.class);
         addEffect(BleedEffect.class);
+        addEffect(CursedEffect.class);
         addEffect(DeadEffect.class);
         addEffect(NoGuardSleepEffect.class);
         addEffect(SleepEffect.class);
@@ -34,7 +36,7 @@ public class EffectRepository extends AbstractContentRepository<IEffect> {
         addEffect(RegenEffect.class);
         addEffect(RudeDrawEffect.class);
         addEffect(RudeDrawingsEffect.class);
-        
+
     }
 
     private void addEffect(Class<? extends IEffect> clazz) {

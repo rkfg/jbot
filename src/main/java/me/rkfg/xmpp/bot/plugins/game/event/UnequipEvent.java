@@ -18,13 +18,18 @@ public class UnequipEvent extends AbstractEvent {
 
     @Override
     public void apply() {
+        // this is a multipipe event, we'll execute it later
+    }
+    
+    public void unequip() {
         getAttribute(SLOT_ATTR).ifPresent(s -> target.as(MUTABLEPLAYER_OBJ).ifPresent(p -> {
             try {
                 p.unequipItem(s);
                 setDescription(String.format("Вы освобождаете слот [%s]", p.getSlot(s).flatMap(ISlot::getDescription).orElse(s.getName())));
-                super.apply();
+                logTargetComment();
             } catch (NotEquippableException e) {
                 target.log("Не удалось надеть предмет: " + e.getMessage());
+                setCancelled();
             }
         }));
     }

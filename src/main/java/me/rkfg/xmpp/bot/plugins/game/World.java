@@ -14,12 +14,11 @@ import java.util.stream.Collectors;
 
 import me.rkfg.xmpp.bot.message.Message;
 import me.rkfg.xmpp.bot.plugins.game.effect.BattleFatigueEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.EquipRedirectorEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.NoGuardSleepEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.SleepEffect.SleepType;
 import me.rkfg.xmpp.bot.plugins.game.effect.StaminaRegenEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.StatsEffect;
-import me.rkfg.xmpp.bot.plugins.game.event.EquipEvent;
-import me.rkfg.xmpp.bot.plugins.game.event.ItemPickupEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.RenameEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.SetSleepEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
@@ -97,6 +96,7 @@ public class World extends Player {
             player.enqueueEvents(new SetSleepEvent(SleepType.DEEP));
             effectRepository.getObjectById(BattleFatigueEffect.TYPE).ifPresent(player::enqueueAttachEffect);
             player.enqueueAttachEffect(new StaminaRegenEffect());
+            player.enqueueAttachEffect(new EquipRedirectorEffect());
             StatsEffect statsEffectFat = new StatsEffect("fat", "жиробасина");
             statsEffectFat.setStatChange(ATK, 1);
             statsEffectFat.setStatChange(DEF, -1);
@@ -106,12 +106,12 @@ public class World extends Player {
             statsEffectAlco.addEffect(new NoGuardSleepEffect());
             player.enqueueAttachEffect(statsEffectFat);
             player.enqueueAttachEffect(statsEffectAlco);
-            weaponRepository.getObjectById("pen").ifPresent(w -> player.enqueueEvent(new EquipEvent(w)));
+            weaponRepository.getObjectById("pen").ifPresent(player::enqueueEquipItem);
             // weaponRepository.getRandomObjectByTier(1).ifPresent(w -> player.enqueueEvent(new EquipEvent(w)));
-            armorRepository.getRandomObjectByTier(1).ifPresent(a -> player.enqueueEvent(new EquipEvent(a)));
-            weaponRepository.getObjectById("dildo").ifPresent(w -> player.enqueueEvent(new ItemPickupEvent(w)));
-            weaponRepository.getObjectById("lasersaw").ifPresent(w -> player.enqueueEvent(new ItemPickupEvent(w)));
-            usableRepository.getObjectById("bandage").ifPresent(w -> player.enqueueEvent(new ItemPickupEvent(w)));
+            armorRepository.getRandomObjectByTier(1).ifPresent(player::enqueueEquipItem);
+            weaponRepository.getObjectById("dildo").ifPresent(player::enqueuePickup);
+            weaponRepository.getObjectById("lasersaw").ifPresent(player::enqueuePickup);
+            usableRepository.getObjectById("bandage").ifPresent(player::enqueuePickup);
         }
     }
 

@@ -14,17 +14,22 @@ public class EquipEvent extends AbstractEvent {
     public EquipEvent(IItem item) {
         super(TYPE);
         setAttribute(ITEM, item);
-        setDescription(String.format("Вы пытаетесь надеть предмет [%s]", item.getDescription().orElse("<предмет>")));
     }
 
     @Override
     public void apply() {
-        super.apply();
+        // this is a multipipe event, we'll execute it later
+    }
+
+    public void equip() {
         getAttribute(ITEM).ifPresent(i -> target.as(MUTABLEPLAYER_OBJ).ifPresent(p -> {
             try {
                 p.equipItem(i);
+                setDescription(String.format("Вы надеваете предмет [%s]", i.getDescription().orElse("<предмет>")));
+                logTargetComment();
             } catch (NotEquippableException e) {
                 target.log("Не удалось надеть предмет: " + e.getMessage());
+                setCancelled();
             }
         }));
     }

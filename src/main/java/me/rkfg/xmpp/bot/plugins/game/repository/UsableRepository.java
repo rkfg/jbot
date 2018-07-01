@@ -35,7 +35,7 @@ public class UsableRepository extends AbstractContentRepository<IUsable> impleme
             result.put(CONTENT_ID, parts[0]);
             result.put(TIER_CNT, Integer.valueOf(parts[1]));
             result.put(USE_CNT, Integer.valueOf(parts[2]));
-            if (parts.length > 3) {
+            if (parts.length > 4) {
                 processEffects(result, parts[3]);
                 result.put(DESC_CNT, parts[4]);
             } else {

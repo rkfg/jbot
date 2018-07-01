@@ -31,4 +31,9 @@ public interface IPlayer extends IGameObject {
 
     List<IItem> getBackpack();
 
+    boolean enqueueEquipItem(IItem item);
+
+    boolean enqueueUnequipItem(TypedAttribute<ISlot> slot);
+    
+    boolean enqueuePickup(IItem item);
 }

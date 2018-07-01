@@ -6,10 +6,9 @@ import java.util.Optional;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.misc.IHasAttributes;
-import me.rkfg.xmpp.bot.plugins.game.misc.IHasDescription;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 
-public interface IItem extends IGameObject, IHasDescription, IHasAttributes {
+public interface IItem extends IGameObject, IHasAttributes {
     Optional<TypedAttribute<ISlot>> getFittingSlot();
 
     Optional<IGameObject> getOwner();
@@ -26,7 +25,7 @@ public interface IItem extends IGameObject, IHasDescription, IHasAttributes {
     }
 
     default void onUse() {
-        
+
     }
-    
+
 }

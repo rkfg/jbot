@@ -13,6 +13,9 @@ import java.util.function.BinaryOperator;
 import me.rkfg.xmpp.bot.plugins.game.effect.AbstractEffectReceiver;
 import me.rkfg.xmpp.bot.plugins.game.effect.DeadEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.IEffect;
+import me.rkfg.xmpp.bot.plugins.game.event.EquipEvent;
+import me.rkfg.xmpp.bot.plugins.game.event.ItemPickupEvent;
+import me.rkfg.xmpp.bot.plugins.game.event.UnequipEvent;
 import me.rkfg.xmpp.bot.plugins.game.exception.NotEquippableException;
 import me.rkfg.xmpp.bot.plugins.game.item.IArmor;
 import me.rkfg.xmpp.bot.plugins.game.item.IItem;
@@ -222,5 +225,41 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
     @Override
     public void removeFromBackpack(IItem item) {
         backpack.remove(item);
+    }
+
+    @Override
+    public boolean enqueueEquipItem(IItem item) {
+        if (!item.getFittingSlot().map(this::enqueueUnequipItem).orElse(true)) {
+            return false;
+        }
+        final EquipEvent equipEvent = new EquipEvent(item);
+        if (enqueueEvent(equipEvent)) {
+            equipEvent.equip();
+            if (!equipEvent.isCancelled()) {
+                removeFromBackpack(item);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean enqueueUnequipItem(TypedAttribute<ISlot> slot) {
+        return getSlot(slot).flatMap(ISlot::getItem).map(i -> {
+            final UnequipEvent event = new UnequipEvent(slot);
+            if (enqueueEvent(event)) {
+                event.unequip();
+                if (!event.isCancelled()) {
+                    putItemToBackpack(i);
+                    return true;
+                }
+            }
+            return false;
+        }).orElse(true);
+    }
+    
+    @Override
+    public boolean enqueuePickup(IItem item) {
+        return enqueueEvent(new ItemPickupEvent(item));
     }
 }
