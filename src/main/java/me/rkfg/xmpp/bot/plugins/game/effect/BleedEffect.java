@@ -26,7 +26,7 @@ public class BleedEffect extends AbstractEffect {
     @Override
     public Collection<IEvent> processEvent(IEvent event) {
         if (event.getType().equals(TickEvent.TYPE)) {
-            final StatsEvent bleedEvent = new StatsEvent(source);
+            final StatsEvent bleedEvent = new StatsEvent();
             final Integer bleedRate = getAttribute(BLEED_RATE_ATTR).orElse(1);
             bleedEvent.setAttribute(HP, -bleedRate);
             bleedEvent.setDescription("Персонаж теряет " + bleedRate + " hp, истекая кровью");

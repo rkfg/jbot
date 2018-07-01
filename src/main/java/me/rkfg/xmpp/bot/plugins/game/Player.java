@@ -156,7 +156,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
             if (dead) {
                 enqueueAttachEffect(new DeadEffect());
             } else {
-                enqueueDetachEffect(DeadEffect.TYPE, World.THIS);
+                enqueueDetachEffect(DeadEffect.TYPE);
             }
         }
     }

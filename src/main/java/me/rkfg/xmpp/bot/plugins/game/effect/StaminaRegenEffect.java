@@ -28,7 +28,7 @@ public class StaminaRegenEffect extends AbstractEffect {
         if (!event.isOfType(TickEvent.TYPE)) {
             return super.processEvent(event);
         }
-        return singleEvent(new StatsEvent(source).setAttributeChain(STM, getAttribute(REGEN).orElse(0)));
+        return singleEvent(new StatsEvent().setAttributeChain(STM, getAttribute(REGEN).orElse(0)));
     }
 
 }

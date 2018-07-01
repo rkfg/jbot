@@ -24,7 +24,7 @@ public class SleepCommand implements ICommandHandler {
             try {
                 SleepType sleepType = arg.map(Integer::valueOf).filter(v -> v >= 0 && v < 3).map(v -> SleepType.values()[v])
                         .orElseThrow(NumberFormatException::new);
-                player.enqueueEvent(new SetSleepEvent(sleepType, player));
+                player.enqueueEvent(new SetSleepEvent(sleepType));
             } catch (NumberFormatException e) {
                 return getHelp();
             }

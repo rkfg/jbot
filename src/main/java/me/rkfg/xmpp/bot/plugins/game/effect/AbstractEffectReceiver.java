@@ -130,7 +130,7 @@ public abstract class AbstractEffectReceiver implements IGameObject, IAttachDeta
     }
 
     @Override
-    public void enqueueDetachEffect(String effectType, IGameObject source) {
-        enqueueEvent(new EffectEvent(effectType, source));
+    public void enqueueDetachEffect(String effectType) {
+        enqueueEvent(new EffectEvent(effectType));
     }
 }

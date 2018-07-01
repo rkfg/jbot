@@ -2,15 +2,14 @@ package me.rkfg.xmpp.bot.plugins.game.event;
 
 import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
-import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 
 public class StatsEvent extends AbstractEvent {
 
     public static final String TYPE = "statchange";
 
-    public StatsEvent(IGameObject source) {
-        super(TYPE, source);
+    public StatsEvent() {
+        super(TYPE);
     }
 
     @Override

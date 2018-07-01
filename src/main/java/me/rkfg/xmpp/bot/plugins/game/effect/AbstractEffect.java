@@ -54,7 +54,7 @@ public abstract class AbstractEffect implements IEffect {
     }
 
     protected Collection<IEvent> detachEffect(String effectType) {
-        return singleEvent(new EffectEvent(effectType, source));
+        return singleEvent(new EffectEvent(effectType));
     }
 
     protected Collection<IEvent> attachEffect(IEffect effect) {

@@ -35,6 +35,6 @@ public interface IGameObject extends IGameBase {
 
     void enqueueAttachEffect(IEffect effect);
 
-    void enqueueDetachEffect(String effectType, IGameObject source);
+    void enqueueDetachEffect(String effectType);
 
 }

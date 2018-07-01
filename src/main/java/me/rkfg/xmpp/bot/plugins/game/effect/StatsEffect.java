@@ -16,8 +16,8 @@ public class StatsEffect extends AbstractEffect {
 
     public StatsEffect(String type, String description) {
         super(type, description);
-        attachStatsEvent = new StatsEvent(source);
-        detachStatsEvent = new StatsEvent(source);
+        attachStatsEvent = new StatsEvent();
+        detachStatsEvent = new StatsEvent();
     }
     
     public StatsEffect() {
@@ -31,7 +31,7 @@ public class StatsEffect extends AbstractEffect {
 
     public void addEffect(IEffect effect) {
         attachEffectEvents.add(new EffectEvent(effect));
-        detachEffectEvents.add(new EffectEvent(effect.getType(), source));
+        detachEffectEvents.add(new EffectEvent(effect.getType()));
     }
 
     @Override

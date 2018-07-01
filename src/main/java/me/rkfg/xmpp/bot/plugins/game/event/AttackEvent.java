@@ -18,7 +18,8 @@ public class AttackEvent extends AbstractEvent {
     public static final TypedAttribute<Boolean> SUCCESSFUL = TypedAttribute.of("successful");
 
     public AttackEvent(IGameObject source, IGameObject target) {
-        super(TYPE, source);
+        super(TYPE);
+        setSource(source);
         setTarget(target);
         try {
             IPlayer srcPlayer = source.as(PLAYER_OBJ).orElseThrow(() -> new RuntimeException("Неверный источник атаки"));

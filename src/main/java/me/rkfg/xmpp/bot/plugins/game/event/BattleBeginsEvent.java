@@ -11,7 +11,8 @@ public class BattleBeginsEvent extends AbstractEvent {
     public static final String TYPE = "battlebegins";
 
     public BattleBeginsEvent(IGameObject source) {
-        super(TYPE, source);
+        super(TYPE);
+        setSource(source);
     }
 
     @Override
@@ -38,7 +39,9 @@ public class BattleBeginsEvent extends AbstractEvent {
             if (attackEvent.isSuccessful()) {
                 srcPlayer.log("Атака достигает цели и наносит " + attackEvent.getDamage() + " урона!");
                 tgtPlayer.log("Соперник наносит вам " + attackEvent.getDamage() + " урона!");
-                tgtPlayer.enqueueEvent(new StatsEvent(srcPlayer).setAttributeChain(HP, -attackEvent.getDamage()));
+                final StatsEvent statsEvent = new StatsEvent();
+                statsEvent.setSource(srcPlayer);
+                tgtPlayer.enqueueEvent(statsEvent.setAttributeChain(HP, -attackEvent.getDamage()));
             } else {
                 srcPlayer.log("Вы пытаетесь поразить соперника, но промахиваетесь!");
                 tgtPlayer.log("Соперник пытается нанести удар, но промахивается!");

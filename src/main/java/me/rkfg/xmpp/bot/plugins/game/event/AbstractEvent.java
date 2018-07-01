@@ -19,9 +19,8 @@ public abstract class AbstractEvent implements IEvent {
     private boolean cancelled = false;
     private String description;
 
-    public AbstractEvent(String type, IGameObject source) {
+    public AbstractEvent(String type) {
         this.type = type;
-        this.source = source;
     }
 
     @Override

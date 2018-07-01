@@ -13,7 +13,7 @@ public class UnequipEvent extends AbstractEvent {
     public static final TypedAttribute<TypedAttribute<ISlot>> SLOT_ATTR = TypedAttribute.of("slotattr");
 
     public UnequipEvent(IGameObject source, TypedAttribute<ISlot> slot) {
-        super(TYPE, source);
+        super(TYPE);
         setAttribute(SLOT_ATTR, slot);
     }
 

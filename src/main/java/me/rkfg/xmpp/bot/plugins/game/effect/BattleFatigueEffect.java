@@ -29,7 +29,7 @@ public class BattleFatigueEffect extends AbstractEffect {
         if (event.isOfType(BattleBeginsEvent.TYPE) && target == event.getSource()) {
             Optional<IPlayer> player = target.as(PLAYER_OBJ).filter(p -> p.getStat(STM) >= stmCost);
             if (player.isPresent()) {
-                player.get().enqueueEvent(new StatsEvent(target).setAttributeChain(STM, -stmCost));
+                player.get().enqueueEvent(new StatsEvent().setAttributeChain(STM, -stmCost));
             } else {
                 target.log("Вы слишком устали, чтобы сражаться.");
                 return cancelEvent();

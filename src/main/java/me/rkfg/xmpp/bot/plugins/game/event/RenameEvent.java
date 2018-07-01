@@ -2,7 +2,6 @@ package me.rkfg.xmpp.bot.plugins.game.event;
 
 import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
-import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 import me.rkfg.xmpp.bot.plugins.game.misc.Utils;
 
@@ -11,8 +10,8 @@ public class RenameEvent extends AbstractEvent {
     public static final String TYPE = "rename";
     public static final TypedAttribute<String> NAME = TypedAttribute.of("name");
 
-    public RenameEvent(IGameObject source, String newName) {
-        super(TYPE, source);
+    public RenameEvent(String newName) {
+        super(TYPE);
         setAttribute(NAME, newName);
     }
 

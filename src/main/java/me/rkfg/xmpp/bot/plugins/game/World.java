@@ -90,8 +90,8 @@ public class World extends Player {
             if (round > 1) {
                 name += " " + round + "-й";
             }
-            player.enqueueEvent(new RenameEvent(this, name));
-            player.enqueueEvents(new SetSleepEvent(SleepType.DEEP, this));
+            player.enqueueEvent(new RenameEvent(name));
+            player.enqueueEvents(new SetSleepEvent(SleepType.DEEP));
             effectRepository.getObjectById(BattleFatigueEffect.TYPE).ifPresent(player::enqueueAttachEffect);
             player.enqueueAttachEffect(new StaminaRegenEffect());
             StatsEffect statsEffectFat = new StatsEffect("fat", "жиробасина");

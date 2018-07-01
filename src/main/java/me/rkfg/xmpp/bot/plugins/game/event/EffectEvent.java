@@ -1,6 +1,5 @@
 package me.rkfg.xmpp.bot.plugins.game.event;
 
-import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.effect.IAttachDetachEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.IEffect;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
@@ -12,12 +11,12 @@ public class EffectEvent extends AbstractEvent {
     public static final TypedAttribute<String> DETACH_EFFECT = TypedAttribute.of("detacheffect");
 
     public EffectEvent(IEffect effectToAttach) {
-        super(TYPE, effectToAttach.getSource());
+        super(TYPE);
         setAttribute(ATTACH_EFFECT, effectToAttach);
     }
 
-    public EffectEvent(String effectToDetach, IGameObject source) {
-        super(TYPE, source);
+    public EffectEvent(String effectToDetach) {
+        super(TYPE);
         setAttribute(DETACH_EFFECT, effectToDetach);
     }
 

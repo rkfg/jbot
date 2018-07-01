@@ -28,7 +28,7 @@ public class NoGuardSleepEffect extends AbstractEffect {
     @Override
     public void onBeforeAttach() {
         if (target.hasMatchingEffect(SleepEffect.TYPE, SleepEffect.SLEEP_TYPE_ATTR, SleepType.GUARD)) {
-            target.enqueueEvent(new SetSleepEvent(SleepType.AWAKE, source));
+            target.enqueueEvent(new SetSleepEvent(SleepType.AWAKE));
         }
     }
 
