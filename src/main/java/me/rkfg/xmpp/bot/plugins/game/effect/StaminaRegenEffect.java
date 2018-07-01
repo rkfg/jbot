@@ -31,4 +31,9 @@ public class StaminaRegenEffect extends AbstractEffect {
         return singleEvent(new StatsEvent().setAttributeChain(STM, getAttribute(REGEN).orElse(0)));
     }
 
+    @Override
+    public boolean isVisible() {
+        return false;
+    }
+    
 }

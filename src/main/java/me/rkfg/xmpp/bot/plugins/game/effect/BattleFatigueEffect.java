@@ -38,4 +38,9 @@ public class BattleFatigueEffect extends AbstractEffect {
         return super.processEvent(event);
     }
 
+    @Override
+    public boolean isVisible() {
+        return false;
+    }
+    
 }

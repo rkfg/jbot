@@ -12,6 +12,7 @@ import java.util.function.BinaryOperator;
 
 import me.rkfg.xmpp.bot.plugins.game.effect.AbstractEffectReceiver;
 import me.rkfg.xmpp.bot.plugins.game.effect.DeadEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.IEffect;
 import me.rkfg.xmpp.bot.plugins.game.exception.NotEquippableException;
 import me.rkfg.xmpp.bot.plugins.game.item.IArmor;
 import me.rkfg.xmpp.bot.plugins.game.item.IItem;
@@ -105,8 +106,8 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
             return attr.getName() + ": " + (modStat.equals(stat) ? stat : modStat + " (" + stat + ")");
         })).filter(Optional::isPresent).map(Optional::get).reduce(pipeReducer).orElse("нет стат");
         sb.append(statsStr);
-        final String effectsStr = listEffects().stream().map(effect -> effect.getDescription().orElse(effect.getType())).reduce(pipeReducer)
-                .orElse("нет эффектов");
+        final String effectsStr = listEffects().stream().filter(IEffect::isVisible)
+                .map(effect -> effect.getDescription().orElse(effect.getType())).reduce(pipeReducer).orElse("нет эффектов");
         sb.append("\nЭффекты: ").append(effectsStr);
         final String slotsStr = SLOTS.stream()
                 .map(slotAttr -> equipment.get(slotAttr)
@@ -211,12 +212,12 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
     public List<IItem> getBackpack() {
         return Collections.unmodifiableList(backpack);
     }
-    
+
     @Override
     public void putItemToBackpack(IItem item) {
         backpack.add(item);
     }
-    
+
     @Override
     public void removeFromBackpack(IItem item) {
         backpack.remove(item);

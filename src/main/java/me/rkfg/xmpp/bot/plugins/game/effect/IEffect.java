@@ -34,5 +34,9 @@ public interface IEffect extends IHasAttributes, IHasType, IHasDirection, IHasDe
     default boolean isReplacementAllowed(IEffect replacement) {
         return true;
     }
+    
+    default boolean isVisible() {
+        return true;
+    }
 
 }
