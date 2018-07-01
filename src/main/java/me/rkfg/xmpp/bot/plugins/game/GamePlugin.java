@@ -14,6 +14,7 @@ import me.rkfg.xmpp.bot.message.Message;
 import me.rkfg.xmpp.bot.plugins.CommandPlugin;
 import me.rkfg.xmpp.bot.plugins.game.command.AttackCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.DefaultCommand;
+import me.rkfg.xmpp.bot.plugins.game.command.EquipCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.ICommandHandler;
 import me.rkfg.xmpp.bot.plugins.game.command.ListBackpackCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.ListPlayersCommand;
@@ -60,6 +61,7 @@ public class GamePlugin extends CommandPlugin {
         registerHandler(new SleepCommand());
         registerHandler(new AttackCommand());
         registerHandler(new ListBackpackCommand());
+        registerHandler(new EquipCommand());
         registerHandler(new ManCommand(handlers));
     }
 

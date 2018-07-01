@@ -13,11 +13,12 @@ public interface IMutablePlayer extends IPlayer {
     void changeStat(TypedAttribute<Integer> attr, Integer diff);
 
     void setDead(boolean dead);
-    
+
     void equipItem(IItem item);
 
     void unequipItem(TypedAttribute<ISlot> slotAttr);
 
     void putItemToBackpack(IItem item);
 
+    void removeFromBackpack(IItem item);
 }
