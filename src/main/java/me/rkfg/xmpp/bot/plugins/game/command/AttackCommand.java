@@ -27,7 +27,7 @@ public class AttackCommand implements ICommandHandler {
                 return Optional.of("нельзя атаковать себя");
             }
             if (!player.enqueueEvent(new BattleBeginsEvent(player)) || !target.enqueueEvent(new BattleBeginsEvent(player))) {
-                return Optional.of("Не удалось начать бой");
+                player.log("Не удалось начать бой");
             }
         } catch (NumberFormatException e) {
             return getHelp();
