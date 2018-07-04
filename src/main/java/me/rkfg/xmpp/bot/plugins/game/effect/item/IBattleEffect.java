@@ -10,6 +10,8 @@ import java.util.function.BiFunction;
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.effect.IEffect;
 import me.rkfg.xmpp.bot.plugins.game.event.BattleAttackEvent;
+import me.rkfg.xmpp.bot.plugins.game.event.BattleBeginsEvent;
+import me.rkfg.xmpp.bot.plugins.game.event.BattleEndsEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 
 public interface IBattleEffect extends IEffect {
@@ -26,7 +28,21 @@ public interface IBattleEffect extends IEffect {
                 result.addAll(defenceSuccess(event));
             }
         }
+        if (event.isOfType(BattleBeginsEvent.TYPE)) {
+            result.addAll(battleBegins(event));
+        }
+        if (event.isOfType(BattleEndsEvent.TYPE)) {
+            result.addAll(battleEnds(event));
+        }
         return result;
+    }
+
+    default Collection<IEvent> battleBegins(IEvent event) {
+        return noEvent();
+    }
+
+    default Collection<IEvent> battleEnds(IEvent event) {
+        return noEvent();
     }
 
     default Collection<IEvent> defenceSuccess(IEvent event) {

@@ -23,9 +23,4 @@ public class BattleFatigueEffect extends AbstractEffect implements IFatigueEffec
         return processFatigue(event, BattleBeginsEvent.TYPE, "Вы слишком устали, чтобы сражаться.");
     }
 
-    @Override
-    public boolean isVisible() {
-        return false;
-    }
-
 }

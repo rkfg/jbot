@@ -18,9 +18,5 @@ public class SearchFatigue extends AbstractEffect implements IFatigueEffect {
     public Collection<IEvent> processEvent(IEvent event) {
         return processFatigue(event, SearchEvent.TYPE, "Вы слишком устали, чтобы искать вещи.");
     }
-    
-    @Override
-    public boolean isVisible() {
-        return false;
-    }
+
 }

@@ -4,7 +4,7 @@ import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 
 public class BattleEndsEvent extends AbstractEvent {
 
-    private static final String TYPE = "battleends";
+    public static final String TYPE = "battleends";
 
     public BattleEndsEvent(IPlayer attacker, IPlayer defender) {
         super(TYPE);
