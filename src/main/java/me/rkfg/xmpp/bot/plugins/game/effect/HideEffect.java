@@ -20,7 +20,7 @@ public class HideEffect extends AbstractEffect implements IBattleEffect {
     public Collection<IEvent> battleBegins(IEvent event) {
         if (imDefender(event)) {
             return withPlayers(event, (attacker, defender) -> {
-                int hide = attacker.getStat(DEF) + attacker.getStat(LCK) + drn();
+                int hide = defender.getStat(DEF) + defender.getStat(LCK) + drn();
                 int seek = attacker.getStat(ATK) + attacker.getStat(LCK) + drn();
                 if (seek > hide) {
                     attacker.log("Жертва старательно скрывалась, но вы сумели её обнаружить!");
