@@ -11,13 +11,13 @@ import me.rkfg.xmpp.bot.plugins.game.item.IWeapon;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 import me.rkfg.xmpp.bot.plugins.game.misc.Utils;
 
-public class AttackEvent extends AbstractEvent {
+public class BattleAttackEvent extends AbstractEvent {
 
-    public static final String TYPE = "attack";
+    public static final String TYPE = "battleattack";
 
     public static final TypedAttribute<Boolean> SUCCESSFUL = TypedAttribute.of("successful");
 
-    public AttackEvent(IGameObject source, IGameObject target) {
+    public BattleAttackEvent(IGameObject source, IGameObject target) {
         super(TYPE);
         setSource(source);
         setTarget(target);
