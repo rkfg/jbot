@@ -33,6 +33,10 @@ public class TypedAttributeMap {
         return Optional.ofNullable((T) map.get(key.getName()));
     }
 
+    public <T> T getDef(TypedAttribute<T> key, T defValue) {
+        return get(key).orElse(defValue);
+    }
+
     public <T> Optional<T> get(TypedAttribute<T> key, Function<? super TypedAttribute<T>, ? extends T> mappingFunction) {
         Objects.requireNonNull(mappingFunction);
         Optional<T> v = get(key);

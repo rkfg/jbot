@@ -24,7 +24,8 @@ public interface IHasEffects extends IContentRepository {
             String[] params = effectDesc.split(":");
             Optional<IEffect> effect = World.THIS.getEffectRepository().getObjectById(params[0]);
             if (!effect.isPresent()) {
-                LoggerFactory.getLogger(getClass()).warn("Effect {} for item {} not found", params[0], content.get(CONTENT_ID));
+                LoggerFactory.getLogger(getClass()).warn("Effect {} for item {} not found", params[0],
+                        content.getDef(CONTENT_ID, "<noid>"));
             }
             if (params.length > 1) {
                 effect.ifPresent(e -> processEffectParams(params, e));
