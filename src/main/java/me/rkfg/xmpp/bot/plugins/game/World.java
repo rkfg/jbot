@@ -112,6 +112,7 @@ public class World extends Player {
             weaponRepository.getObjectById("dildo").ifPresent(player::enqueuePickup);
             weaponRepository.getObjectById("lasersaw").ifPresent(player::enqueuePickup);
             usableRepository.getObjectById("bandage").ifPresent(player::enqueuePickup);
+            usableRepository.getObjectById("speedhack").ifPresent(player::enqueuePickup);
         }
     }
 

@@ -1,8 +1,11 @@
 package me.rkfg.xmpp.bot.plugins.game.effect;
 
+import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 
 import me.rkfg.xmpp.bot.plugins.game.event.CancelEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.EffectEvent;
@@ -65,4 +68,40 @@ public interface IEffect extends IHasAttributes, IHasType, IHasDirection {
         return singleEvent(new CancelEvent());
     }
 
+    default Optional<Integer> getIntParameter(int idx) {
+        return getAttribute(EFFECT_PARAMS).map(p -> {
+            if (p.size() <= idx) {
+                return null;
+            }
+            try {
+                return Integer.valueOf(p.get(idx));
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        });
+    }
+
+    default Integer getIntParameter(int idx, int def) {
+        return getIntParameter(idx).orElse(def);
+    }
+
+    default Optional<Integer> getIntParameterByKey(String key) {
+        try {
+            return getAttribute(EFFECT_PARAMS_KV).map(kv -> kv.get(key)).map(Integer::parseInt);
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    default Integer getIntParameterByKey(String key, int def) {
+        return getIntParameterByKey(key).orElse(def);
+    }
+
+    default Optional<String> getParameterByKey(String key) {
+        try {
+            return getAttribute(EFFECT_PARAMS_KV).map(kv -> kv.get(key));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
 }

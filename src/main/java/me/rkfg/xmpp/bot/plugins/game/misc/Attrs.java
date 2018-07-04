@@ -2,6 +2,7 @@ package me.rkfg.xmpp.bot.plugins.game.misc;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import me.rkfg.xmpp.bot.plugins.game.IMutablePlayer;
@@ -52,6 +53,7 @@ public class Attrs {
     public static final IndexPointer<String> DESC_IDX = IndexPointer.named("descidx");
 
     public static final TypedAttribute<List<String>> EFFECT_PARAMS = TypedAttribute.of("effectparams");
+    public static final TypedAttribute<Map<String, String>> EFFECT_PARAMS_KV = TypedAttribute.of("effectparamskv");
     
     public static final TypedAttribute<Integer> USE_CNT = TypedAttribute.of("использования");
 }
