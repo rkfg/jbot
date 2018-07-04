@@ -1,18 +1,20 @@
-package me.rkfg.xmpp.bot.plugins.game.effect.item;
+package me.rkfg.xmpp.bot.plugins.game.effect;
 
 import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 
+import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
-import me.rkfg.xmpp.bot.plugins.game.effect.IEffect;
 import me.rkfg.xmpp.bot.plugins.game.event.BattleAttackEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.BattleBeginsEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.BattleEndsEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
+import me.rkfg.xmpp.bot.plugins.game.item.IItem;
 
 public interface IBattleEffect extends IEffect {
 
@@ -65,5 +67,25 @@ public interface IBattleEffect extends IEffect {
         return event.getSource().as(PLAYER_OBJ)
                 .flatMap(attacker -> event.getTarget().as(PLAYER_OBJ).map(defender -> f.apply(attacker, defender)))
                 .orElseGet(this::noEvent);
+    }
+
+    default boolean imDefender(IEvent event) {
+        return event.getTarget() == getTarget();
+    }
+
+    default boolean imAttacker(IEvent event) {
+        return event.getSource() == getTarget();
+    }
+
+    default boolean myOwnerIsDefender(IEvent event) {
+        return getOwner().filter(p -> p == event.getTarget()).isPresent();
+    }
+
+    default boolean myOwnerIsAttacker(IEvent event) {
+        return getOwner().filter(p -> p == event.getSource()).isPresent();
+    }
+
+    default Optional<IGameObject> getOwner() {
+        return getTarget().as(ITEM_OBJ).flatMap(IItem::getOwner);
     }
 }
