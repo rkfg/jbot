@@ -1,5 +1,7 @@
 package me.rkfg.xmpp.bot.plugins.game.effect;
 
+import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
+
 import java.util.Collection;
 
 import me.rkfg.xmpp.bot.plugins.game.World;
@@ -16,6 +18,7 @@ public class DeadEffect extends AbstractEffect {
 
     @Override
     public Collection<IEvent> processEvent(IEvent event) {
+        target.as(PLAYER_OBJ).ifPresent(p -> event.getSource().log("%s мёртв.", p.getName()));
         return cancelEvent(); // dead man reacts to no events
     }
 
