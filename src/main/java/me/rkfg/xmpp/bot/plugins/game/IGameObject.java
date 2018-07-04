@@ -15,8 +15,6 @@ public interface IGameObject extends IGameBase {
 
     boolean enqueueEvent(IEvent event);
 
-    void processEvents();
-
     Optional<IEffect> findEffect(String type);
 
     default <T> boolean hasMatchingEffect(String type, TypedAttribute<T> attr, T value) {

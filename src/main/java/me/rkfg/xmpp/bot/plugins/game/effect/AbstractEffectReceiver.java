@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -15,73 +17,75 @@ import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 
 public abstract class AbstractEffectReceiver implements IGameObject, IAttachDetachEffect {
 
-    private Set<IEvent> incomingEvents = new HashSet<>();
+    private static final int RECURSION_LIMIT = 10;
     private Set<IEffect> effects = new HashSet<>();
-
-    private boolean processingEvents = false;
+    private int recursionCounter = 0;
 
     @Override
     public boolean enqueueEvent(IEvent event) {
-        addEvent(event);
-        processEvents();
+        prepareEvent(event);
+        List<IEvent> newEvents = new LinkedList<>();
+        newEvents.add(event);
+        processEvents(newEvents);
         return !event.isCancelled();
     }
 
-    private void addEvent(IEvent event) {
+    private void prepareEvent(IEvent event) {
         if (event.getTarget() == null) {
             event.setTarget(this);
         }
         if (event.getSource() == null) {
             event.setSource(World.THIS);
         }
-        incomingEvents.add(event);
     }
 
     @Override
-    public void enqueueEvents(Collection<? extends IEvent> events) {
-        events.forEach(this::addEvent);
-        processEvents();
+    public void enqueueEvents(Collection<IEvent> events) {
+        events.forEach(this::prepareEvent);
+        processEvents(events);
     }
 
     @Override
     public void enqueueEvents(IEvent... events) {
+        List<IEvent> newEvents = new LinkedList<>();
         for (IEvent event : events) {
-            addEvent(event);
+            newEvents.add(event);
         }
-        processEvents();
+        enqueueEvents(newEvents);
     }
 
-    @Override
-    public void processEvents() {
-        if (processingEvents) { // prevent endless recursion
+    private void processEvents(Collection<IEvent> incomingEvents) {
+        if (++recursionCounter > RECURSION_LIMIT) {
+            log("Слишком большая рекурсия событий ({}), обработка прервана. Очередь событий: {}", recursionCounter,
+                    incomingEvents.stream().map(IEvent::getType).reduce((a, e) -> a + ", " + e));
             return;
         }
-        processingEvents = true;
-        while (!incomingEvents.isEmpty()) {
-            Set<IEvent> processedEvents = new HashSet<>();
-            Iterator<IEvent> eiter = incomingEvents.iterator();
-            while (eiter.hasNext()) {
-                IEvent event = eiter.next();
-                for (IEffect effect : effects) {
-                    Collection<IEvent> result = effect.processEvent(event);
-                    if (result != null) {
-                        if (result.stream().anyMatch(e -> CancelEvent.TYPE.equals(e.getType()))) {
-                            event.setCancelled();
-                            eiter.remove();
-                        }
-                        // set ourselves as a target by default as most events are directed to us
-                        result.stream().filter(e -> e.getTarget() == null).forEach(e -> e.setTarget(this));
-                        processedEvents.addAll(result);
-                    }
+        HashSet<IEvent> newEvents = new HashSet<>();
+        Iterator<IEvent> eiter = incomingEvents.iterator();
+        while (eiter.hasNext()) {
+            processEffects(newEvents, eiter);
+        }
+        incomingEvents.addAll(newEvents);
+        for (IEvent event : incomingEvents) {
+            event.apply();
+        }
+        --recursionCounter;
+    }
+
+    private void processEffects(Set<IEvent> incomingEvents, Iterator<IEvent> eiter) {
+        IEvent event = eiter.next();
+        for (IEffect effect : effects) {
+            Collection<IEvent> resultEvents = effect.processEvent(event);
+            if (resultEvents != null) {
+                if (resultEvents.stream().anyMatch(e -> CancelEvent.TYPE.equals(e.getType()))) {
+                    event.setCancelled();
+                    eiter.remove();
                 }
-            }
-            processedEvents.addAll(incomingEvents);
-            incomingEvents.clear(); // will accept more events from processed ones via attach/detach effects
-            for (IEvent event : processedEvents) {
-                event.apply();
+                // set ourselves as a target by default as most events are directed to us
+                resultEvents.stream().filter(e -> e.getTarget() == null).forEach(e -> e.setTarget(this));
+                incomingEvents.addAll(resultEvents);
             }
         }
-        processingEvents = false;
     }
 
     @Override
