@@ -12,8 +12,8 @@ public interface IBattleEffect extends IEffect {
 
     @Override
     default Collection<IEvent> processEvent(IEvent event) {
+        Set<IEvent> result = new HashSet<>();
         if (event.isOfType(BattleAttackEvent.TYPE)) {
-            Set<IEvent> result = new HashSet<>();
             if (event.getAttribute(BattleAttackEvent.SUCCESSFUL).orElse(false)) {
                 result.addAll(attackSuccess(event));
                 result.addAll(defenceFailure(event));
@@ -22,7 +22,7 @@ public interface IBattleEffect extends IEffect {
                 result.addAll(defenceSuccess(event));
             }
         }
-        return noEvent();
+        return result;
     }
 
     default Collection<IEvent> defenceSuccess(IEvent event) {
