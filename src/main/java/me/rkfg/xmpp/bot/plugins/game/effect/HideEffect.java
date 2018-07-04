@@ -5,7 +5,6 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Utils.*;
 
 import java.util.Collection;
 
-import me.rkfg.xmpp.bot.plugins.game.event.EffectEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 
 public class HideEffect extends AbstractEffect implements IBattleEffect {
@@ -25,7 +24,7 @@ public class HideEffect extends AbstractEffect implements IBattleEffect {
                 if (seek > hide) {
                     attacker.log("Жертва старательно скрывалась, но вы сумели её обнаружить!");
                     defender.log("О нет, вас заметили и собираются хорошенько отметелить!");
-                    return unhide();
+                    return detachEffect(TYPE);
                 } else {
                     attacker.log("Вам не удалось найти жертву.");
                     defender.log("Кто-то искал вас, чтобы подраться, но не нашёл.");
@@ -33,12 +32,8 @@ public class HideEffect extends AbstractEffect implements IBattleEffect {
                 }
             });
         } else {
-            return unhide();
+            return detachEffect(TYPE);
         }
-    }
-
-    public Collection<IEvent> unhide() {
-        return singleEvent(new EffectEvent(TYPE));
     }
 
     @Override

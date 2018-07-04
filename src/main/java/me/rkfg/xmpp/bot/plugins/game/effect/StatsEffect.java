@@ -20,7 +20,7 @@ public class StatsEffect extends AbstractEffect {
         attachStatsEvent = new StatsEvent();
         detachStatsEvent = new StatsEvent();
     }
-    
+
     public StatsEffect() {
         this("statseffect", null);
     }
