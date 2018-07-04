@@ -1,15 +1,15 @@
 package me.rkfg.xmpp.bot.plugins.game.event;
 
-import me.rkfg.xmpp.bot.plugins.game.IGameObject;
+import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 
 public class BattleEndsEvent extends AbstractEvent {
 
     private static final String TYPE = "battleends";
 
-    public BattleEndsEvent(IGameObject source, String battleDescription) {
+    public BattleEndsEvent(IPlayer attacker, IPlayer defender) {
         super(TYPE);
-        setSource(source);
-        setDescription(battleDescription + " завершён.");
+        setSource(attacker);
+        setTarget(defender);
     }
 
 }
