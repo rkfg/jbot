@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.plugins.game.effect.AmbushFatigueEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.BattleFatigueEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.EquipRedirectorEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.HideFatigueEffect;
@@ -99,6 +100,7 @@ public class World extends Player {
             player.enqueueAttachEffect(new BattleFatigueEffect());
             player.enqueueAttachEffect(new HideFatigueEffect());
             player.enqueueAttachEffect(new SearchFatigueEffect());
+            player.enqueueAttachEffect(new AmbushFatigueEffect());
             player.enqueueAttachEffect(new StaminaRegenEffect());
             player.enqueueAttachEffect(new EquipRedirectorEffect());
             StatsEffect statsEffectFat = new StatsEffect("fat", "жиробасина");

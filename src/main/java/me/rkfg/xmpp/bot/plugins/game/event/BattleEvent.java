@@ -4,6 +4,7 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
+import me.rkfg.xmpp.bot.plugins.game.effect.BattleFatigueEffect;
 import me.rkfg.xmpp.bot.plugins.game.misc.Utils;
 
 public class BattleEvent extends AbstractEvent {
@@ -14,14 +15,14 @@ public class BattleEvent extends AbstractEvent {
         super(TYPE);
         setSource(attacker);
         setTarget(defender);
+        setAttribute(BattleFatigueEffect.FAIR, true);
     }
 
     @Override
     public void apply() {
         source.as(PLAYER_OBJ).ifPresent(attacker -> target.as(PLAYER_OBJ).ifPresent(defender -> {
-            if (!attacker.enqueueEvent(new BattleBeginsEvent(attacker, defender))
-                    || !defender.enqueueEvent(new BattleBeginsEvent(attacker, defender))) {
-                attacker.log("Не удалось начать бой");
+            if (!attacker.enqueueEvent(createBeginEvent(attacker, defender))
+                    || !defender.enqueueEvent(createBeginEvent(attacker, defender))) {
                 return;
             }
             attacker.log(String.format("Вы нападаете на %s!", Utils.getPlayerName(defender)));
@@ -34,6 +35,12 @@ public class BattleEvent extends AbstractEvent {
             attacker.log(endMessage);
             defender.log(endMessage);
         }));
+    }
+
+    public BattleBeginsEvent createBeginEvent(IPlayer attacker, IPlayer defender) {
+        final BattleBeginsEvent event = new BattleBeginsEvent(attacker, defender);
+        getAttribute(BattleFatigueEffect.FAIR).ifPresent(f -> event.setAttribute(BattleFatigueEffect.FAIR, f));
+        return event;
     }
 
     private void battleTurn(IGameObject srcPlayer, IGameObject tgtPlayer) {

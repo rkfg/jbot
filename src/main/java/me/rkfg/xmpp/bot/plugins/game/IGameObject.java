@@ -39,4 +39,13 @@ public interface IGameObject extends IGameBase {
 
     void enqueueDetachEffect(String effectType);
 
+    default void enqueueToggleEffect(IEffect effect) {
+        final String type = effect.getType();
+        if (hasEffect(type)) {
+            enqueueDetachEffect(type);
+        } else {
+            enqueueAttachEffect(effect);
+        }
+    }
+
 }

@@ -6,18 +6,18 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
-import me.rkfg.xmpp.bot.plugins.game.effect.HideEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.AmbushEffect;
 
-public class HideCommand implements ICommandHandler {
+public class AmbushCommand implements ICommandHandler {
 
     @Override
     public Collection<String> getCommand() {
-        return Arrays.asList("спрятаться", "спр");
+        return Arrays.asList("засада", "з");
     }
 
     @Override
     public Optional<String> exec(IPlayer player, Stream<String> args) {
-        player.enqueueToggleEffect(new HideEffect());
+        player.enqueueToggleEffect(new AmbushEffect());
         return Optional.empty();
     }
 
