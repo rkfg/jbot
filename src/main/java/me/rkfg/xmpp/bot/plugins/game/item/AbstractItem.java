@@ -27,11 +27,6 @@ public abstract class AbstractItem extends AbstractEffectReceiver implements IIt
     }
 
     @Override
-    public void log(String message) {
-        owner.log(message); // redirect item's log to the owner
-    }
-
-    @Override
     public TypedAttributeMap getAttrs() {
         return attrs;
     }

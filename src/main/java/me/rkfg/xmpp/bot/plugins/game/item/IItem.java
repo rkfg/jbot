@@ -24,6 +24,11 @@ public interface IItem extends IGameObject, IHasAttributes {
         return Optional.empty();
     }
 
+    @Override
+    default void log(String message) {
+        getOwner().ifPresent(owner -> owner.log(message));
+    }
+
     default void onUse() {
 
     }
