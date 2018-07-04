@@ -27,8 +27,7 @@ public interface IFatigueEffect extends IEffect {
     default Collection<IEvent> processFatigue(IEvent event, String fatigueMessage, Predicate<IEvent> condition) {
         if (getTarget() == event.getSource() && condition.test(event)) {
             return getAttribute(FATIGUE).map(stmCost -> getTarget().as(PLAYER_OBJ).filter(p -> p.getStat(STM) >= stmCost).map(player -> {
-                player.enqueueEvent(new StatsEvent().setAttributeChain(STM, -stmCost));
-                return noEvent();
+                return singleEvent(new StatsEvent().setAttributeChain(STM, -stmCost));
             }).orElseGet(() -> {
                 getTarget().log(fatigueMessage);
                 return cancelEvent();
