@@ -4,15 +4,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 import me.rkfg.xmpp.bot.plugins.game.event.EffectEvent;
+import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.StatsEvent;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 
 public class StatsEffect extends AbstractEffect {
 
     private StatsEvent attachStatsEvent;
-    private Set<EffectEvent> attachEffectEvents = new HashSet<>();
+    private Set<IEvent> attachEffectEvents = new HashSet<>();
     private StatsEvent detachStatsEvent;
-    private Set<EffectEvent> detachEffectEvents = new HashSet<>();
+    private Set<IEvent> detachEffectEvents = new HashSet<>();
 
     public StatsEffect(String type, String description) {
         super(type, description);

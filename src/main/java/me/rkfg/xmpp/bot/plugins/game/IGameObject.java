@@ -23,7 +23,7 @@ public interface IGameObject extends IGameBase {
         return findEffect(type).flatMap(e -> e.getAttribute(attr)).filter(v -> v.equals(value)).isPresent();
     }
 
-    void enqueueEvents(Collection<? extends IEvent> attachEffectEvents);
+    void enqueueEvents(Collection<IEvent> events);
 
     Collection<IEffect> listEffects();
 
