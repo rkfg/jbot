@@ -5,11 +5,11 @@ import java.util.Collection;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.SearchEvent;
 
-public class SearchFatigue extends AbstractEffect implements IFatigueEffect {
+public class SearchFatigueEffect extends AbstractEffect implements IFatigueEffect {
 
     public static final String TYPE = "searchfatigue";
 
-    public SearchFatigue() {
+    public SearchFatigueEffect() {
         super(TYPE, "устаёт при поисках");
         initFatigue(2);
     }

@@ -26,7 +26,7 @@ public class SearchEvent extends AbstractEvent {
             int territory = 30 + Utils.drn();
             int diff = search - territory;
             if (diff < 1) {
-                return null;
+                return Optional.empty();
             }
             int tier = 1;
             if (diff > 10 && diff < 16) {
@@ -53,7 +53,7 @@ public class SearchEvent extends AbstractEvent {
                     repo = Optional.of(World.THIS.getUsableRepository());
                     break;
                 default:
-                    return null;
+                    return Optional.empty();
                 }
                 final int t = tier;
                 found = repo.flatMap(r -> r.getRandomObjectByTier(t));

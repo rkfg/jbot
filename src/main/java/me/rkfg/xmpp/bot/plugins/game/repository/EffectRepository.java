@@ -4,13 +4,11 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
 import java.util.Optional;
 
-import me.rkfg.xmpp.bot.plugins.game.effect.BattleFatigueEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.BleedEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.DeadEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.IEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.NoGuardSleepEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.SleepEffect;
-import me.rkfg.xmpp.bot.plugins.game.effect.StaminaRegenEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.StatsEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.CursedEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.ItemStatEffect;
@@ -25,14 +23,12 @@ public class EffectRepository extends AbstractContentRepository<IEffect> {
 
     @Override
     public void loadContent() {
-        addEffect(BattleFatigueEffect.class);
         addEffect(BleedEffect.class);
         addEffect(CursedEffect.class);
         addEffect(DeadEffect.class);
         addEffect(ItemStatEffect.class);
         addEffect(NoGuardSleepEffect.class);
         addEffect(SleepEffect.class);
-        addEffect(StaminaRegenEffect.class);
         addEffect(StatsEffect.class);
         addEffect(RudeDrawEffect.class);
         addEffect(RudeDrawingsEffect.class);

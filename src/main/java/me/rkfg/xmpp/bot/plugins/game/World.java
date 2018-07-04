@@ -16,6 +16,7 @@ import me.rkfg.xmpp.bot.message.Message;
 import me.rkfg.xmpp.bot.plugins.game.effect.BattleFatigueEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.EquipRedirectorEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.NoGuardSleepEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.SearchFatigueEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.SleepEffect.SleepType;
 import me.rkfg.xmpp.bot.plugins.game.effect.StaminaRegenEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.StatsEffect;
@@ -94,7 +95,8 @@ public class World extends Player {
             }
             player.enqueueEvent(new RenameEvent(name));
             player.enqueueEvents(new SetSleepEvent(SleepType.DEEP));
-            effectRepository.getObjectById(BattleFatigueEffect.TYPE).ifPresent(player::enqueueAttachEffect);
+            player.enqueueAttachEffect(new BattleFatigueEffect());
+            player.enqueueAttachEffect(new SearchFatigueEffect());
             player.enqueueAttachEffect(new StaminaRegenEffect());
             player.enqueueAttachEffect(new EquipRedirectorEffect());
             StatsEffect statsEffectFat = new StatsEffect("fat", "жиробасина");
