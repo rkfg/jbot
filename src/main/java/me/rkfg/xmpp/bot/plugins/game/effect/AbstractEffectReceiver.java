@@ -73,7 +73,8 @@ public abstract class AbstractEffectReceiver implements IGameObject, IAttachDeta
 
     private void processEffects(Set<IEvent> incomingEvents, Iterator<IEvent> eiter) {
         IEvent event = eiter.next();
-        for (IEffect effect : effects) {
+        Set<IEffect> localEffects = new HashSet<>(effects); // make a copy to prevent concurrent modification on recursion
+        for (IEffect effect : localEffects) {
             Collection<IEvent> resultEvents = effect.processEvent(event);
             if (resultEvents != null) {
                 if (resultEvents.stream().anyMatch(e -> CancelEvent.TYPE.equals(e.getType()))) {
