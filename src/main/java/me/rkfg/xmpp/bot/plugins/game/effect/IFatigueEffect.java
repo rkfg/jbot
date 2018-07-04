@@ -5,7 +5,6 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 import java.util.Collection;
 import java.util.function.Predicate;
 
-import me.rkfg.xmpp.bot.plugins.game.event.EffectEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.StatsEvent;
 
@@ -20,8 +19,7 @@ public interface IFatigueEffect extends IEffect {
     }
 
     default Collection<IEvent> processEffectAttachFatigue(IEvent event, String effectType, String fatigueMessage) {
-        return processFatigue(event, fatigueMessage,
-                ev -> ev.getAttribute(EffectEvent.ATTACH_EFFECT).filter(eff -> eff.getType().equals(effectType)).isPresent());
+        return processFatigue(event, fatigueMessage, ev -> ev.isAttachEffect(effectType));
     }
 
     default Collection<IEvent> processFatigue(IEvent event, String fatigueMessage, Predicate<IEvent> condition) {

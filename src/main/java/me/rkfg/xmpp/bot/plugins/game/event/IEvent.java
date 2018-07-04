@@ -13,6 +13,15 @@ public interface IEvent extends IHasAttributes, IHasType, IHasDirection {
         return isOfType(type) && matchAttributeValue(attr, value);
     }
 
+    default boolean isAttachEffect(String effectType) {
+        return isOfType(EffectEvent.TYPE)
+                && getAttribute(EffectEvent.ATTACH_EFFECT).filter(eff -> eff.getType().equals(effectType)).isPresent();
+    }
+
+    default boolean isDetachEffect(String effectType) {
+        return matchByTypeAttr(EffectEvent.TYPE, EffectEvent.DETACH_EFFECT, effectType);
+    }
+
     public void setCancelled();
 
     public boolean isCancelled();
