@@ -61,11 +61,12 @@ public class ChargeableEffect extends AbstractEffect implements IBattleEffect {
 
     private Collection<IEvent> discharge() {
         return getAttribute(CHARGES).map(c -> {
-            if (--c < 1) {
+            if (c == 1) {
                 setAttribute(CHARGES, 0);
                 return onDischarged();
-            } else {
-                setAttribute(CHARGES, c);
+            }
+            if (c > 1) {
+                setAttribute(CHARGES, c - 1);
             }
             return null;
         }).orElseGet(this::noEvent);
