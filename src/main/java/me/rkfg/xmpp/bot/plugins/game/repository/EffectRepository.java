@@ -10,6 +10,7 @@ import me.rkfg.xmpp.bot.plugins.game.effect.IEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.NoGuardSleepEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.SleepEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.StatsEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.item.ChargeableEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.CursedEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.ItemStatEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.RudeDrawEffect;
@@ -24,6 +25,7 @@ public class EffectRepository extends AbstractContentRepository<IEffect> {
     @Override
     public void loadContent() {
         addEffect(BleedEffect.class);
+        addEffect(ChargeableEffect.class);
         addEffect(CursedEffect.class);
         addEffect(DeadEffect.class);
         addEffect(ItemStatEffect.class);
