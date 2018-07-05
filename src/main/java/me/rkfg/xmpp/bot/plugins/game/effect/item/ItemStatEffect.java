@@ -20,19 +20,19 @@ public class ItemStatEffect extends AbstractEffect implements IUseEffect {
         super(TYPE, "изменение стат");
     }
 
-    private static final List<String> keys = Arrays.asList("hp", "atk", "def", "str", "prt", "lck", "stm");
-    private static final List<TypedAttribute<Integer>> attrs = Arrays.asList(HP, ATK, DEF, STR, PRT, LCK, STM);
-    private static final List<String> messages = Arrays.asList("Здоровье", "Способность атаковать", "Способность защищаться", "Сила",
+    private static final List<String> KEYS = Arrays.asList("hp", "atk", "def", "str", "prt", "lck", "stm");
+    private static final List<TypedAttribute<Integer>> EFFECT_ATTRS = Arrays.asList(HP, ATK, DEF, STR, PRT, LCK, STM);
+    private static final List<String> MESSAGES = Arrays.asList("Здоровье", "Способность атаковать", "Способность защищаться", "Сила",
             "Защита", "Удача", "Энергия");
 
     @Override
     public Collection<IEvent> applyEffect(IGameObject useTarget) {
         StatsEvent statsEvent = new StatsEvent();
-        for (int i = 0; i < keys.size(); ++i) {
+        for (int i = 0; i < KEYS.size(); ++i) {
             int idx = i;
-            getIntParameterByKey(keys.get(i)).ifPresent(stat -> {
-                useTarget.log(messages.get(idx) + " %s на %d.", stat > 0 ? "увеличивается" : "уменьшается", stat);
-                statsEvent.setAttribute(attrs.get(idx), stat);
+            getIntParameterByKey(KEYS.get(i)).ifPresent(stat -> {
+                useTarget.log("%s %s на %d.", MESSAGES.get(idx), stat > 0 ? "увеличивается" : "уменьшается", stat);
+                statsEvent.setAttribute(EFFECT_ATTRS.get(idx), stat);
             });
         }
         useTarget.enqueueEvent(statsEvent);
