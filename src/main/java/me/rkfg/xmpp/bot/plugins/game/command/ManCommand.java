@@ -1,5 +1,7 @@
 package me.rkfg.xmpp.bot.plugins.game.command;
 
+import static me.rkfg.xmpp.bot.plugins.game.misc.Utils.*;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -26,7 +28,7 @@ public class ManCommand implements ICommandHandler {
         return Optional.of(args.findFirst().flatMap(arg -> handlers.get(arg).getHelp())
                 .orElse("доступные команды: " + handlers.values().stream().distinct()
                         .map(h -> h.getCommand().stream().filter(c -> !c.isEmpty()).reduce((a, c) -> a + "/" + c))
-                        .filter(Optional::isPresent).map(Optional::get).reduce((acc, cmd) -> acc + ", " + cmd).orElse("команд нет")));
+                        .filter(Optional::isPresent).map(Optional::get).reduce(commaReducer).orElse("команд нет")));
     }
 
 }

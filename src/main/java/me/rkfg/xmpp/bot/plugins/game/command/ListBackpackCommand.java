@@ -1,5 +1,7 @@
 package me.rkfg.xmpp.bot.plugins.game.command;
 
+import static me.rkfg.xmpp.bot.plugins.game.misc.Utils.*;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -22,12 +24,12 @@ public class ListBackpackCommand implements ICommandHandler {
         List<IItem> backpack = player.getBackpack();
         return Optional.of("Содержимое рюкзака: " + IntStream.range(0, backpack.size())
                 .mapToObj(idx -> String.format("%d: %s", idx + 1, backpack.get(idx).getDescription().orElse("неизвестно")))
-                .reduce((a, s) -> a + ", " + s).orElse("рюкзак пуст"));
+                .reduce(commaReducer).orElse("рюкзак пуст"));
     }
 
     @Override
     public Optional<String> getHelp() {
         return Optional.of("Получить пронумерованный список вещей в рюкзаке.");
     }
-    
+
 }

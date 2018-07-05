@@ -1,5 +1,7 @@
 package me.rkfg.xmpp.bot.plugins.game.effect;
 
+import static me.rkfg.xmpp.bot.plugins.game.misc.Utils.*;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -56,7 +58,7 @@ public abstract class AbstractEffectReceiver implements IGameObject, IAttachDeta
     private void processEvents(Collection<IEvent> incomingEvents) {
         if (++recursionCounter > RECURSION_LIMIT) {
             log("Слишком большая рекурсия событий ({}), обработка прервана. Очередь событий: {}", recursionCounter,
-                    incomingEvents.stream().map(IEvent::getType).reduce((a, e) -> a + ", " + e));
+                    incomingEvents.stream().map(IEvent::getType).reduce(commaReducer));
             return;
         }
         HashSet<IEvent> newEvents = new HashSet<>();

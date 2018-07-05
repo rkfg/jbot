@@ -1,6 +1,7 @@
 package me.rkfg.xmpp.bot.plugins.game;
 
 import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
+import static me.rkfg.xmpp.bot.plugins.game.misc.Utils.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,7 +9,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BinaryOperator;
 
 import me.rkfg.xmpp.bot.plugins.game.effect.AbstractEffectReceiver;
 import me.rkfg.xmpp.bot.plugins.game.effect.DeadEffect;
@@ -50,8 +50,6 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
     private String id;
     private String name = "<безымянный>";
     private List<IItem> backpack = new ArrayList<>();
-
-    private BinaryOperator<String> pipeReducer = (acc, v) -> acc + " | " + v;
 
     public Player(String id) {
         this.id = id;

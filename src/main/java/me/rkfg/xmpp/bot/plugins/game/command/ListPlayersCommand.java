@@ -1,5 +1,7 @@
 package me.rkfg.xmpp.bot.plugins.game.command;
 
+import static me.rkfg.xmpp.bot.plugins.game.misc.Utils.*;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -21,7 +23,7 @@ public class ListPlayersCommand implements ICommandHandler {
         return IntStream.range(0, playersList.size()).mapToObj(i -> {
             final IPlayer p = playersList.get(i);
             return "" + (i + 1) + ": " + p.getName() + (p.isAlive() ? "" : " [мёртв]") + (p == player ? " [вы]" : "");
-        }).reduce((acc, p) -> acc + ", " + p).map(list -> "Игроки: " + list);
+        }).reduce(commaReducer).map(list -> "Игроки: " + list);
     }
 
     @Override

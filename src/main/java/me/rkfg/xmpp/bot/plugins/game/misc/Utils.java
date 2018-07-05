@@ -4,6 +4,7 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
 import java.security.SecureRandom;
 import java.util.Optional;
+import java.util.function.BinaryOperator;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
@@ -14,6 +15,8 @@ public class Utils {
 
     private static final String UNKNOWN = "<неизвестный>";
     private static SecureRandom rnd = new SecureRandom();
+    public static BinaryOperator<String> pipeReducer = (acc, v) -> acc + " | " + v;
+    public static BinaryOperator<String> commaReducer = (acc, v) -> acc + ", " + v;
 
     public static int drn() {
         int sum = 0;
