@@ -191,6 +191,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
                         s.getDescription().orElse("неизвестный"), i.getDescription().orElse("неизвестно")));
             });
             s.setItem(item);
+            item.setOwner(this);
         });
     }
 

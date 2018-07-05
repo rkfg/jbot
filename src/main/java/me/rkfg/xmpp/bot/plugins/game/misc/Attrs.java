@@ -7,7 +7,6 @@ import java.util.Set;
 
 import me.rkfg.xmpp.bot.plugins.game.IMutablePlayer;
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
-import me.rkfg.xmpp.bot.plugins.game.effect.IEffect;
 import me.rkfg.xmpp.bot.plugins.game.item.IArmor;
 import me.rkfg.xmpp.bot.plugins.game.item.IItem;
 import me.rkfg.xmpp.bot.plugins.game.item.ISlot;
@@ -44,7 +43,7 @@ public class Attrs {
     public static final TypedAttribute<String> CONTENT_ID = TypedAttribute.of("contentid");
     public static final TypedAttribute<Integer> LIFETIME = TypedAttribute.of("lifetime");
     public static final TypedAttribute<Integer> FATIGUE = TypedAttribute.of("fatigue");
-    public static final TypedAttribute<Set<IEffect>> EFFECTS = TypedAttribute.of("effects");
+    public static final TypedAttribute<Set<TypedAttributeMap>> EFFECTS = TypedAttribute.of("effects");
 
     public static final TypedAttribute<Integer> TIER_CNT = TypedAttribute.of("tiercnt");
     public static final IndexPointer<Integer> TIER_IDX = IndexPointer.named("tieridx");

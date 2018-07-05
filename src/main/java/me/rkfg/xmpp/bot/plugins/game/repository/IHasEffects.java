@@ -21,21 +21,19 @@ public interface IHasEffects extends IContentRepository {
 
     default void processEffects(TypedAttributeMap content, String effectsDesc) {
         content.put(EFFECTS, Stream.of(effectsDesc.split(",")).map(String::trim).map(effectDesc -> {
+            TypedAttributeMap result = new TypedAttributeMap();
             String[] params = effectDesc.split(":");
-            Optional<IEffect> effect = World.THIS.getEffectRepository().getObjectById(params[0]);
-            if (!effect.isPresent()) {
-                LoggerFactory.getLogger(getClass()).warn("Effect {} for item {} not found", params[0],
-                        content.getDef(CONTENT_ID, "<noid>"));
-            }
+            String type = params[0];
+            result.put(CONTENT_ID, type);
             if (params.length > 1) {
-                effect.ifPresent(e -> processEffectParams(params, e));
+                processEffectParams(params, result);
             }
-            return effect;
-        }).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet()));
+            return result;
+        }).collect(Collectors.toSet()));
 
     }
 
-    default void processEffectParams(String[] params, IEffect e) {
+    default void processEffectParams(String[] params, TypedAttributeMap result) {
         List<String> simpleEffectParams = new ArrayList<>();
         Map<String, String> kvEffectParams = new HashMap<>();
         for (int i = 1; i < params.length; ++i) {
@@ -47,15 +45,30 @@ public interface IHasEffects extends IContentRepository {
             }
         }
         if (!simpleEffectParams.isEmpty()) {
-            e.setAttribute(EFFECT_PARAMS, simpleEffectParams);
+            result.put(EFFECT_PARAMS, simpleEffectParams);
         }
         if (!kvEffectParams.isEmpty()) {
-            e.setAttribute(EFFECT_PARAMS_KV, kvEffectParams);
+            result.put(EFFECT_PARAMS_KV, kvEffectParams);
         }
     }
 
+    default Optional<IEffect> instantiateEffect(TypedAttributeMap content) {
+        return content.get(CONTENT_ID).flatMap(type -> {
+            Optional<IEffect> effect = World.THIS.getEffectRepository().getObjectById(type);
+            effect.ifPresent(eff -> {
+                content.get(EFFECT_PARAMS).ifPresent(p -> eff.setAttribute(EFFECT_PARAMS, p));
+                content.get(EFFECT_PARAMS_KV).ifPresent(p -> eff.setAttribute(EFFECT_PARAMS_KV, p));
+            });
+            if (!effect.isPresent()) {
+                LoggerFactory.getLogger(getClass()).warn("Effect {} for item {} not found", type, content.getDef(CONTENT_ID, "<noid>"));
+            }
+            return effect;
+        });
+    }
+
     default <T extends IAttachDetachEffect> T attachEffects(T item, TypedAttributeMap content) {
-        content.get(EFFECTS).ifPresent(fx -> fx.forEach(item::attachEffect));
+        content.get(EFFECTS).ifPresent(
+                fx -> fx.stream().map(this::instantiateEffect).filter(Optional::isPresent).map(Optional::get).forEach(item::attachEffect));
         return item;
     }
 
