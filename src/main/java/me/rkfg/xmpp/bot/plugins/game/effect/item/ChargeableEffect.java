@@ -10,6 +10,7 @@ import java.util.Optional;
 import me.rkfg.xmpp.bot.plugins.game.effect.AbstractEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.IBattleEffect;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
+import me.rkfg.xmpp.bot.plugins.game.event.RechargeEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.StatsEvent;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 
@@ -17,6 +18,7 @@ public class ChargeableEffect extends AbstractEffect implements IBattleEffect {
 
     public static final String TYPE = "chargeable";
     public static final TypedAttribute<Integer> CHARGES = TypedAttribute.of("charges");
+    public static final TypedAttribute<Integer> MAXCHARGES = TypedAttribute.of("maxcharges");
 
     private static final List<String> KEYS = Arrays.asList("atk", "def", "str", "prt");
     private static final List<TypedAttribute<Integer>> EFFECT_ATTRS = Arrays.asList(ATK, DEF, STR, PRT);
@@ -27,8 +29,25 @@ public class ChargeableEffect extends AbstractEffect implements IBattleEffect {
     }
 
     @Override
+    public Collection<IEvent> processEvent(IEvent event) {
+        if (event.isOfType(RechargeEvent.TYPE)) {
+            getAttribute(MAXCHARGES).ifPresent(mc -> {
+                boolean charged = isCharged();
+                setAttribute(CHARGES, mc);
+                if (!charged) { // charged now, change the stats back
+                    enqueueStatsEvent();
+                }
+            });
+        }
+        return IBattleEffect.super.processEvent(event);
+    }
+
+    @Override
     public void onBeforeAttach() {
-        getIntParameter(0).ifPresent(ch -> setAttribute(CHARGES, ch));
+        getIntParameter(0).ifPresent(ch -> {
+            setAttribute(CHARGES, ch);
+            setAttribute(MAXCHARGES, ch);
+        });
         enqueueStatsEvent();
     }
 
@@ -60,16 +79,7 @@ public class ChargeableEffect extends AbstractEffect implements IBattleEffect {
     }
 
     private Collection<IEvent> discharge() {
-        return getAttribute(CHARGES).map(c -> {
-            if (c == 1) {
-                setAttribute(CHARGES, 0);
-                return onDischarged();
-            }
-            if (c > 1) {
-                setAttribute(CHARGES, c - 1);
-            }
-            return null;
-        }).orElseGet(this::noEvent);
+        return decAttribute(CHARGES, this::onDischarged).orElseGet(this::noEvent);
     }
 
     private Collection<IEvent> onDischarged() {

@@ -13,6 +13,7 @@ import me.rkfg.xmpp.bot.plugins.game.effect.StatsEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.ChargeableEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.CursedEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.ItemStatEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.item.RechargeEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.RudeDrawEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.RudeDrawingsEffect;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
@@ -32,6 +33,7 @@ public class EffectRepository extends AbstractContentRepository<IEffect> {
         addEffect(NoGuardSleepEffect.class);
         addEffect(SleepEffect.class);
         addEffect(StatsEffect.class);
+        addEffect(RechargeEffect.class);
         addEffect(RudeDrawEffect.class);
         addEffect(RudeDrawingsEffect.class);
 

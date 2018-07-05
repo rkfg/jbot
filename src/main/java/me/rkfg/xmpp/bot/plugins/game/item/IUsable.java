@@ -15,12 +15,9 @@ public interface IUsable extends IItem {
 
     @Override
     default void onUse() {
-        getAttribute(USE_CNT).ifPresent(c -> {
-            if (--c < 1) {
-                getOwner().flatMap(o -> o.as(MUTABLEPLAYER_OBJ)).ifPresent(p -> p.removeFromBackpack(this));
-            } else {
-                setAttribute(USE_CNT, c);
-            }
+        decAttribute(USE_CNT, () -> {
+            getOwner().flatMap(o -> o.as(MUTABLEPLAYER_OBJ)).ifPresent(p -> p.removeFromBackpack(this));
+            return null;
         });
     }
 }
