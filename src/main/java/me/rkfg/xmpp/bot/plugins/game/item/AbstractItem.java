@@ -1,9 +1,12 @@
 package me.rkfg.xmpp.bot.plugins.game.item;
 
+import static me.rkfg.xmpp.bot.plugins.game.misc.Utils.*;
+
 import java.util.Optional;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.effect.AbstractEffectReceiver;
+import me.rkfg.xmpp.bot.plugins.game.effect.IEffect;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
 public abstract class AbstractItem extends AbstractEffectReceiver implements IItem {
@@ -33,7 +36,9 @@ public abstract class AbstractItem extends AbstractEffectReceiver implements IIt
 
     @Override
     public Optional<String> getDescription() {
-        return Optional.ofNullable(description);
+        return Optional.of((description != null ? description : "<нет описания>")
+                + listEffects().stream().filter(IEffect::isVisible).map(IEffect::getDescription).filter(Optional::isPresent)
+                        .map(Optional::get).reduce(commaReducer).map(s -> " [" + s + "]").orElse(""));
     }
 
 }

@@ -21,6 +21,6 @@ public abstract class AbstractArmor extends AbstractItem implements IArmor {
     }
 
     private String getStatsStr() {
-        return String.format(" %d/%d", getDefence(), getProtection());
+        return String.format(" З:%d/Б:%d", getDefence(), getProtection());
     }
 }

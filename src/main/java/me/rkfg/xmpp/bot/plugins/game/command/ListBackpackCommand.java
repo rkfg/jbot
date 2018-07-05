@@ -23,7 +23,7 @@ public class ListBackpackCommand implements ICommandHandler {
     public Optional<String> exec(IPlayer player, Stream<String> args) {
         List<IItem> backpack = player.getBackpack();
         return Optional.of("Содержимое рюкзака: " + IntStream.range(0, backpack.size())
-                .mapToObj(idx -> String.format("%d: %s", idx + 1, backpack.get(idx).getDescription().orElse("неизвестно")))
+                .mapToObj(idx -> String.format("{%d}: %s", idx + 1, backpack.get(idx).getDescription().orElse("неизвестно")))
                 .reduce(commaReducer).orElse("рюкзак пуст"));
     }
 

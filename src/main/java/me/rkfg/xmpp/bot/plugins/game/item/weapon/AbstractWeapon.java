@@ -22,6 +22,6 @@ public abstract class AbstractWeapon extends AbstractItem implements IWeapon {
     }
 
     private String getStatsStr() {
-        return String.format(" %d/%d/%d", getAttack(), getDefence(), getStrength());
+        return String.format(" А:%d/З:%d/С:%d", getAttack(), getDefence(), getStrength());
     }
 }
