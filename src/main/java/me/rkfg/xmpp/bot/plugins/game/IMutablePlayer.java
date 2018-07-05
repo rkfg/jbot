@@ -10,8 +10,6 @@ public interface IMutablePlayer extends IPlayer {
 
     void setName(String name);
 
-    void changeStat(TypedAttribute<Integer> attr, Integer diff);
-
     void setDead(boolean dead);
 
     void equipItem(IItem item);

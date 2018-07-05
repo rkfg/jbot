@@ -6,8 +6,9 @@ import java.util.Optional;
 
 import me.rkfg.xmpp.bot.plugins.game.item.AbstractItem;
 import me.rkfg.xmpp.bot.plugins.game.item.IWeapon;
+import me.rkfg.xmpp.bot.plugins.game.misc.IMutableStats;
 
-public abstract class AbstractWeapon extends AbstractItem implements IWeapon {
+public abstract class AbstractWeapon extends AbstractItem implements IWeapon, IMutableStats {
 
     public AbstractWeapon(Integer attack, Integer defence, Integer strength, String description) {
         super(description);

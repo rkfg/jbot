@@ -15,14 +15,14 @@ public class StatsEvent extends AbstractEvent {
     @Override
     public void apply() {
         for (TypedAttribute<Integer> attr : STATS) {
-            getAttribute(attr).ifPresent(s -> target.as(MUTABLEPLAYER_OBJ).ifPresent(player -> {
+            getAttribute(attr).ifPresent(s -> target.as(MUTABLESTATS_OBJ).ifPresent(player -> {
                 int oldStat = player.getStat(attr);
                 player.changeStat(attr, s);
                 if (player.getStat(attr) != oldStat) {
                     super.apply();
                 }
                 if (player.getStat(HP) < 1) {
-                    player.setDead(true);
+                    target.as(MUTABLEPLAYER_OBJ).ifPresent(p -> p.setDead(true));
                 }
                 if (player.getStat(STM) > 15) {
                     player.changeStat(STM, Math.min(15 - player.getStat(STM), 0));

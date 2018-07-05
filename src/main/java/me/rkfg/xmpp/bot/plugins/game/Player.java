@@ -23,10 +23,11 @@ import me.rkfg.xmpp.bot.plugins.game.item.IMutableSlot;
 import me.rkfg.xmpp.bot.plugins.game.item.ISlot;
 import me.rkfg.xmpp.bot.plugins.game.item.IWeapon;
 import me.rkfg.xmpp.bot.plugins.game.item.Slot;
+import me.rkfg.xmpp.bot.plugins.game.misc.IMutableStats;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
-public class Player extends AbstractEffectReceiver implements IMutablePlayer {
+public class Player extends AbstractEffectReceiver implements IMutablePlayer, IMutableStats {
 
     private class LogEntry {
         String message;
@@ -70,11 +71,6 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
     }
 
     @Override
-    public Integer getStat(TypedAttribute<Integer> attr) {
-        return stats.get(attr).orElse(0);
-    }
-
-    @Override
     public String getId() {
         return id;
     }
@@ -92,11 +88,6 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
     @Override
     public void setName(String name) {
         this.name = name;
-    }
-
-    @Override
-    public void changeStat(TypedAttribute<Integer> attr, Integer diff) {
-        stats.get(attr).ifPresent(s -> stats.put(attr, Math.max(s + diff, 0))); // clamped to zero
     }
 
     @Override
@@ -166,7 +157,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
     @SuppressWarnings("unchecked")
     @Override
     public <T extends IGameObject> Optional<T> as(TypedAttribute<T> type) {
-        if (type == PLAYER_OBJ || type == MUTABLEPLAYER_OBJ) {
+        if (type == PLAYER_OBJ || type == MUTABLEPLAYER_OBJ || type == STATS_OBJ || type == MUTABLESTATS_OBJ) {
             return Optional.of((T) this);
         }
         return Optional.empty();
@@ -256,9 +247,14 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer {
             return false;
         }).orElse(true);
     }
-    
+
     @Override
     public boolean enqueuePickup(IItem item) {
         return enqueueEvent(new ItemPickupEvent(item));
+    }
+
+    @Override
+    public TypedAttributeMap getAttrs() {
+        return stats;
     }
 }

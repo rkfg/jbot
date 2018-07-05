@@ -6,8 +6,9 @@ import java.util.Optional;
 
 import me.rkfg.xmpp.bot.plugins.game.item.AbstractItem;
 import me.rkfg.xmpp.bot.plugins.game.item.IArmor;
+import me.rkfg.xmpp.bot.plugins.game.misc.IMutableStats;
 
-public abstract class AbstractArmor extends AbstractItem implements IArmor {
+public abstract class AbstractArmor extends AbstractItem implements IArmor, IMutableStats {
 
     public AbstractArmor(Integer defence, Integer protection, String description) {
         super(description);
