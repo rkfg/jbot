@@ -19,15 +19,16 @@ public class RechargeEffect extends AbstractEffect implements IUseEffect {
 
     @Override
     public Collection<IEvent> applyEffect(IGameObject target) {
-        target.as(PLAYER_OBJ).ifPresent(p -> {
+        return target.as(PLAYER_OBJ).map(p -> {
             boolean weaponRecharged = p.getWeapon().filter(w -> w.hasEffect(ChargeableEffect.TYPE))
                     .map(w -> w.enqueueEvent(new RechargeEvent())).orElse(false);
             boolean armorRecharged = p.getArmor().filter(w -> w.hasEffect(ChargeableEffect.TYPE))
                     .map(w -> w.enqueueEvent(new RechargeEvent())).orElse(false);
             if (!weaponRecharged && !armorRecharged) {
-                incAttribute(USE_CNT);
+                p.log("Сначала наденьте броню или оружие, которые можно перезарядить.");
+                return cancelEvent();
             }
-        });
-        return noEvent();
+            return null;
+        }).orElseGet(this::noEvent);
     }
 }
