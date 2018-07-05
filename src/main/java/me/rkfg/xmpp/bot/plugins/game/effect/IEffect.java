@@ -68,6 +68,19 @@ public interface IEffect extends IHasAttributes, IHasType, IHasDirection {
         return singleEvent(new CancelEvent());
     }
 
+    default Optional<String> getParameter(int idx) {
+        return getAttribute(EFFECT_PARAMS).map(pl -> {
+            if (idx < 0 || idx >= pl.size()) {
+                return null;
+            }
+            return pl.get(idx);
+        });
+    }
+
+    default String getParameter(int idx, String def) {
+        return getParameter(idx).orElse(def);
+    }
+
     default Optional<Integer> getIntParameter(int idx) {
         return getAttribute(EFFECT_PARAMS).map(p -> {
             if (p.size() <= idx) {
@@ -85,9 +98,17 @@ public interface IEffect extends IHasAttributes, IHasType, IHasDirection {
         return getIntParameter(idx).orElse(def);
     }
 
+    default Optional<String> getParameterByKey(String key) {
+        return getAttribute(EFFECT_PARAMS_KV).map(kv -> kv.get(key));
+    }
+
+    default String getParameterByKey(String key, String def) {
+        return getParameterByKey(key).orElse(def);
+    }
+
     default Optional<Integer> getIntParameterByKey(String key) {
         try {
-            return getAttribute(EFFECT_PARAMS_KV).map(kv -> kv.get(key)).map(Integer::parseInt);
+            return getParameterByKey(key).map(Integer::valueOf);
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
@@ -97,11 +118,4 @@ public interface IEffect extends IHasAttributes, IHasType, IHasDirection {
         return getIntParameterByKey(key).orElse(def);
     }
 
-    default Optional<String> getParameterByKey(String key) {
-        try {
-            return getAttribute(EFFECT_PARAMS_KV).map(kv -> kv.get(key));
-        } catch (NumberFormatException e) {
-            return Optional.empty();
-        }
-    }
 }
