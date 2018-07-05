@@ -15,17 +15,17 @@ public class StatsEvent extends AbstractEvent {
     @Override
     public void apply() {
         for (TypedAttribute<Integer> attr : STATS) {
-            getAttribute(attr).ifPresent(s -> target.as(MUTABLESTATS_OBJ).ifPresent(player -> {
-                int oldStat = player.getStat(attr);
-                player.changeStat(attr, s);
-                if (player.getStat(attr) != oldStat) {
+            getAttribute(attr).ifPresent(s -> target.as(MUTABLESTATS_OBJ).ifPresent(item -> {
+                int oldStat = item.getStat(attr);
+                item.changeStat(attr, s, item.as(PLAYER_OBJ).isPresent()); // player can't have negative stats, items can
+                if (item.getStat(attr) != oldStat) {
                     super.apply();
                 }
-                if (player.getStat(HP) < 1) {
+                if (item.getStat(HP) < 1) {
                     target.as(MUTABLEPLAYER_OBJ).ifPresent(p -> p.setDead(true));
                 }
-                if (player.getStat(STM) > 15) {
-                    player.changeStat(STM, Math.min(15 - player.getStat(STM), 0));
+                if (item.getStat(STM) > 15) {
+                    item.changeStat(STM, Math.min(15 - item.getStat(STM), 0), true);
                 }
             }));
         }
