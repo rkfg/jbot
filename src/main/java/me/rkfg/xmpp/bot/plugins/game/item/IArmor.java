@@ -5,10 +5,9 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 import java.util.Optional;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
-import me.rkfg.xmpp.bot.plugins.game.misc.IHasStats;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 
-public interface IArmor extends IItem, IHasStats {
+public interface IArmor extends IStatsItem {
     @Override
     default Optional<TypedAttribute<ISlot>> getFittingSlot() {
         return Optional.of(ARMOR_SLOT);

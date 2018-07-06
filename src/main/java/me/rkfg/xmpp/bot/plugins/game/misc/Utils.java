@@ -6,6 +6,8 @@ import java.security.SecureRandom;
 import java.util.Optional;
 import java.util.function.BinaryOperator;
 
+import org.apache.commons.lang3.StringUtils;
+
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 
@@ -55,5 +57,9 @@ public class Utils {
 
     public static String unboxString(Optional<String> opt) {
         return unboxOptional(opt, "<неизвестно>");
+    }
+    
+    public static String capitalize(String s) {
+        return StringUtils.capitalize(s);
     }
 }

@@ -5,9 +5,10 @@ import java.util.Optional;
 
 import me.rkfg.xmpp.bot.plugins.game.effect.IEffect;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
+import me.rkfg.xmpp.bot.plugins.game.misc.IHasDescription;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 
-public interface IGameObject extends IGameBase {
+public interface IGameObject extends IGameBase, IHasDescription {
 
     default boolean hasEffect(String type) {
         return findEffect(type).isPresent();

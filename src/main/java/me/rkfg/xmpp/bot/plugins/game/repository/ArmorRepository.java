@@ -4,8 +4,8 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
 import java.util.Optional;
 
+import me.rkfg.xmpp.bot.plugins.game.item.AbstractArmor;
 import me.rkfg.xmpp.bot.plugins.game.item.IArmor;
-import me.rkfg.xmpp.bot.plugins.game.item.armor.AbstractArmor;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
 public class ArmorRepository extends AbstractContentRepository<IArmor> implements IHasEffects {
@@ -14,6 +14,7 @@ public class ArmorRepository extends AbstractContentRepository<IArmor> implement
 
         public Armor(TypedAttributeMap content) {
             super(content.get(DEF).orElse(0), content.get(PRT).orElse(0), content.get(DESC_CNT).orElse(null));
+            setObjectVerboseDescription(content, this);
         }
 
     }
@@ -31,12 +32,13 @@ public class ArmorRepository extends AbstractContentRepository<IArmor> implement
             result.put(DEF, Integer.valueOf(parts[1]));
             result.put(PRT, Integer.valueOf(parts[2]));
             result.put(TIER_CNT, Integer.valueOf(parts[3]));
-            if (parts.length > 5) {
+            int effShift = 0;
+            if (parts.length == 7) {
                 processEffects(result, parts[4]);
-                result.put(DESC_CNT, parts[5]);
-            } else {
-                result.put(DESC_CNT, parts[4]);
+                effShift += 1;
             }
+            result.put(DESC_CNT, parts[4 + effShift]);
+            result.put(DESC_V_CNT, parts[5 + effShift]);
             return Optional.of(result);
         } catch (NumberFormatException e) {
             return Optional.empty();
@@ -45,12 +47,12 @@ public class ArmorRepository extends AbstractContentRepository<IArmor> implement
 
     @Override
     protected int getMaxParts() {
-        return 6;
+        return 7;
     }
 
     @Override
     protected int getMinParts() {
-        return 5;
+        return 6;
     }
 
     @Override

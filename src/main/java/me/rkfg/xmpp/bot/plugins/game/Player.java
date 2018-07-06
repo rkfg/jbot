@@ -103,8 +103,8 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
         sb.append("\nЭффекты: ").append(effectsStr);
         final String slotsStr = SLOTS.stream()
                 .map(slotAttr -> equipment.get(slotAttr)
-                        .map(s -> String.format("%s: [%s]", s.getDescription().orElse(""),
-                                s.getItem().flatMap(IItem::getDescription).orElse("пусто")))
+                        .map(s -> String.format("%s: %s", s.getDescription().orElse(""),
+                                s.getItem().flatMap(i -> i.getDescription(Verbosity.WITH_PARAMS)).orElse("пусто")))
                         .orElse(""))
                 .reduce(pipeReducer).orElse("нет слотов");
         sb.append("\nСлоты: ").append(slotsStr);

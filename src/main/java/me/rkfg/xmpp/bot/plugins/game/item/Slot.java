@@ -2,18 +2,15 @@ package me.rkfg.xmpp.bot.plugins.game.item;
 
 import java.util.Optional;
 
+import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
+
 public class Slot implements IMutableSlot {
 
-    private String description;
+    private TypedAttributeMap attrs = new TypedAttributeMap();
     private IItem item;
 
     public Slot(String description) {
-        this.description = description;
-    }
-    
-    @Override
-    public Optional<String> getDescription() {
-        return Optional.of(description);
+        setDescription(description);
     }
 
     @Override
@@ -25,5 +22,10 @@ public class Slot implements IMutableSlot {
     public void setItem(IItem item) {
         this.item = item;
     }
-    
+
+    @Override
+    public TypedAttributeMap getAttrs() {
+        return attrs;
+    }
+
 }

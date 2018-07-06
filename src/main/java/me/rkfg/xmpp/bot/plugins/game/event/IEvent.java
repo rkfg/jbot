@@ -1,11 +1,12 @@
 package me.rkfg.xmpp.bot.plugins.game.event;
 
 import me.rkfg.xmpp.bot.plugins.game.misc.IHasAttributes;
+import me.rkfg.xmpp.bot.plugins.game.misc.IHasDescription;
 import me.rkfg.xmpp.bot.plugins.game.misc.IHasDirection;
 import me.rkfg.xmpp.bot.plugins.game.misc.IHasType;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 
-public interface IEvent extends IHasAttributes, IHasType, IHasDirection {
+public interface IEvent extends IHasAttributes, IHasType, IHasDirection, IHasDescription {
 
     public void apply();
 

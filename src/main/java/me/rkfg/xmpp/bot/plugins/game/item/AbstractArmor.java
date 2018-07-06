@@ -1,11 +1,7 @@
-package me.rkfg.xmpp.bot.plugins.game.item.armor;
+package me.rkfg.xmpp.bot.plugins.game.item;
 
 import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
-import java.util.Optional;
-
-import me.rkfg.xmpp.bot.plugins.game.item.AbstractItem;
-import me.rkfg.xmpp.bot.plugins.game.item.IArmor;
 import me.rkfg.xmpp.bot.plugins.game.misc.IMutableStats;
 
 public abstract class AbstractArmor extends AbstractItem implements IArmor, IMutableStats {
@@ -17,11 +13,7 @@ public abstract class AbstractArmor extends AbstractItem implements IArmor, IMut
     }
 
     @Override
-    public Optional<String> getDescription() {
-        return super.getDescription().map(d -> d + getStatsStr());
-    }
-
-    private String getStatsStr() {
+    public String getStatsStr() {
         return String.format(" З:%d/Б:%d", getDefence(), getProtection());
     }
 }

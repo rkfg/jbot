@@ -53,8 +53,12 @@ public class Attrs {
     public static final TypedAttribute<String> DESC_CNT = TypedAttribute.of("desccnt");
     public static final IndexPointer<String> DESC_IDX = IndexPointer.named("descidx");
 
+    public static final TypedAttribute<String> DESC_V_CNT = TypedAttribute.of("descvcnt");
+    
     public static final TypedAttribute<List<String>> EFFECT_PARAMS = TypedAttribute.of("effectparams");
     public static final TypedAttribute<Map<String, String>> EFFECT_PARAMS_KV = TypedAttribute.of("effectparamskv");
-    
+
     public static final TypedAttribute<Integer> USE_CNT = TypedAttribute.of("использования");
+    public static final TypedAttribute<String> DESCRIPTION = TypedAttribute.of("description");
+    public static final TypedAttribute<String> DESCRIPTION_V = TypedAttribute.of("verbosedescription");
 }

@@ -11,10 +11,11 @@ import me.rkfg.xmpp.bot.plugins.game.event.CancelEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.EffectEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 import me.rkfg.xmpp.bot.plugins.game.misc.IHasAttributes;
+import me.rkfg.xmpp.bot.plugins.game.misc.IHasDescription;
 import me.rkfg.xmpp.bot.plugins.game.misc.IHasDirection;
 import me.rkfg.xmpp.bot.plugins.game.misc.IHasType;
 
-public interface IEffect extends IHasAttributes, IHasType, IHasDirection {
+public interface IEffect extends IHasAttributes, IHasType, IHasDirection, IHasDescription {
 
     default Collection<IEvent> processEvent(IEvent event) {
         return Collections.emptySet();

@@ -35,12 +35,13 @@ public class UsableRepository extends AbstractContentRepository<IUsable> impleme
             result.put(CONTENT_ID, parts[0]);
             result.put(TIER_CNT, Integer.valueOf(parts[1]));
             result.put(USE_CNT, Integer.valueOf(parts[2]));
-            if (parts.length > 4) {
+            int effShift = 0;
+            if (parts.length > 5) {
                 processEffects(result, parts[3]);
-                result.put(DESC_CNT, parts[4]);
-            } else {
-                result.put(DESC_CNT, parts[3]);
+                effShift += 1;
             }
+            result.put(DESC_CNT, parts[3 + effShift]);
+            result.put(DESC_V_CNT, parts[4 + effShift]);
             return Optional.of(result);
         } catch (NumberFormatException e) {
             return Optional.empty();
@@ -49,12 +50,12 @@ public class UsableRepository extends AbstractContentRepository<IUsable> impleme
 
     @Override
     protected int getMaxParts() {
-        return 5;
+        return 6;
     }
 
     @Override
     protected int getMinParts() {
-        return 4;
+        return 5;
     }
 
     @Override

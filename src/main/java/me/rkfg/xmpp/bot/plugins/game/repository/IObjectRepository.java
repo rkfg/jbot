@@ -4,7 +4,9 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
 import java.util.Optional;
 
+import me.rkfg.xmpp.bot.plugins.game.misc.IHasDescription;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
+import me.rkfg.xmpp.bot.plugins.game.misc.IHasDescription.Verbosity;
 import me.rkfg.xmpp.bot.plugins.game.repository.AbstractContentRepository.IndexPointer;
 
 public interface IObjectRepository<O> extends IContentRepository {
@@ -26,5 +28,9 @@ public interface IObjectRepository<O> extends IContentRepository {
     }
 
     Optional<O> contentToObject(TypedAttributeMap content);
-    
+
+    default void setObjectVerboseDescription(TypedAttributeMap content, IHasDescription obj) {
+        content.get(DESC_V_CNT).ifPresent(d -> obj.setDescription(Verbosity.VERBOSE, d));
+    }
+
 }

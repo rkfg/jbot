@@ -1,11 +1,7 @@
-package me.rkfg.xmpp.bot.plugins.game.item.weapon;
+package me.rkfg.xmpp.bot.plugins.game.item;
 
 import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
-import java.util.Optional;
-
-import me.rkfg.xmpp.bot.plugins.game.item.AbstractItem;
-import me.rkfg.xmpp.bot.plugins.game.item.IWeapon;
 import me.rkfg.xmpp.bot.plugins.game.misc.IMutableStats;
 
 public abstract class AbstractWeapon extends AbstractItem implements IWeapon, IMutableStats {
@@ -18,11 +14,7 @@ public abstract class AbstractWeapon extends AbstractItem implements IWeapon, IM
     }
 
     @Override
-    public Optional<String> getDescription() {
-        return super.getDescription().map(d -> d + getStatsStr());
-    }
-
-    private String getStatsStr() {
+    public String getStatsStr() {
         return String.format(" А:%d/З:%d/С:%d", getAttack(), getDefence(), getStrength());
     }
 }
