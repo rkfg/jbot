@@ -2,6 +2,7 @@ package me.rkfg.xmpp.bot.plugins.game.repository;
 
 import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
 
 import me.rkfg.xmpp.bot.plugins.game.effect.BleedEffect;
@@ -43,11 +44,12 @@ public class EffectRepository extends AbstractContentRepository<IEffect> {
         TypedAttributeMap effectDesc = new TypedAttributeMap();
         String type;
         try {
-            type = clazz.newInstance().getType();
+            type = clazz.getDeclaredConstructor().newInstance().getType();
             effectDesc.put(CONTENT_ID, type);
             effectDesc.put(EFFECT_CNT, clazz);
             content.put(type, effectDesc);
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+                | NoSuchMethodException | SecurityException e) {
             log.warn("Couldn't add effect of class {}: {}", clazz.getName(), e);
         }
     }
@@ -76,8 +78,9 @@ public class EffectRepository extends AbstractContentRepository<IEffect> {
     public Optional<IEffect> contentToObject(TypedAttributeMap content) {
         return content.get(EFFECT_CNT).map(t -> {
             try {
-                return t.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
+                return t.getDeclaredConstructor().newInstance();
+            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+                    | NoSuchMethodException | SecurityException e) {
                 log.warn("Couldn't instantiate {}: {}", t.getName(), e);
                 return null;
             }

@@ -2,6 +2,7 @@ package me.rkfg.xmpp.bot;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -69,8 +70,8 @@ public abstract class BotBase implements IBot {
         for (String pluginName : pluginClassesNames) {
             try {
                 Class<? extends MessagePlugin> clazz = Class.forName(PLUGINS_PACKAGE_NAME + pluginName).asSubclass(MessagePlugin.class);
-                plugins.add(clazz.newInstance());
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+                plugins.add(clazz.getDeclaredConstructor().newInstance());
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
                 log.warn("Couldn't load plugin {}: {}", pluginName, e);
             }
         }
