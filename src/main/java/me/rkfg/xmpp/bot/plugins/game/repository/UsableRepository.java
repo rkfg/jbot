@@ -10,11 +10,12 @@ import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
 public class UsableRepository extends AbstractContentRepository<IUsable> implements IHasEffects {
 
-    public static class Usable extends AbstractItem implements IUsable {
+    public class Usable extends AbstractItem implements IUsable {
 
         public Usable(TypedAttributeMap content) {
             super(content.get(CONTENT_ID).orElse(""), content.get(DESC_CNT).orElse(null));
             content.get(USE_CNT).ifPresent(c -> setAttribute(USE_CNT, c));
+            setObjectVerboseDescription(content, this);
         }
     }
 
