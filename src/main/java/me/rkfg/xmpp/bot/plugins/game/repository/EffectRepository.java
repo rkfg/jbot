@@ -17,6 +17,7 @@ import me.rkfg.xmpp.bot.plugins.game.effect.item.ItemStatEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.RechargeEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.RudeDrawEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.RudeDrawingsEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.item.SetEffect;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
@@ -37,7 +38,7 @@ public class EffectRepository extends AbstractContentRepository<IEffect> {
         addEffect(RechargeEffect.class);
         addEffect(RudeDrawEffect.class);
         addEffect(RudeDrawingsEffect.class);
-
+        addEffect(SetEffect.class);
     }
 
     private void addEffect(Class<? extends IEffect> clazz) {

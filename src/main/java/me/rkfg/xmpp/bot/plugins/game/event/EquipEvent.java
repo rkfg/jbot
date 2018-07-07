@@ -1,15 +1,24 @@
 package me.rkfg.xmpp.bot.plugins.game.event;
 
-import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
+import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.ITEM;
+import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.MUTABLEPLAYER_OBJ;
 
 import me.rkfg.xmpp.bot.plugins.game.exception.NotEquippableException;
 import me.rkfg.xmpp.bot.plugins.game.item.IItem;
-import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 
 public class EquipEvent extends AbstractEvent {
 
     public static final String TYPE = "equipevent";
-    public static final TypedAttribute<IItem> ITEM = TypedAttribute.of("item");
+
+    public class EquippedEvent extends AbstractEvent {
+
+        public static final String TYPE = "equippedvent";
+
+        public EquippedEvent() {
+            super(TYPE);
+        }
+
+    }
 
     public EquipEvent(IItem item) {
         super(TYPE);
@@ -27,6 +36,7 @@ public class EquipEvent extends AbstractEvent {
                 p.equipItem(i);
                 setDescription(String.format("Вы надеваете предмет [%s]", i.getDescription().orElse("<предмет>")));
                 logTargetComment();
+                p.enqueueEvent(new EquippedEvent());
             } catch (NotEquippableException e) {
                 target.log("Не удалось надеть предмет: " + e.getMessage());
                 setCancelled();
