@@ -1,7 +1,5 @@
 package me.rkfg.xmpp.bot.plugins.game.item;
 
-import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
-
 import java.util.Optional;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
@@ -13,8 +11,9 @@ public abstract class AbstractItem extends AbstractEffectReceiver implements IIt
     private IGameObject owner;
     private TypedAttributeMap attrs = new TypedAttributeMap();
 
-    public AbstractItem(String description) {
-        setAttribute(DESCRIPTION, description);
+    public AbstractItem(String type, String description) {
+        setDescription(description);
+        setType(type);
     }
 
     @Override

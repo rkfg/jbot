@@ -8,9 +8,10 @@ import java.util.Optional;
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
 import me.rkfg.xmpp.bot.plugins.game.effect.IEffect;
 import me.rkfg.xmpp.bot.plugins.game.misc.IHasAttributes;
+import me.rkfg.xmpp.bot.plugins.game.misc.IHasType;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 
-public interface IItem extends IGameObject, IHasAttributes {
+public interface IItem extends IGameObject, IHasAttributes, IHasType {
     Optional<TypedAttribute<ISlot>> getFittingSlot();
 
     Optional<IGameObject> getOwner();

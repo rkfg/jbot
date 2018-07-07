@@ -13,7 +13,8 @@ public class ArmorRepository extends AbstractContentRepository<IArmor> implement
     public class Armor extends AbstractArmor {
 
         public Armor(TypedAttributeMap content) {
-            super(content.get(DEF).orElse(0), content.get(PRT).orElse(0), content.get(DESC_CNT).orElse(null));
+            super(content.get(CONTENT_ID).orElse(""), content.get(DEF).orElse(0), content.get(PRT).orElse(0),
+                    content.get(DESC_CNT).orElse(null));
             setObjectVerboseDescription(content, this);
         }
 

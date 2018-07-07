@@ -13,7 +13,8 @@ public class WeaponRepository extends AbstractContentRepository<IWeapon> impleme
     public class Weapon extends AbstractWeapon {
 
         public Weapon(TypedAttributeMap content) {
-            super(content.get(ATK).orElse(0), content.get(DEF).orElse(0), content.get(STR).orElse(0), content.get(DESC_CNT).orElse(null));
+            super(content.get(CONTENT_ID).orElse(""), content.get(ATK).orElse(0), content.get(DEF).orElse(0), content.get(STR).orElse(0),
+                    content.get(DESC_CNT).orElse(null));
             setObjectVerboseDescription(content, this);
         }
     }

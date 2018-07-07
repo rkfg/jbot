@@ -8,7 +8,6 @@ import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
 public abstract class AbstractEvent implements IEvent {
 
-    private String type;
     protected IGameObject source;
     protected IGameObject target;
     protected Logger log = LoggerFactory.getLogger(getClass());
@@ -17,12 +16,7 @@ public abstract class AbstractEvent implements IEvent {
     private boolean cancelled = false;
 
     public AbstractEvent(String type) {
-        this.type = type;
-    }
-
-    @Override
-    public String getType() {
-        return type;
+        setType(type);
     }
 
     @Override

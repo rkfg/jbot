@@ -61,4 +61,5 @@ public class Attrs {
     public static final TypedAttribute<Integer> USE_CNT = TypedAttribute.of("использования");
     public static final TypedAttribute<String> DESCRIPTION = TypedAttribute.of("description");
     public static final TypedAttribute<String> DESCRIPTION_V = TypedAttribute.of("verbosedescription");
+    public static final TypedAttribute<String> OBJTYPE = TypedAttribute.of("objtype");
 }

@@ -6,8 +6,8 @@ import me.rkfg.xmpp.bot.plugins.game.misc.IMutableStats;
 
 public abstract class AbstractWeapon extends AbstractItem implements IWeapon, IMutableStats {
 
-    public AbstractWeapon(Integer attack, Integer defence, Integer strength, String description) {
-        super(description);
+    public AbstractWeapon(String type, Integer attack, Integer defence, Integer strength, String description) {
+        super(type, description);
         setAttribute(ATK, attack);
         setAttribute(DEF, defence);
         setAttribute(STR, strength);

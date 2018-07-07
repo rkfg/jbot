@@ -13,7 +13,7 @@ public class UsableRepository extends AbstractContentRepository<IUsable> impleme
     public static class Usable extends AbstractItem implements IUsable {
 
         public Usable(TypedAttributeMap content) {
-            super(content.get(DESC_CNT).orElse(null));
+            super(content.get(CONTENT_ID).orElse(""), content.get(DESC_CNT).orElse(null));
             content.get(USE_CNT).ifPresent(c -> setAttribute(USE_CNT, c));
         }
     }
