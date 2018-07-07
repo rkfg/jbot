@@ -31,10 +31,9 @@ public class BattleEvent extends AbstractEvent {
             BattleAttackEvent defenceEvent = null;
             int rollLimit = ROLL_LIMIT;
             // roll until at least one attack succeeds
-            while (rollLimit > 0 && (attackEvent == null || !attackEvent.isSuccessful()) && (defenceEvent == null || !defenceEvent.isSuccessful())) {
+            while (rollLimit-- > 0 && (attackEvent == null || !attackEvent.isSuccessful()) && (defenceEvent == null || !defenceEvent.isSuccessful())) {
                 attackEvent = new BattleAttackEvent(attacker, defender);
                 defenceEvent = new BattleAttackEvent(defender, attacker);
-                --rollLimit;
             }
             battleTurn(attackEvent);
             battleTurn(defenceEvent);
