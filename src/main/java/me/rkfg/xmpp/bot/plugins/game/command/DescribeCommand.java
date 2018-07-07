@@ -15,7 +15,7 @@ public class DescribeCommand implements ICommandHandler, IUsesBackpack {
 
     @Override
     public Collection<String> getCommand() {
-        return Arrays.asList("осмотреть", "о");
+        return Arrays.asList("осмотреть");
     }
 
     @Override

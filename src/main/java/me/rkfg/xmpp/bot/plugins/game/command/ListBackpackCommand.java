@@ -16,7 +16,7 @@ public class ListBackpackCommand implements ICommandHandler {
 
     @Override
     public Collection<String> getCommand() {
-        return Arrays.asList("рюкзак", "р");
+        return Arrays.asList("рюкзак");
     }
 
     @Override

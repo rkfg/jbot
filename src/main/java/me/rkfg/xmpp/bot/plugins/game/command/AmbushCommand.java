@@ -12,7 +12,7 @@ public class AmbushCommand implements ICommandHandler {
 
     @Override
     public Collection<String> getCommand() {
-        return Arrays.asList("засада", "з");
+        return Arrays.asList("засада");
     }
 
     @Override

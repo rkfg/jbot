@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
@@ -12,6 +13,7 @@ import java.util.stream.Stream;
 
 import me.rkfg.xmpp.bot.message.Message;
 import me.rkfg.xmpp.bot.plugins.CommandPlugin;
+import me.rkfg.xmpp.bot.plugins.game.command.AmbiguousCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.AmbushCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.AttackCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.DefaultCommand;
@@ -55,6 +57,17 @@ public class GamePlugin extends CommandPlugin {
     public Optional<String> processCommand(List<String> args, IPlayer player) {
         String cmd = args.stream().findFirst().map(String::toLowerCase).orElse("");
         ICommandHandler f = handlers.get(cmd);
+        if (f == null) {
+            for (Entry<String, ICommandHandler> entry : handlers.entrySet()) {
+                if (entry.getKey().startsWith(cmd)) {
+                    if (f != null) {
+                        f = new AmbiguousCommand();
+                    } else {
+                        f = entry.getValue();
+                    }
+                }
+            }
+        }
         if (f == null || !f.deadAllowed() && !player.isAlive()) {
             return Optional.empty();
         }

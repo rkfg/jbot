@@ -14,7 +14,7 @@ public class SleepCommand implements ICommandHandler {
 
     @Override
     public Collection<String> getCommand() {
-        return Arrays.asList("спать", "с");
+        return Arrays.asList("спать");
     }
 
     @Override

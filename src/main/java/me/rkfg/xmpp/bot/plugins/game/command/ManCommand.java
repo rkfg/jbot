@@ -26,7 +26,7 @@ public class ManCommand implements ICommandHandler {
     @Override
     public Optional<String> exec(IPlayer player, Stream<String> args) {
         return Optional.of(args.findFirst().flatMap(arg -> handlers.get(arg).getHelp())
-                .orElse("доступные команды: " + handlers.values().stream().distinct()
+                .orElse("доступные команды (можно использовать только первые буквы): " + handlers.values().stream().distinct()
                         .map(h -> h.getCommand().stream().filter(c -> !c.isEmpty()).reduce((a, c) -> a + "/" + c))
                         .filter(Optional::isPresent).map(Optional::get).reduce(commaReducer).orElse("команд нет")));
     }

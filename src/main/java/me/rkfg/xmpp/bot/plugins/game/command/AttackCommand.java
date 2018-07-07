@@ -14,7 +14,7 @@ public class AttackCommand implements ICommandHandler {
 
     @Override
     public Collection<String> getCommand() {
-        return Arrays.asList("атака", "а");
+        return Arrays.asList("атака");
     }
 
     @Override

@@ -15,7 +15,7 @@ public class UseCommand implements ICommandHandler, IUsesBackpack {
 
     @Override
     public Collection<String> getCommand() {
-        return Arrays.asList("использовать", "исп");
+        return Arrays.asList("использовать");
     }
 
     @Override
@@ -25,7 +25,7 @@ public class UseCommand implements ICommandHandler, IUsesBackpack {
             final UseEvent useEvent = new UseEvent();
             useEvent.setTarget(player);
             if (item.enqueueEvent(useEvent)) {
-                player.log("Предмет %s использован!", unboxString(item.getDescription()));
+                player.log("Предмет %s использован.", unboxString(item.getDescription()));
                 item.onUse();
             } else {
                 player.log("Предмет %s не удалось использовать.", unboxString(item.getDescription()));

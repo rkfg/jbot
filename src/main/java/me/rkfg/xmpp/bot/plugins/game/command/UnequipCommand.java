@@ -13,7 +13,7 @@ public class UnequipCommand implements ICommandHandler {
 
     @Override
     public Collection<String> getCommand() {
-        return Arrays.asList("снять", "сн");
+        return Arrays.asList("снять");
     }
 
     @Override

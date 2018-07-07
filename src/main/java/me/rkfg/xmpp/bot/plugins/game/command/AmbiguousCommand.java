@@ -1,24 +1,23 @@
 package me.rkfg.xmpp.bot.plugins.game.command;
 
-import java.util.Arrays;
+import static java.util.Collections.emptySet;
+
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
-import me.rkfg.xmpp.bot.plugins.game.effect.HideEffect;
 
-public class HideCommand implements ICommandHandler {
+public class AmbiguousCommand implements ICommandHandler {
 
     @Override
     public Collection<String> getCommand() {
-        return Arrays.asList("спрятаться");
+        return emptySet();
     }
 
     @Override
     public Optional<String> exec(IPlayer player, Stream<String> args) {
-        player.enqueueToggleEffect(new HideEffect());
-        return Optional.empty();
+        return Optional.of("неоднозначная команда, используйте более полную форму.");
     }
 
 }

@@ -33,7 +33,7 @@ public class ListPlayersCommand implements ICommandHandler {
 
     @Override
     public Collection<String> getCommand() {
-        return Arrays.asList("игроки", "иг");
+        return Arrays.asList("игроки");
     }
 
 }

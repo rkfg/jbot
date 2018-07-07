@@ -12,7 +12,7 @@ public class EquipCommand implements ICommandHandler, IUsesBackpack {
 
     @Override
     public Collection<String> getCommand() {
-        return Arrays.asList("надеть", "н");
+        return Arrays.asList("надеть");
     }
 
     @Override

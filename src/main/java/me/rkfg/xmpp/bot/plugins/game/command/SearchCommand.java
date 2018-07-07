@@ -12,7 +12,7 @@ public class SearchCommand implements ICommandHandler {
 
     @Override
     public Collection<String> getCommand() {
-        return Arrays.asList("искать", "и");
+        return Arrays.asList("искать");
     }
 
     @Override
