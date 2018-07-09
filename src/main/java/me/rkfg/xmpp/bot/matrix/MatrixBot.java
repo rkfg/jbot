@@ -14,6 +14,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.http.HttpResponse;
@@ -324,6 +325,12 @@ public class MatrixBot extends BotBase {
     @Override
     public MUCManager getMUCManager() {
         throw new NotImplementedException();
+    }
+
+    @Override
+    public Set<String> getRoomsWithUser(String userId) {
+        return stateManager.listRooms().stream().filter(r -> roomParticipantsManager.getUsers(r).contains(userId))
+                .collect(Collectors.toSet());
     }
 
 }

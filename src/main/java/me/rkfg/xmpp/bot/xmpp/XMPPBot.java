@@ -1,10 +1,12 @@
 package me.rkfg.xmpp.bot.xmpp;
 
 import java.io.IOException;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jivesoftware.smack.AbstractConnectionListener;
@@ -225,5 +227,11 @@ public class XMPPBot extends BotBase {
 
     public MUCManager getMUCManager() {
         return mucManager;
+    }
+
+    @Override
+    public Set<String> getRoomsWithUser(String userId) {
+        return mucManager.listMUCs().stream().filter(muc -> muc.getOccupants().contains(userId)).map(MultiUserChat::getRoom)
+                .collect(Collectors.toSet());
     }
 }

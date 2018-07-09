@@ -1,6 +1,7 @@
 package me.rkfg.xmpp.bot;
 
 import java.util.List;
+import java.util.Set;
 
 import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.packet.Message;
@@ -26,6 +27,8 @@ public interface IBot {
     String sendMessage(String message, String mucName);
 
     void sendMessage(String message);
+    
+    Set<String> getRoomsWithUser(String userId);
 
     ChatManager getChatManagerInstance();
 
