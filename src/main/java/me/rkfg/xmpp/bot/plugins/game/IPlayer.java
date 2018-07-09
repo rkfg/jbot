@@ -35,4 +35,7 @@ public interface IPlayer extends IGameObject, IHasStats {
     boolean enqueueUnequipItem(TypedAttribute<ISlot> slot);
 
     boolean enqueuePickup(IItem item);
+
+    boolean isReady();
+    
 }

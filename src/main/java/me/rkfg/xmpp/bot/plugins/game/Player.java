@@ -29,6 +29,8 @@ import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
 public class Player extends AbstractEffectReceiver implements IMutablePlayer, IMutableStats {
 
+    private static final String UNNAMED = "<безымянный>";
+
     private class LogEntry {
         String message;
         long timestamp;
@@ -49,7 +51,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
     private TypedAttributeMap stats = new TypedAttributeMap();
     private TypedAttributeMap equipment = new TypedAttributeMap();
     private String id;
-    private String name = "<безымянный>";
+    private String name = UNNAMED;
     private List<IItem> backpack = new ArrayList<>();
 
     public Player(String id) {
@@ -256,5 +258,23 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
     @Override
     public TypedAttributeMap getAttrs() {
         return stats;
+    }
+
+    @Override
+    public void reset() {
+        stats = new TypedAttributeMap();
+        equipment = new TypedAttributeMap();
+        backpack = new ArrayList<>();
+        name = UNNAMED;
+    }
+
+    @Override
+    public void setReady(boolean ready) {
+        setAttribute(READY, ready);
+    }
+
+    @Override
+    public boolean isReady() {
+        return getAttribute(READY).orElse(false);
     }
 }

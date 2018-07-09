@@ -65,4 +65,5 @@ public class Attrs {
     public static final TypedAttribute<String> OTHERTYPE = TypedAttribute.of("othertype");
     public static final TypedAttribute<IItem> ITEM = TypedAttribute.of("item");
     public static final TypedAttribute<Boolean> SETEFFECTACTIVE = TypedAttribute.of("seteffectactive");
+    public static final TypedAttribute<Boolean> READY = TypedAttribute.of("ready");
 }

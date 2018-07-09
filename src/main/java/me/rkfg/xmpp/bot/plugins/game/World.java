@@ -12,6 +12,7 @@ import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import me.rkfg.xmpp.bot.Main;
 import me.rkfg.xmpp.bot.message.Message;
 import me.rkfg.xmpp.bot.plugins.game.effect.AmbushFatigueEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.BattleFatigueEffect;
@@ -47,21 +48,13 @@ public class World extends Player {
     private ArmorRepository armorRepository;
     private EffectRepository effectRepository;
     private UsableRepository usableRepository;
+    private Timer timer = new Timer("Game clock", true);
 
     public World() {
         super("ZAWARUDO");
     }
 
     public void init() {
-        new Timer("Game clock", true).scheduleAtFixedRate(new TimerTask() {
-
-            @Override
-            public void run() {
-                synchronized (World.this) {
-                    players.values().forEach(p -> p.enqueueEvent(new TickEvent()));
-                }
-            }
-        }, TimeUnit.SECONDS.toMillis(5), TimeUnit.SECONDS.toMillis(5));
         nameRepository = new NameRepository();
         nameRepository.loadContent();
         names = nameRepository.getAllContent().stream().map(tm -> tm.get(DESC_CNT)).map(Optional::get).collect(Collectors.toList());
@@ -75,18 +68,35 @@ public class World extends Player {
         usableRepository.loadContent();
     }
 
+    public void startTime() {
+        timer.scheduleAtFixedRate(new TimerTask() {
+
+            @Override
+            public void run() {
+                synchronized (World.this) {
+                    players.values().forEach(p -> p.enqueueEvent(new TickEvent()));
+                }
+            }
+        }, TimeUnit.SECONDS.toMillis(5), TimeUnit.SECONDS.toMillis(5));
+    }
+
     public IPlayer getCurrentPlayer(Message message) {
-        final IPlayer player = players.computeIfAbsent(message.getFrom(), Player::new);
-        initPlayer(player);
-        return player;
+        return players.computeIfAbsent(message.getFrom(), Player::new);
     }
 
     public List<IPlayer> listPlayers() {
         return players.values().stream().sorted((p1, p2) -> p1.getName().compareTo(p2.getName())).collect(Collectors.toList());
     }
 
-    private void initPlayer(IPlayer player) {
-        if (state == GameState.GATHER && player.listEffects().isEmpty()) {
+    private void resetPlayer(IPlayer player) {
+        if (state == GameState.GATHER) {
+            player.as(MUTABLEPLAYER_OBJ).ifPresent(p -> {
+                boolean ready = p.isReady();
+                p.reset();
+                p.setReady(ready);
+            });
+        }
+        if (state == GameState.PLAYING) {
             if (players.size() % names.size() == 1) {
                 Collections.shuffle(names);
             }
@@ -96,31 +106,34 @@ public class World extends Player {
                 name += " " + round + "-й";
             }
             player.enqueueEvent(new RenameEvent(name));
-            player.enqueueEvents(new SetSleepEvent(SleepType.DEEP));
-            player.enqueueAttachEffect(new BattleFatigueEffect());
-            player.enqueueAttachEffect(new HideFatigueEffect());
-            player.enqueueAttachEffect(new SearchFatigueEffect());
-            player.enqueueAttachEffect(new AmbushFatigueEffect());
-            player.enqueueAttachEffect(new StaminaRegenEffect());
-            player.enqueueAttachEffect(new EquipRedirectorEffect());
-            StatsEffect statsEffectFat = new StatsEffect("fat", "жиробасина");
-            statsEffectFat.setStatChange(ATK, 1);
-            statsEffectFat.setStatChange(DEF, -1);
-            StatsEffect statsEffectAlco = new StatsEffect("alcoholic", "алкашня");
-            statsEffectAlco.setStatChange(DEF, -1);
-            statsEffectAlco.setStatChange(PRT, -1);
-            statsEffectAlco.addEffect(new NoGuardSleepEffect());
-            player.enqueueAttachEffect(statsEffectFat);
-            player.enqueueAttachEffect(statsEffectAlco);
-            weaponRepository.getObjectById("pen").ifPresent(player::enqueueEquipItem);
-            // weaponRepository.getRandomObjectByTier(1).ifPresent(w -> player.enqueueEvent(new EquipEvent(w)));
-            armorRepository.getRandomObjectByTier(1).ifPresent(player::enqueueEquipItem);
-            weaponRepository.getObjectById("dildo").ifPresent(player::enqueuePickup);
-            weaponRepository.getObjectById("lasersaw").ifPresent(player::enqueuePickup);
-            usableRepository.getObjectById("bandage").ifPresent(player::enqueuePickup);
-            usableRepository.getObjectById("speedhack").ifPresent(player::enqueuePickup);
-            usableRepository.getObjectById("energycell").ifPresent(player::enqueuePickup);
         }
+    }
+
+    public void generateTraits(IPlayer player) {
+        player.enqueueEvents(new SetSleepEvent(SleepType.DEEP));
+        player.enqueueAttachEffect(new BattleFatigueEffect());
+        player.enqueueAttachEffect(new HideFatigueEffect());
+        player.enqueueAttachEffect(new SearchFatigueEffect());
+        player.enqueueAttachEffect(new AmbushFatigueEffect());
+        player.enqueueAttachEffect(new StaminaRegenEffect());
+        player.enqueueAttachEffect(new EquipRedirectorEffect());
+        StatsEffect statsEffectFat = new StatsEffect("fat", "жиробасина");
+        statsEffectFat.setStatChange(ATK, 1);
+        statsEffectFat.setStatChange(DEF, -1);
+        StatsEffect statsEffectAlco = new StatsEffect("alcoholic", "алкашня");
+        statsEffectAlco.setStatChange(DEF, -1);
+        statsEffectAlco.setStatChange(PRT, -1);
+        statsEffectAlco.addEffect(new NoGuardSleepEffect());
+        player.enqueueAttachEffect(statsEffectFat);
+        player.enqueueAttachEffect(statsEffectAlco);
+        weaponRepository.getObjectById("pen").ifPresent(player::enqueueEquipItem);
+        // weaponRepository.getRandomObjectByTier(1).ifPresent(w -> player.enqueueEvent(new EquipEvent(w)));
+        armorRepository.getRandomObjectByTier(1).ifPresent(player::enqueueEquipItem);
+        weaponRepository.getObjectById("dildo").ifPresent(player::enqueuePickup);
+        weaponRepository.getObjectById("lasersaw").ifPresent(player::enqueuePickup);
+        usableRepository.getObjectById("bandage").ifPresent(player::enqueuePickup);
+        usableRepository.getObjectById("speedhack").ifPresent(player::enqueuePickup);
+        usableRepository.getObjectById("energycell").ifPresent(player::enqueuePickup);
     }
 
     public void announce(String message) {
@@ -159,6 +172,38 @@ public class World extends Player {
 
     public UsableRepository getUsableRepository() {
         return usableRepository;
+    }
+
+    public void defaultCommand(IPlayer player) {
+        switch (state) {
+        case GATHER:
+            resetPlayer(player);
+            player.log("Вы в игре.");
+            break;
+        case PLAYING:
+            player.dumpStats();
+            break;
+        case FINISHED:
+            player.log("Игра завершена.");
+            break;
+        default:
+            break;
+        }
+    }
+
+    public void setPlayerReady(IPlayer player, boolean ready) {
+        player.as(MUTABLEPLAYER_OBJ).ifPresent(p -> {
+            p.setReady(ready);
+            announce(String.format("Игрок %s %s начать игру.", p.getId(), ready ? "готов" : "не готов"));
+            int readyPlayersPct = players.values().stream().mapToInt(pl -> pl.isReady() ? 1 : 0).sum() * 100 / players.size();
+            if (readyPlayersPct >= 75) {
+                state = GameState.PLAYING;
+                Main.INSTANCE.sendMessage("Игра начинается!");
+                players.entrySet().forEach(e -> {
+                    generateTraits(e.getValue());
+                });
+            }
+        });
     }
 
 }
