@@ -32,7 +32,7 @@ public class RoomParticipantsManager {
     }
 
     public Set<String> getEmptyRooms() {
-        return roomUsers.keySet().stream().filter(k -> isRoomEmpty(k)).collect(Collectors.toSet());
+        return roomUsers.keySet().stream().filter(this::isRoomEmpty).collect(Collectors.toSet());
     }
 
     public void removeRoom(String roomId) {
