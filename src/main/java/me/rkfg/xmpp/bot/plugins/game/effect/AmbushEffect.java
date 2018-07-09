@@ -45,7 +45,7 @@ public class AmbushEffect extends AbstractEffect implements IBattleEffect {
     }
 
     @Override
-    public Collection<IEvent> battleBegins(IEvent event) {
+    public Collection<IEvent> battleInvite(IEvent event) {
         if (imDefender(event)) {
             return withPlayers(event, (attacker, defender) -> {
                 int ambush = defender.getStat(ATK) + defender.getStat(LCK) + drn();

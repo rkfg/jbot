@@ -13,6 +13,7 @@ import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.event.BattleAttackEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.BattleBeginsEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.BattleEndsEvent;
+import me.rkfg.xmpp.bot.plugins.game.event.BattleInviteEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 import me.rkfg.xmpp.bot.plugins.game.item.IItem;
 
@@ -30,6 +31,9 @@ public interface IBattleEffect extends IEffect {
                 result.addAll(defenceSuccess(event));
             }
         }
+        if (event.isOfType(BattleInviteEvent.TYPE)) {
+            result.addAll(battleInvite(event));
+        }
         if (event.isOfType(BattleBeginsEvent.TYPE)) {
             result.addAll(battleBegins(event));
         }
@@ -37,6 +41,11 @@ public interface IBattleEffect extends IEffect {
             result.addAll(battleEnds(event));
         }
         return result;
+    }
+
+
+    default Collection<IEvent> battleInvite(IEvent event) {
+        return noEvent();
     }
 
     default Collection<IEvent> battleBegins(IEvent event) {

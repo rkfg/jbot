@@ -21,10 +21,12 @@ public class BattleEvent extends AbstractEvent {
     @Override
     public void apply() {
         source.as(PLAYER_OBJ).ifPresent(attacker -> target.as(PLAYER_OBJ).ifPresent(defender -> {
-            if (!attacker.enqueueEvent(createBeginEvent(attacker, defender))
-                    || !defender.enqueueEvent(createBeginEvent(attacker, defender))) {
+            if (!attacker.enqueueEvent(createInviteEvent(attacker, defender))
+                    || !defender.enqueueEvent(createInviteEvent(attacker, defender))) {
                 return;
             }
+            attacker.enqueueEvent(new BattleBeginsEvent(attacker, defender));
+            defender.enqueueEvent(new BattleBeginsEvent(attacker, defender));
             attacker.log(String.format("Вы нападаете на %s!", Utils.getPlayerName(defender)));
             defender.log(String.format("%s нападает на вас!", Utils.getPlayerName(attacker)));
             BattleAttackEvent attackEvent = null;
@@ -45,8 +47,8 @@ public class BattleEvent extends AbstractEvent {
         }));
     }
 
-    public BattleBeginsEvent createBeginEvent(IPlayer attacker, IPlayer defender) {
-        final BattleBeginsEvent event = new BattleBeginsEvent(attacker, defender);
+    public BattleInviteEvent createInviteEvent(IPlayer attacker, IPlayer defender) {
+        final BattleInviteEvent event = new BattleInviteEvent(attacker, defender);
         getAttribute(BattleFatigueEffect.FAIR).ifPresent(f -> event.setAttribute(BattleFatigueEffect.FAIR, f));
         return event;
     }

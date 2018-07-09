@@ -16,7 +16,7 @@ public class HideEffect extends AbstractEffect implements IBattleEffect {
     }
 
     @Override
-    public Collection<IEvent> battleBegins(IEvent event) {
+    public Collection<IEvent> battleInvite(IEvent event) {
         if (imDefender(event)) {
             return withPlayers(event, (attacker, defender) -> {
                 int hide = defender.getStat(DEF) + defender.getStat(LCK) + drn();
