@@ -14,6 +14,10 @@ import me.rkfg.xmpp.bot.plugins.game.item.IWeapon;
 import me.rkfg.xmpp.bot.plugins.game.repository.AbstractContentRepository.IndexPointer;
 
 public class Attrs {
+    public enum GamePlayerState {
+        NONE, GATHER, READY, PLAYING
+    }
+
     private Attrs() {
     }
 
@@ -65,5 +69,5 @@ public class Attrs {
     public static final TypedAttribute<String> OTHERTYPE = TypedAttribute.of("othertype");
     public static final TypedAttribute<IItem> ITEM = TypedAttribute.of("item");
     public static final TypedAttribute<Boolean> SETEFFECTACTIVE = TypedAttribute.of("seteffectactive");
-    public static final TypedAttribute<Boolean> READY = TypedAttribute.of("ready");
+    public static final TypedAttribute<GamePlayerState> READY = TypedAttribute.of("ready");
 }

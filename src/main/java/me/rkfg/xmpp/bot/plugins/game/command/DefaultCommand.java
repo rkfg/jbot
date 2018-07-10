@@ -26,4 +26,9 @@ public class DefaultCommand implements ICommandHandler {
         return true;
     }
 
+    @Override
+    public boolean pregameAllowed() {
+        return true;
+    }
+
 }

@@ -23,6 +23,7 @@ import me.rkfg.xmpp.bot.plugins.game.item.IMutableSlot;
 import me.rkfg.xmpp.bot.plugins.game.item.ISlot;
 import me.rkfg.xmpp.bot.plugins.game.item.IWeapon;
 import me.rkfg.xmpp.bot.plugins.game.item.Slot;
+import me.rkfg.xmpp.bot.plugins.game.misc.Attrs.GamePlayerState;
 import me.rkfg.xmpp.bot.plugins.game.misc.IMutableStats;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
@@ -56,6 +57,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
 
     public Player(String id) {
         this.id = id;
+        setState(GamePlayerState.NONE);
     }
 
     @Override
@@ -267,16 +269,17 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
             stats.put(STM, 10);
             equipment.put(WEAPON_SLOT, new Slot("оружие"));
             equipment.put(ARMOR_SLOT, new Slot("броня"));
+            setState(GamePlayerState.PLAYING);
         }
     }
 
     @Override
-    public void setReady(boolean ready) {
-        setAttribute(READY, ready);
+    public void setState(GamePlayerState state) {
+        setAttribute(READY, state);
     }
 
     @Override
-    public boolean isReady() {
-        return getAttribute(READY).orElse(false);
+    public GamePlayerState getState() {
+        return getAttribute(READY).orElse(GamePlayerState.NONE);
     }
 }

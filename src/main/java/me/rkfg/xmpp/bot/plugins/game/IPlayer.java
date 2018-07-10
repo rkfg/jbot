@@ -7,6 +7,7 @@ import me.rkfg.xmpp.bot.plugins.game.item.IArmor;
 import me.rkfg.xmpp.bot.plugins.game.item.IItem;
 import me.rkfg.xmpp.bot.plugins.game.item.ISlot;
 import me.rkfg.xmpp.bot.plugins.game.item.IWeapon;
+import me.rkfg.xmpp.bot.plugins.game.misc.Attrs.GamePlayerState;
 import me.rkfg.xmpp.bot.plugins.game.misc.IHasStats;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 
@@ -36,6 +37,6 @@ public interface IPlayer extends IGameObject, IHasStats {
 
     boolean enqueuePickup(IItem item);
 
-    boolean isReady();
+    GamePlayerState getState();
     
 }

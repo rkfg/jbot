@@ -20,6 +20,10 @@ public interface ICommandHandler {
         return false;
     }
 
+    default boolean pregameAllowed() {
+        return false;
+    }
+
     default Optional<Integer> getFirstIntegerArg(Stream<String> args) {
         return args.findFirst().map(Integer::valueOf);
     }

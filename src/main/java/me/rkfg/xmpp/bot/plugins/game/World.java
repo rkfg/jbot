@@ -24,6 +24,7 @@ import me.rkfg.xmpp.bot.plugins.game.effect.StaminaRegenEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.StatsEffect;
 import me.rkfg.xmpp.bot.plugins.game.event.RenameEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
+import me.rkfg.xmpp.bot.plugins.game.misc.Attrs.GamePlayerState;
 import me.rkfg.xmpp.bot.plugins.game.repository.ArmorRepository;
 import me.rkfg.xmpp.bot.plugins.game.repository.EffectRepository;
 import me.rkfg.xmpp.bot.plugins.game.repository.NameRepository;
@@ -36,11 +37,6 @@ public class World extends Player {
     private Map<String, IPlayer> players = new HashMap<>();
     private NameRepository nameRepository;
 
-    private enum GameState {
-        GATHER, PLAYING, FINISHED
-    }
-
-    private GameState state = GameState.GATHER;
     private List<String> names;
     private WeaponRepository weaponRepository;
     private ArmorRepository armorRepository;
@@ -50,6 +46,7 @@ public class World extends Player {
 
     public World() {
         super("ZAWARUDO");
+        setState(GamePlayerState.GATHER);
     }
 
     public void init() {
@@ -90,17 +87,7 @@ public class World extends Player {
         return players.values().stream().sorted((p1, p2) -> p1.getName().compareTo(p2.getName())).collect(Collectors.toList());
     }
 
-    private void resetPlayer(IPlayer player) {
-        if (state == GameState.GATHER) {
-            player.as(MUTABLEPLAYER_OBJ).ifPresent(p -> {
-                boolean ready = p.isReady();
-                p.reset(false);
-                p.setReady(ready);
-            });
-        }
-    }
-
-    public void generateTraits(IPlayer player) {
+    private void generateTraits(IPlayer player) {
         player.as(MUTABLEPLAYER_OBJ).ifPresent(p -> p.reset(true));
         player.enqueueAttachEffect(new BattleFatigueEffect());
         player.enqueueAttachEffect(new HideFatigueEffect());
@@ -134,16 +121,18 @@ public class World extends Player {
         List<IPlayer> alive = players.values().stream().filter(IPlayer::isAlive).collect(Collectors.toList());
         if (alive.isEmpty()) {
             announce("Игра завершена, выживших нет.");
-            state = GameState.FINISHED;
+            setState(GamePlayerState.GATHER);
         }
         if (alive.size() == 1) {
             final IPlayer winner = alive.get(0);
             announce("Игра завершена, последний выживший — " + winner.getName() + " aka " + winner.getId());
             winner.log("Вы победили!");
-            state = GameState.FINISHED;
+            setState(GamePlayerState.GATHER);
         }
-        if (state == GameState.FINISHED) {
+        if (getState() == GamePlayerState.GATHER) {
             stopTime();
+            players.values().stream().map(p -> p.as(MUTABLEPLAYER_OBJ)).filter(Optional::isPresent).map(Optional::get)
+                    .forEach(p -> p.setState(GamePlayerState.NONE));
         }
     }
 
@@ -168,47 +157,94 @@ public class World extends Player {
     }
 
     public void defaultCommand(IPlayer player) {
-        switch (state) {
+        switch (getState()) {
         case GATHER:
-            resetPlayer(player);
-            player.log("Вы в игре.");
+            switch (player.getState()) {
+            case NONE:
+                player.log("Чтобы вступить в игру, напишите %гм участвую");
+                break;
+            case READY:
+                player.log("Вы готовы начать игру.");
+                break;
+            case GATHER:
+                player.log("Чтобы подтвердить свою готовность, напишите %гм готов");
+                break;
+            default:
+                player.log("Неверный статус.");
+                break;
+            }
             break;
         case PLAYING:
             player.dumpStats();
-            break;
-        case FINISHED:
-            player.log("Игра завершена.");
             break;
         default:
             break;
         }
     }
 
-    public Optional<String> setPlayerReady(IPlayer player, boolean ready) {
-        switch (state) {
-        case GATHER:
+    public Optional<String> setPlayerState(IPlayer player, GamePlayerState playerState) {
+        if (getState() == GamePlayerState.GATHER) {
             player.as(MUTABLEPLAYER_OBJ).ifPresent(p -> {
-                p.setReady(ready);
-                announce(String.format("Игрок %s %s начать игру.", p.getId(), ready ? "готов" : "не готов"));
-                int readyPlayersPct = players.values().stream().mapToInt(pl -> pl.isReady() ? 1 : 0).sum() * 100 / players.size();
-                if (readyPlayersPct >= 75) {
-                    state = GameState.PLAYING;
-                    players.keySet().stream().flatMap(u -> Main.INSTANCE.getRoomsWithUser(u).stream()).distinct()
-                            .filter(Main.INSTANCE::isDirectChat).forEach(roomId -> Main.INSTANCE.sendMessage("Игра начинается!", roomId));
-                    initPlayers();
+                p.setState(playerState);
+                switch (playerState) {
+                case NONE:
+                    player.log("Вы не будете участвовать в игре.");
+                    break;
+                case READY:
+                    announce(String.format("Игрок %s готов начать игру.", p.getId()));
+                    int readyCnt = 0;
+                    int gatherCnt = 0;
+                    for (IPlayer p2 : players.values()) {
+                        if (p2.getState() == GamePlayerState.READY) {
+                            ++readyCnt;
+                        }
+                        if (p2.getState() != GamePlayerState.NONE) {
+                            ++gatherCnt;
+                        }
+                    }
+                    if (gatherCnt == 0) {
+                        gatherCnt = 1; // should never happen
+                    }
+                    long readyPlayersPct = readyCnt * 100 / gatherCnt;
+                    if (readyPlayersPct >= 75 && gatherCnt > 1) {
+                        startGame();
+                    } else {
+                        player.log("Чтобы отменить свою готовность, напишите %гм готов 0");
+                    }
+                    break;
+                case GATHER:
+                    player.log("Вы будете участвовать в игре. Чтобы отказаться от участия, напишите %гм участвую 0");
+                    break;
+                default:
+                    player.log("Неверный статус.");
+                    break;
                 }
-                startTime();
             });
-            break;
-        case PLAYING:
-            return Optional.of("Игра уже идёт, дождитесь следующего раунда.");
-        case FINISHED:
-            return Optional.of("Игра завершена, дождитесь начала раунда.");
+        } else if (getState() == GamePlayerState.PLAYING)
+
+        {
+            if (player.getState() != GamePlayerState.PLAYING) {
+                return Optional.of("Игра уже идёт, дождитесь следующего раунда.");
+            } else {
+                return Optional.of("Игра уже идёт, и вы участвуете.");
+            }
         }
         return Optional.empty();
     }
 
-    public void initPlayers() {
+    private void startGame() {
+        setState(GamePlayerState.PLAYING);
+        players.entrySet().removeIf(e -> {
+            GamePlayerState r = e.getValue().getState();
+            return r != GamePlayerState.READY && r != GamePlayerState.GATHER;
+        }); // remove non-participating players
+        players.keySet().stream().flatMap(u -> Main.INSTANCE.getRoomsWithUser(u).stream()).distinct().filter(Main.INSTANCE::isDirectChat)
+                .forEach(roomId -> Main.INSTANCE.sendMessage("Игра начинается!", roomId));
+        initPlayers();
+        startTime();
+    }
+
+    private void initPlayers() {
         int pIdx = 0;
         for (Entry<String, IPlayer> entry : players.entrySet()) {
             if (pIdx % names.size() == 0) {

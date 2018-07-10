@@ -24,11 +24,13 @@ import me.rkfg.xmpp.bot.plugins.game.command.ICommandHandler;
 import me.rkfg.xmpp.bot.plugins.game.command.ListBackpackCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.ListPlayersCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.ManCommand;
+import me.rkfg.xmpp.bot.plugins.game.command.ParticipatingCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.ReadyCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.SearchCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.SleepCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.UnequipCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.UseCommand;
+import me.rkfg.xmpp.bot.plugins.game.misc.Attrs.GamePlayerState;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 
@@ -72,6 +74,9 @@ public class GamePlugin extends CommandPlugin {
         if (f == null || !f.deadAllowed() && !player.isAlive()) {
             return Optional.empty();
         }
+        if (World.THIS.getState() != GamePlayerState.PLAYING && !f.pregameAllowed()) {
+            return Optional.of("Эта команда не разрешена вне игры.");
+        }
         return Optional.of(f.exec(player, args.stream().skip(1)).orElseGet(player::getLog));
     }
 
@@ -88,6 +93,7 @@ public class GamePlugin extends CommandPlugin {
         registerHandler(new HideCommand());
         registerHandler(new AmbushCommand());
         registerHandler(new DescribeCommand());
+        registerHandler(new ParticipatingCommand());
         registerHandler(new ReadyCommand());
         registerHandler(new ManCommand(handlers));
     }

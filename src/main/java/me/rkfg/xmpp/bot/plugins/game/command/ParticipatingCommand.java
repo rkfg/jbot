@@ -10,26 +10,25 @@ import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.World;
 import me.rkfg.xmpp.bot.plugins.game.misc.Attrs.GamePlayerState;
 
-public class ReadyCommand implements ICommandHandler {
+public class ParticipatingCommand implements ICommandHandler {
 
     @Override
     public Collection<String> getCommand() {
-        return asList("готов");
+        return asList("участвую");
     }
 
     @Override
     public Optional<String> exec(IPlayer player, Stream<String> args) {
         Optional<Integer> arg = getFirstIntegerArg(args);
         if (arg.isPresent() && arg.get().equals(0)) {
-            return World.THIS.setPlayerState(player, GamePlayerState.GATHER);
-        } else {
-            return World.THIS.setPlayerState(player, GamePlayerState.READY);
+            return World.THIS.setPlayerState(player, GamePlayerState.NONE);
         }
+        return World.THIS.setPlayerState(player, GamePlayerState.GATHER);
     }
 
     @Override
     public boolean pregameAllowed() {
         return true;
     }
-    
+
 }
