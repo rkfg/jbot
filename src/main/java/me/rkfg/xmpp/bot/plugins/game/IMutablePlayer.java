@@ -20,7 +20,7 @@ public interface IMutablePlayer extends IPlayer {
 
     void removeFromBackpack(IItem item);
 
-    void reset();
+    void reset(boolean init);
     
     void setReady(boolean ready);
 }

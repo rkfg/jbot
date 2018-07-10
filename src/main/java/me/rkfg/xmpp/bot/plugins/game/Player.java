@@ -56,15 +56,6 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
 
     public Player(String id) {
         this.id = id;
-        stats.put(HP, 30);
-        stats.put(ATK, 10);
-        stats.put(DEF, 10);
-        stats.put(STR, 5);
-        stats.put(PRT, 5);
-        stats.put(LCK, 10);
-        stats.put(STM, 10);
-        equipment.put(WEAPON_SLOT, new Slot("оружие"));
-        equipment.put(ARMOR_SLOT, new Slot("броня"));
     }
 
     @Override
@@ -261,11 +252,22 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
     }
 
     @Override
-    public void reset() {
+    public void reset(boolean init) {
         stats = new TypedAttributeMap();
         equipment = new TypedAttributeMap();
         backpack = new ArrayList<>();
         name = UNNAMED;
+        if (init) {
+            stats.put(HP, 30);
+            stats.put(ATK, 10);
+            stats.put(DEF, 10);
+            stats.put(STR, 5);
+            stats.put(PRT, 5);
+            stats.put(LCK, 10);
+            stats.put(STM, 10);
+            equipment.put(WEAPON_SLOT, new Slot("оружие"));
+            equipment.put(ARMOR_SLOT, new Slot("броня"));
+        }
     }
 
     @Override

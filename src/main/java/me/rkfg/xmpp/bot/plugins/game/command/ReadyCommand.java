@@ -18,8 +18,7 @@ public class ReadyCommand implements ICommandHandler {
 
     @Override
     public Optional<String> exec(IPlayer player, Stream<String> args) {
-        World.THIS.setPlayerReady(player, true);
-        return Optional.empty();
+        return World.THIS.setPlayerReady(player, true);
     }
 
 }

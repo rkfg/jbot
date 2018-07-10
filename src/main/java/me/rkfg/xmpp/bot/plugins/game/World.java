@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -80,6 +81,10 @@ public class World extends Player {
         }, TimeUnit.SECONDS.toMillis(5), TimeUnit.SECONDS.toMillis(5));
     }
 
+    private void stopTime() {
+        timer.cancel();
+    }
+
     public IPlayer getCurrentPlayer(Message message) {
         return players.computeIfAbsent(message.getFrom(), Player::new);
     }
@@ -92,24 +97,14 @@ public class World extends Player {
         if (state == GameState.GATHER) {
             player.as(MUTABLEPLAYER_OBJ).ifPresent(p -> {
                 boolean ready = p.isReady();
-                p.reset();
+                p.reset(false);
                 p.setReady(ready);
             });
-        }
-        if (state == GameState.PLAYING) {
-            if (players.size() % names.size() == 1) {
-                Collections.shuffle(names);
-            }
-            int round = (players.size() - 1) / names.size() + 1;
-            String name = names.get(players.size() % names.size());
-            if (round > 1) {
-                name += " " + round + "-й";
-            }
-            player.enqueueEvent(new RenameEvent(name));
         }
     }
 
     public void generateTraits(IPlayer player) {
+        player.as(MUTABLEPLAYER_OBJ).ifPresent(p -> p.reset(true));
         player.enqueueEvents(new SetSleepEvent(SleepType.DEEP));
         player.enqueueAttachEffect(new BattleFatigueEffect());
         player.enqueueAttachEffect(new HideFatigueEffect());
@@ -152,6 +147,9 @@ public class World extends Player {
             winner.log("Вы победили!");
             state = GameState.FINISHED;
         }
+        if (state == GameState.FINISHED) {
+            stopTime();
+        }
     }
 
     public NameRepository getNameRepository() {
@@ -191,19 +189,46 @@ public class World extends Player {
         }
     }
 
-    public void setPlayerReady(IPlayer player, boolean ready) {
-        player.as(MUTABLEPLAYER_OBJ).ifPresent(p -> {
-            p.setReady(ready);
-            announce(String.format("Игрок %s %s начать игру.", p.getId(), ready ? "готов" : "не готов"));
-            int readyPlayersPct = players.values().stream().mapToInt(pl -> pl.isReady() ? 1 : 0).sum() * 100 / players.size();
-            if (readyPlayersPct >= 75) {
-                state = GameState.PLAYING;
-                Main.INSTANCE.sendMessage("Игра начинается!");
-                players.entrySet().forEach(e -> {
-                    generateTraits(e.getValue());
-                });
+    public Optional<String> setPlayerReady(IPlayer player, boolean ready) {
+        switch (state) {
+        case GATHER:
+            player.as(MUTABLEPLAYER_OBJ).ifPresent(p -> {
+                p.setReady(ready);
+                announce(String.format("Игрок %s %s начать игру.", p.getId(), ready ? "готов" : "не готов"));
+                int readyPlayersPct = players.values().stream().mapToInt(pl -> pl.isReady() ? 1 : 0).sum() * 100 / players.size();
+                if (readyPlayersPct >= 75) {
+                    state = GameState.PLAYING;
+                    players.keySet().stream().flatMap(u -> Main.INSTANCE.getRoomsWithUser(u).stream()).distinct()
+                            .filter(Main.INSTANCE::isDirectChat).forEach(roomId -> Main.INSTANCE.sendMessage("Игра начинается!", roomId));
+                    initPlayers();
+                }
+                startTime();
+            });
+            break;
+        case PLAYING:
+            return Optional.of("Игра уже идёт, дождитесь следующего раунда.");
+        case FINISHED:
+            return Optional.of("Игра завершена, дождитесь начала раунда.");
+        }
+        return Optional.empty();
+    }
+
+    public void initPlayers() {
+        int pIdx = 0;
+        for (Entry<String, IPlayer> entry : players.entrySet()) {
+            if (pIdx % names.size() == 0) {
+                Collections.shuffle(names);
             }
-        });
+            int round = pIdx / names.size() + 1;
+            String name = names.get(pIdx % names.size());
+            if (round > 1) {
+                name += " " + round + "-й";
+            }
+            IPlayer player = entry.getValue();
+            generateTraits(player);
+            player.enqueueEvent(new RenameEvent(name));
+            pIdx++;
+        }
     }
 
 }
