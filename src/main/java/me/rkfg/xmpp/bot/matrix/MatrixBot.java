@@ -333,4 +333,8 @@ public class MatrixBot extends BotBase {
                 .collect(Collectors.toSet());
     }
 
+    @Override
+    public boolean isDirectChat(String roomId) {
+        return roomParticipantsManager.isDirectChat(roomId);
+    }
 }

@@ -31,6 +31,11 @@ public class RoomParticipantsManager {
         return users.size() == 1 && users.contains(mxid); // only I left
     }
 
+    public boolean isDirectChat(String roomId) {
+        Set<String> users = getUsers(roomId);
+        return users.size() == 2 && users.contains(mxid); // only I left
+    }
+
     public Set<String> getEmptyRooms() {
         return roomUsers.keySet().stream().filter(this::isRoomEmpty).collect(Collectors.toSet());
     }

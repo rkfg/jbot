@@ -234,4 +234,9 @@ public class XMPPBot extends BotBase {
         return mucManager.listMUCs().stream().filter(muc -> muc.getOccupants().contains(userId)).map(MultiUserChat::getRoom)
                 .collect(Collectors.toSet());
     }
+
+    @Override
+    public boolean isDirectChat(String roomId) {
+        return mucManager.listMUCs().stream().noneMatch(m -> m.getRoom().equals(roomId));
+    }
 }

@@ -33,5 +33,7 @@ public interface IBot {
     ChatManager getChatManagerInstance();
 
     MUCManager getMUCManager();
+    
+    boolean isDirectChat(String roomId);
 
 }
