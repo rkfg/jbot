@@ -19,13 +19,10 @@ import me.rkfg.xmpp.bot.plugins.game.effect.AmbushFatigueEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.BattleFatigueEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.EquipRedirectorEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.HideFatigueEffect;
-import me.rkfg.xmpp.bot.plugins.game.effect.NoGuardSleepEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.SearchFatigueEffect;
-import me.rkfg.xmpp.bot.plugins.game.effect.SleepEffect.SleepType;
 import me.rkfg.xmpp.bot.plugins.game.effect.StaminaRegenEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.StatsEffect;
 import me.rkfg.xmpp.bot.plugins.game.event.RenameEvent;
-import me.rkfg.xmpp.bot.plugins.game.event.SetSleepEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
 import me.rkfg.xmpp.bot.plugins.game.repository.ArmorRepository;
 import me.rkfg.xmpp.bot.plugins.game.repository.EffectRepository;
@@ -105,7 +102,6 @@ public class World extends Player {
 
     public void generateTraits(IPlayer player) {
         player.as(MUTABLEPLAYER_OBJ).ifPresent(p -> p.reset(true));
-        player.enqueueEvents(new SetSleepEvent(SleepType.DEEP));
         player.enqueueAttachEffect(new BattleFatigueEffect());
         player.enqueueAttachEffect(new HideFatigueEffect());
         player.enqueueAttachEffect(new SearchFatigueEffect());
@@ -118,7 +114,6 @@ public class World extends Player {
         StatsEffect statsEffectAlco = new StatsEffect("alcoholic", "алкашня");
         statsEffectAlco.setStatChange(DEF, -1);
         statsEffectAlco.setStatChange(PRT, -1);
-        statsEffectAlco.addEffect(new NoGuardSleepEffect());
         player.enqueueAttachEffect(statsEffectFat);
         player.enqueueAttachEffect(statsEffectAlco);
         weaponRepository.getObjectById("pen").ifPresent(player::enqueueEquipItem);
