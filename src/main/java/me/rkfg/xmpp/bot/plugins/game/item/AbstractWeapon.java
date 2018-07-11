@@ -13,8 +13,4 @@ public abstract class AbstractWeapon extends AbstractItem implements IWeapon, IM
         setAttribute(STR, strength);
     }
 
-    @Override
-    public String getStatsStr() {
-        return String.format(" А:%d/З:%d/С:%d", getAttack(), getDefence(), getStrength());
-    }
 }

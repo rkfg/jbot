@@ -12,8 +12,4 @@ public abstract class AbstractArmor extends AbstractItem implements IArmor, IMut
         setAttribute(PRT, protection);
     }
 
-    @Override
-    public String getStatsStr() {
-        return String.format(" З:%d/Б:%d", getDefence(), getProtection());
-    }
 }

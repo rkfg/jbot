@@ -34,4 +34,9 @@ public interface IWeapon extends IStatsItem {
         }
         return Optional.empty();
     }
+
+    @Override
+    default String getStatsStr() {
+        return String.format(" А:%d/З:%d/С:%d [о]", getAttack(), getDefence(), getStrength());
+    }
 }
