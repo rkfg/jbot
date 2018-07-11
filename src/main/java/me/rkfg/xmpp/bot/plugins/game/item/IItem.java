@@ -18,6 +18,10 @@ public interface IItem extends IGameObject, IHasAttributes, IHasType {
 
     void setOwner(IGameObject owner);
 
+    default String getItemDescription() {
+        return getDescription().orElse("<предмет>");
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     default <T extends IGameObject> Optional<T> as(TypedAttribute<T> type) {

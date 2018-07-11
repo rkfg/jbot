@@ -267,8 +267,8 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
             stats.put(PRT, 5);
             stats.put(LCK, 10);
             stats.put(STM, 10);
-            equipment.put(WEAPON_SLOT, new Slot("оружие"));
-            equipment.put(ARMOR_SLOT, new Slot("броня"));
+            equipment.put(WEAPON_SLOT, new Slot("держит в руках"));
+            equipment.put(ARMOR_SLOT, new Slot("одет в"));
             setState(GamePlayerState.PLAYING);
         }
     }

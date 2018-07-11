@@ -22,7 +22,7 @@ public class DescribeCommand implements ICommandHandler, IUsesBackpack {
     public Optional<String> exec(IPlayer player, Stream<String> args) {
         try {
             IItem item = getBackpackItem(args, player);
-            player.log("%s подвергается тщательному осмотру. %s", capitalize(unboxString(item.getDescription(Verbosity.WITH_PARAMS))),
+            player.log("Вы тщательно осматриваете %s. %s", unboxString(item.getDescription(Verbosity.WITH_PARAMS)),
                     capitalize(unboxString(item.getDescription(Verbosity.VERBOSE))));
         } catch (NumberFormatException e) {
             return getHelp();
