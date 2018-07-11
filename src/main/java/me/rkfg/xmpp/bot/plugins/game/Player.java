@@ -187,16 +187,6 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
     }
 
     @Override
-    public Optional<IWeapon> getWeapon() {
-        return getSlot(WEAPON_SLOT).flatMap(ISlot::getItem).flatMap(i -> i.as(WEAPON_OBJ));
-    }
-
-    @Override
-    public Optional<IArmor> getArmor() {
-        return getSlot(ARMOR_SLOT).flatMap(ISlot::getItem).flatMap(i -> i.as(ARMOR_OBJ));
-    }
-
-    @Override
     public List<IItem> getBackpack() {
         return Collections.unmodifiableList(backpack);
     }

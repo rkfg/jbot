@@ -1,5 +1,7 @@
 package me.rkfg.xmpp.bot.plugins.game;
 
+import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -25,9 +27,21 @@ public interface IPlayer extends IGameObject, IHasStats {
 
     Optional<ISlot> getSlot(TypedAttribute<ISlot> slot);
 
-    Optional<IWeapon> getWeapon();
+    default Optional<IWeapon> getWeapon() {
+        return getSlot(WEAPON_SLOT).flatMap(ISlot::getItem).flatMap(i -> i.as(WEAPON_OBJ));
+    }
 
-    Optional<IArmor> getArmor();
+    default Optional<IArmor> getArmor() {
+        return getSlot(ARMOR_SLOT).flatMap(ISlot::getItem).flatMap(i -> i.as(ARMOR_OBJ));
+    }
+
+    default String getWeaponName() {
+        return getWeapon().map(IWeapon::getItemDescription).orElse("кулаки");
+    }
+
+    default String getArmorName() {
+        return getArmor().map(IArmor::getItemDescription).orElse("куртку");
+    }
 
     List<IItem> getBackpack();
 
@@ -38,5 +52,5 @@ public interface IPlayer extends IGameObject, IHasStats {
     boolean enqueuePickup(IItem item);
 
     GamePlayerState getState();
-    
+
 }
