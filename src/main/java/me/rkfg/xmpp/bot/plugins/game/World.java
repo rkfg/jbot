@@ -27,6 +27,7 @@ import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
 import me.rkfg.xmpp.bot.plugins.game.misc.Attrs.GamePlayerState;
 import me.rkfg.xmpp.bot.plugins.game.repository.ArmorRepository;
 import me.rkfg.xmpp.bot.plugins.game.repository.EffectRepository;
+import me.rkfg.xmpp.bot.plugins.game.repository.MessageRepository;
 import me.rkfg.xmpp.bot.plugins.game.repository.NameRepository;
 import me.rkfg.xmpp.bot.plugins.game.repository.UsableRepository;
 import me.rkfg.xmpp.bot.plugins.game.repository.WeaponRepository;
@@ -38,6 +39,7 @@ public class World extends Player {
     private NameRepository nameRepository;
 
     private List<String> names;
+    private MessageRepository messageRepository;
     private WeaponRepository weaponRepository;
     private ArmorRepository armorRepository;
     private EffectRepository effectRepository;
@@ -53,6 +55,8 @@ public class World extends Player {
         nameRepository = new NameRepository();
         nameRepository.loadContent();
         names = nameRepository.getAllContent().stream().map(tm -> tm.get(DESC_CNT)).map(Optional::get).collect(Collectors.toList());
+        messageRepository = new MessageRepository();
+        messageRepository.loadContent();
         effectRepository = new EffectRepository();
         effectRepository.loadContent();
         weaponRepository = new WeaponRepository();
@@ -140,6 +144,10 @@ public class World extends Player {
         return nameRepository;
     }
 
+    public MessageRepository getMessageRepository() {
+        return messageRepository;
+    }
+    
     public WeaponRepository getWeaponRepository() {
         return weaponRepository;
     }

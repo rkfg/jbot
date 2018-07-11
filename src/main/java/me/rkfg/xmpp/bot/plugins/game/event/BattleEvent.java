@@ -4,7 +4,6 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.effect.BattleFatigueEffect;
-import me.rkfg.xmpp.bot.plugins.game.misc.Utils;
 
 public class BattleEvent extends AbstractEvent {
 
@@ -27,13 +26,16 @@ public class BattleEvent extends AbstractEvent {
             }
             attacker.enqueueEvent(new BattleBeginsEvent(attacker, defender));
             defender.enqueueEvent(new BattleBeginsEvent(attacker, defender));
-            attacker.log(String.format("Вы нападаете на %s!", Utils.getPlayerName(defender)));
-            defender.log(String.format("%s нападает на вас!", Utils.getPlayerName(attacker)));
+            String[] keys = new String[] { "%atk%", "%def%", "%wpn%", "%arm%" };
+            String[] vals = new String[] { attacker.getName(), defender.getName(), attacker.getWeaponName(), defender.getArmorName() };
+            attacker.log("atkb", keys, vals);
+            defender.log("defb", keys, vals);
             BattleAttackEvent attackEvent = null;
             BattleAttackEvent defenceEvent = null;
             int rollLimit = ROLL_LIMIT;
             // roll until at least one attack succeeds
-            while (rollLimit-- > 0 && (attackEvent == null || !attackEvent.isSuccessful()) && (defenceEvent == null || !defenceEvent.isSuccessful())) {
+            while (rollLimit-- > 0 && (attackEvent == null || !attackEvent.isSuccessful())
+                    && (defenceEvent == null || !defenceEvent.isSuccessful())) {
                 attackEvent = new BattleAttackEvent(attacker, defender);
                 defenceEvent = new BattleAttackEvent(defender, attacker);
             }
@@ -41,9 +43,10 @@ public class BattleEvent extends AbstractEvent {
             battleTurn(defenceEvent);
             attacker.enqueueEvent(new BattleEndsEvent(attacker, defender));
             defender.enqueueEvent(new BattleEndsEvent(attacker, defender));
-            String endMessage = String.format("Бой между %s и %s завершён.", Utils.getPlayerName(attacker), Utils.getPlayerName(defender));
-            attacker.log(endMessage);
-            defender.log(endMessage);
+            if (attacker.isAlive() && defender.isAlive()) {
+                attacker.log("bend", keys, vals);
+                defender.log("bend", keys, vals);
+            }
         }));
     }
 
@@ -54,20 +57,23 @@ public class BattleEvent extends AbstractEvent {
     }
 
     private void battleTurn(BattleAttackEvent attackEvent) {
-        attackEvent.getSource().as(PLAYER_OBJ).ifPresent(srcPlayer -> attackEvent.getTarget().as(PLAYER_OBJ).ifPresent(tgtPlayer -> {
-            if (tgtPlayer.enqueueEvent(attackEvent)
-                    && tgtPlayer.as(PLAYER_OBJ).flatMap(IPlayer::getArmor).map(a -> a.enqueueEvent(attackEvent)).orElse(true)
-                    && srcPlayer.as(PLAYER_OBJ).flatMap(IPlayer::getWeapon).map(a -> a.enqueueEvent(attackEvent)).orElse(true)
-                    && srcPlayer.enqueueEvent(attackEvent)) {
+        attackEvent.getSource().as(PLAYER_OBJ).ifPresent(attacker -> attackEvent.getTarget().as(PLAYER_OBJ).ifPresent(defender -> {
+            if (defender.enqueueEvent(attackEvent)
+                    && defender.as(PLAYER_OBJ).flatMap(IPlayer::getArmor).map(a -> a.enqueueEvent(attackEvent)).orElse(true)
+                    && attacker.as(PLAYER_OBJ).flatMap(IPlayer::getWeapon).map(a -> a.enqueueEvent(attackEvent)).orElse(true)
+                    && attacker.enqueueEvent(attackEvent)) {
+                String[] keys = new String[] { "%atk%", "%def%", "%wpn%", "%arm%", "%hp%" };
+                String[] vals = new String[] { attacker.getName(), defender.getName(), attacker.getWeaponName(), defender.getArmorName(),
+                        "" + attackEvent.getDamage() };
                 if (attackEvent.isSuccessful()) {
-                    srcPlayer.log("Атака достигает цели и наносит " + attackEvent.getDamage() + " урона!");
-                    tgtPlayer.log("Соперник наносит вам " + attackEvent.getDamage() + " урона!");
+                    attacker.log("atks", keys, vals);
+                    defender.log("deff", keys, vals);
                     final StatsEvent statsEvent = new StatsEvent();
-                    statsEvent.setSource(srcPlayer);
-                    tgtPlayer.enqueueEvent(statsEvent.setAttributeChain(HP, -attackEvent.getDamage()));
+                    statsEvent.setSource(attacker);
+                    defender.enqueueEvent(statsEvent.setAttributeChain(HP, -attackEvent.getDamage()));
                 } else {
-                    srcPlayer.log("Вы пытаетесь поразить соперника, но промахиваетесь!");
-                    tgtPlayer.log("Соперник пытается нанести удар, но промахивается!");
+                    attacker.log("atkf", keys, vals);
+                    defender.log("defs", keys, vals);
                 }
             }
         }));
