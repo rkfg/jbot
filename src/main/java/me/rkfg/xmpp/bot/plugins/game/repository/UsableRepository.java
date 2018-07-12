@@ -34,8 +34,8 @@ public class UsableRepository extends AbstractContentRepository<IUsable> impleme
         try {
             TypedAttributeMap result = new TypedAttributeMap();
             result.put(CONTENT_ID, parts[0]);
-            result.put(TIER_CNT, Integer.valueOf(parts[1]));
-            result.put(USE_CNT, Integer.valueOf(parts[2]));
+            result.put(USE_CNT, Integer.valueOf(parts[1]));
+            result.put(TIER_CNT, Integer.valueOf(parts[2]));
             int effShift = 0;
             if (parts.length > 5) {
                 processEffects(result, parts[3]);
