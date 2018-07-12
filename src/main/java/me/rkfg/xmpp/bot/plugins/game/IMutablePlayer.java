@@ -21,7 +21,7 @@ public interface IMutablePlayer extends IPlayer {
 
     void removeFromBackpack(IItem item);
 
-    void reset(boolean init);
+    void reset();
     
     void setState(GamePlayerState state);
 }

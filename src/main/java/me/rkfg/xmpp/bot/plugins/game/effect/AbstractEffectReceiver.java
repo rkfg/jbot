@@ -139,4 +139,8 @@ public abstract class AbstractEffectReceiver implements IGameObject, IAttachDeta
     public void enqueueDetachEffect(String effectType) {
         enqueueEvent(new EffectEvent(effectType));
     }
+
+    protected void resetEffects() {
+        effects = new HashSet<>();
+    }
 }

@@ -15,12 +15,6 @@ import java.util.stream.Collectors;
 
 import me.rkfg.xmpp.bot.Main;
 import me.rkfg.xmpp.bot.message.Message;
-import me.rkfg.xmpp.bot.plugins.game.effect.AmbushFatigueEffect;
-import me.rkfg.xmpp.bot.plugins.game.effect.BattleFatigueEffect;
-import me.rkfg.xmpp.bot.plugins.game.effect.EquipRedirectorEffect;
-import me.rkfg.xmpp.bot.plugins.game.effect.HideFatigueEffect;
-import me.rkfg.xmpp.bot.plugins.game.effect.SearchFatigueEffect;
-import me.rkfg.xmpp.bot.plugins.game.effect.StaminaRegenEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.StatsEffect;
 import me.rkfg.xmpp.bot.plugins.game.event.RenameEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
@@ -93,13 +87,7 @@ public class World extends Player {
     }
 
     private void generateTraits(IPlayer player) {
-        player.as(MUTABLEPLAYER_OBJ).ifPresent(p -> p.reset(true));
-        player.enqueueAttachEffect(new BattleFatigueEffect());
-        player.enqueueAttachEffect(new HideFatigueEffect());
-        player.enqueueAttachEffect(new SearchFatigueEffect());
-        player.enqueueAttachEffect(new AmbushFatigueEffect());
-        player.enqueueAttachEffect(new StaminaRegenEffect());
-        player.enqueueAttachEffect(new EquipRedirectorEffect());
+        player.as(MUTABLEPLAYER_OBJ).ifPresent(IMutablePlayer::reset);
         StatsEffect statsEffectFat = new StatsEffect("fat", "жиробасина");
         statsEffectFat.setStatChange(ATK, 1);
         statsEffectFat.setStatChange(DEF, -1);

@@ -11,8 +11,15 @@ import java.util.List;
 import java.util.Optional;
 
 import me.rkfg.xmpp.bot.plugins.game.effect.AbstractEffectReceiver;
+import me.rkfg.xmpp.bot.plugins.game.effect.AmbushFatigueEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.BattleFatigueEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.DeadEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.EquipRedirectorEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.HideFatigueEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.IEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.LootEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.SearchFatigueEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.StaminaRegenEffect;
 import me.rkfg.xmpp.bot.plugins.game.event.EquipEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.ItemPickupEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.UnequipEvent;
@@ -244,23 +251,28 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
     }
 
     @Override
-    public void reset(boolean init) {
+    public void reset() {
+        resetEffects();
         stats = new TypedAttributeMap();
         equipment = new TypedAttributeMap();
         backpack = new ArrayList<>();
         name = UNNAMED;
-        if (init) {
-            stats.put(HP, 30);
-            stats.put(ATK, 10);
-            stats.put(DEF, 10);
-            stats.put(STR, 5);
-            stats.put(PRT, 5);
-            stats.put(LCK, 10);
-            stats.put(STM, 10);
-            equipment.put(WEAPON_SLOT, new Slot("держит в руках"));
-            equipment.put(ARMOR_SLOT, new Slot("одет в"));
-            setState(GamePlayerState.PLAYING);
-        }
+        stats.put(HP, 30);
+        stats.put(ATK, 10);
+        stats.put(DEF, 10);
+        stats.put(STR, 5);
+        stats.put(PRT, 5);
+        stats.put(LCK, 10);
+        stats.put(STM, 10);
+        equipment.put(WEAPON_SLOT, new Slot("держит в руках"));
+        equipment.put(ARMOR_SLOT, new Slot("одет в"));
+        enqueueAttachEffect(new BattleFatigueEffect());
+        enqueueAttachEffect(new HideFatigueEffect());
+        enqueueAttachEffect(new SearchFatigueEffect());
+        enqueueAttachEffect(new AmbushFatigueEffect());
+        enqueueAttachEffect(new StaminaRegenEffect());
+        enqueueAttachEffect(new EquipRedirectorEffect());
+        setState(GamePlayerState.PLAYING);
     }
 
     @Override
