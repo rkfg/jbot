@@ -272,6 +272,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
         enqueueAttachEffect(new AmbushFatigueEffect());
         enqueueAttachEffect(new StaminaRegenEffect());
         enqueueAttachEffect(new EquipRedirectorEffect());
+        enqueueAttachEffect(new LootEffect());
         setState(GamePlayerState.PLAYING);
     }
 

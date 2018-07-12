@@ -1,0 +1,53 @@
+package me.rkfg.xmpp.bot.plugins.game.effect;
+
+import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import me.rkfg.xmpp.bot.plugins.game.IPlayer;
+import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
+import me.rkfg.xmpp.bot.plugins.game.event.ItemPickupEvent;
+import me.rkfg.xmpp.bot.plugins.game.item.IItem;
+
+public class LootEffect extends AbstractEffect implements IBattleEffect {
+
+    public static final String TYPE = "loot";
+
+    public LootEffect() {
+        super(TYPE, "лутает убитого соперника после боя");
+    }
+
+    @Override
+    public Collection<IEvent> battleEnds(IEvent event) {
+        return withPlayers(event, (attacker, defender) -> {
+            if (!attacker.isAlive() && defender == target) { // I killed the attacker
+                loot(attacker);
+            }
+            if (!defender.isAlive() && attacker == target) { // I killed the defender
+                loot(defender);
+            }
+            return noEvent();
+        });
+    }
+
+    private void loot(IPlayer defeated) {
+        // try to unequip everything before looting
+        defeated.enqueueUnequipItem(WEAPON_SLOT);
+        defeated.enqueueUnequipItem(ARMOR_SLOT);
+        defeated.as(MUTABLEPLAYER_OBJ).ifPresent(p -> {
+            List<IItem> backpack = new ArrayList<>(defeated.getBackpack()); // copy to prevent concurrent modification
+            backpack.forEach(i -> {
+                target.enqueueEvent(new ItemPickupEvent(i));
+                p.removeFromBackpack(i);
+            });
+        });
+    }
+    
+    @Override
+    public boolean isVisible() {
+        return false;
+    }
+
+}
