@@ -71,7 +71,7 @@ public class GamePlugin extends CommandPlugin {
                 }
             }
         }
-        if (f == null || !f.deadAllowed() && !player.isAlive()) {
+        if (f == null || !f.deadAllowed() && !player.isAlive() && World.THIS.getState() == GamePlayerState.PLAYING) {
             return Optional.empty();
         }
         if (World.THIS.getState() != GamePlayerState.PLAYING && !f.pregameAllowed()) {
