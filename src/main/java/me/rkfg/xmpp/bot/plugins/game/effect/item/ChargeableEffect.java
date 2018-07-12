@@ -83,7 +83,7 @@ public class ChargeableEffect extends AbstractEffect implements IBattleEffect {
     }
 
     private Collection<IEvent> onDischarged() {
-        target.getDescription().ifPresent(d -> target.log("%s разряжается.", d));
+        target.getDescription().ifPresent(d -> target.log("Теперь %s менее эффективно использовать из-за разряда.", d));
         enqueueStatsEvent();
         return noEvent();
     }
