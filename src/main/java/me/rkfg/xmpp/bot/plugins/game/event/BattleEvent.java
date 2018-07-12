@@ -26,7 +26,7 @@ public class BattleEvent extends AbstractEvent {
             }
             attacker.enqueueEvent(new BattleBeginsEvent(attacker, defender));
             defender.enqueueEvent(new BattleBeginsEvent(attacker, defender));
-            String[] keys = new String[] { "%atk%", "%def%", "%wpn%", "%arm%" };
+            String[] keys = new String[] { "%atk%", "%def%", "%wpn%", "%prt%" };
             String[] vals = new String[] { attacker.getName(), defender.getName(), attacker.getWeaponName(), defender.getArmorName() };
             attacker.log("atkb", keys, vals);
             defender.log("defb", keys, vals);
@@ -62,7 +62,7 @@ public class BattleEvent extends AbstractEvent {
                     && defender.as(PLAYER_OBJ).flatMap(IPlayer::getArmor).map(a -> a.enqueueEvent(attackEvent)).orElse(true)
                     && attacker.as(PLAYER_OBJ).flatMap(IPlayer::getWeapon).map(a -> a.enqueueEvent(attackEvent)).orElse(true)
                     && attacker.enqueueEvent(attackEvent)) {
-                String[] keys = new String[] { "%atk%", "%def%", "%wpn%", "%arm%", "%hp%" };
+                String[] keys = new String[] { "%atk%", "%def%", "%wpn%", "%prt%", "%hp%" };
                 String[] vals = new String[] { attacker.getName(), defender.getName(), attacker.getWeaponName(), defender.getArmorName(),
                         "" + attackEvent.getDamage() };
                 if (attackEvent.isSuccessful()) {
