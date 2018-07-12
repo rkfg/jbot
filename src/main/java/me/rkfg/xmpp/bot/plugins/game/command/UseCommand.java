@@ -38,7 +38,7 @@ public class UseCommand implements ICommandHandler, IUsesBackpack {
 
     @Override
     public Optional<String> getHelp() {
-        return Optional.of("Попробовать использовать предмет (укажите номер в рюкзаке)");
+        return Optional.of("Попробовать использовать предмет (укажите номер в рюкзаке).");
     }
 
 }

@@ -28,8 +28,14 @@ public class ReadyCommand implements ICommandHandler {
     }
 
     @Override
+    public Optional<String> getHelp() {
+        return Optional.of("Проголосовать за начало игры. Игра начнётся, когда готовы будут 75% игроков. "
+                + "Отменить готовность можно с помощью %гм готов 0");
+    }
+
+    @Override
     public boolean pregameAllowed() {
         return true;
     }
-    
+
 }

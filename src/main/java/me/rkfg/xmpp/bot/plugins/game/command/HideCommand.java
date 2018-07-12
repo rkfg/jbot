@@ -21,4 +21,9 @@ public class HideCommand implements ICommandHandler {
         return Optional.empty();
     }
 
+    @Override
+    public Optional<String> getHelp() {
+        return Optional.of("Попытаться спрятаться в складках местности и кустах, расходует 6 единиц энергии. "
+                + "При определённой доле везения, атакующий не сможет вас найти, и бой не состоится.");
+    }
 }

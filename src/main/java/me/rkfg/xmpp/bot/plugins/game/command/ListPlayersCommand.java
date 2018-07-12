@@ -28,7 +28,7 @@ public class ListPlayersCommand implements ICommandHandler {
 
     @Override
     public Optional<String> getHelp() {
-        return Optional.of("Вывести список всех участников");
+        return Optional.of("Вывести список всех участников.");
     }
 
     @Override

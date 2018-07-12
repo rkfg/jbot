@@ -21,4 +21,11 @@ public class AmbushCommand implements ICommandHandler {
         return Optional.empty();
     }
 
+    @Override
+    public Optional<String> getHelp() {
+        return Optional.of("Устроить засаду, расходует 7 единиц энергии. "
+                + "При определённой доле везения, атакующий вас не заметит, и вы сможете атаковать первым, "
+                + "а также получите бонус к атаке и защите на время боя. "
+                + "Если же противник заметит засаду, вы получите штраф к атаке и защите на время боя.");
+    }
 }

@@ -29,6 +29,7 @@ import me.rkfg.xmpp.bot.plugins.game.command.ReadyCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.SearchCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.SleepCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.UnequipCommand;
+import me.rkfg.xmpp.bot.plugins.game.command.UnknownCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.UseCommand;
 import me.rkfg.xmpp.bot.plugins.game.misc.Attrs.GamePlayerState;
 import ru.ppsrk.gwt.client.ClientAuthException;
@@ -59,6 +60,17 @@ public class GamePlugin extends CommandPlugin {
 
     public Optional<String> processCommand(List<String> args, IPlayer player) {
         String cmd = args.stream().findFirst().map(String::toLowerCase).orElse("");
+        ICommandHandler f = findHandler(handlers, cmd);
+        if (!f.deadAllowed() && !player.isAlive() && World.THIS.getState() == GamePlayerState.PLAYING) {
+            return Optional.empty();
+        }
+        if (World.THIS.getState() != GamePlayerState.PLAYING && !f.pregameAllowed()) {
+            return Optional.of("Эта команда не разрешена вне игры.");
+        }
+        return Optional.of(f.exec(player, args.stream().skip(1)).orElseGet(player::getLog));
+    }
+
+    public static ICommandHandler findHandler(Map<String, ICommandHandler> handlers, String cmd) {
         ICommandHandler f = handlers.get(cmd);
         if (f == null) {
             for (Entry<String, ICommandHandler> entry : handlers.entrySet()) {
@@ -71,13 +83,10 @@ public class GamePlugin extends CommandPlugin {
                 }
             }
         }
-        if (f == null || !f.deadAllowed() && !player.isAlive() && World.THIS.getState() == GamePlayerState.PLAYING) {
-            return Optional.empty();
+        if (f == null) {
+            f = new UnknownCommand();
         }
-        if (World.THIS.getState() != GamePlayerState.PLAYING && !f.pregameAllowed()) {
-            return Optional.of("Эта команда не разрешена вне игры.");
-        }
-        return Optional.of(f.exec(player, args.stream().skip(1)).orElseGet(player::getLog));
+        return f;
     }
 
     public void setupHandlers() {

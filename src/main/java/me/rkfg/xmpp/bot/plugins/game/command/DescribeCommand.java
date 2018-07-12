@@ -20,14 +20,34 @@ public class DescribeCommand implements ICommandHandler, IUsesBackpack {
 
     @Override
     public Optional<String> exec(IPlayer player, Stream<String> args) {
-        try {
-            IItem item = getBackpackItem(args, player);
-            player.log("Вы тщательно осматриваете %s. %s", unboxString(item.getDescription(Verbosity.WITH_PARAMS)),
-                    capitalize(unboxString(item.getDescription(Verbosity.VERBOSE))));
-        } catch (NumberFormatException e) {
-            return getHelp();
+        return args.findFirst().map(String::toLowerCase).flatMap(a -> {
+            try {
+                IItem item = getBackpackItem(Integer.valueOf(a), player);
+                return describeItem(player, Optional.of(item), "Предмет не найден в рюкзаке");
+            } catch (NumberFormatException e) {
+                if ("о".equals(a)) {
+                    return describeItem(player, player.getWeapon(), "У вас в руках ничего нет.");
+                } else if ("б".equals(a)) {
+                    return describeItem(player, player.getArmor(), "На вас не надето никакой брони.");
+                }
+                return getHelp();
+            }
+        });
+    }
+
+    public Optional<String> describeItem(IPlayer player, Optional<? extends IItem> item, String emptyMessage) {
+        if (!item.isPresent()) {
+            player.log(emptyMessage);
+        } else {
+            item.ifPresent(i -> player.log("Вы тщательно осматриваете %s. %s", unboxString(i.getDescription(Verbosity.WITH_PARAMS)),
+                    capitalize(unboxString(i.getDescription(Verbosity.VERBOSE)))));
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Optional<String> getHelp() {
+        return Optional.of("Получить описание предмета в рюкзаке (укажите номер), оружия в руках (буква о) или надетой брони (буква б).");
     }
 
 }

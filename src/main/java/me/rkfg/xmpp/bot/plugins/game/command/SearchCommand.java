@@ -25,7 +25,7 @@ public class SearchCommand implements ICommandHandler {
 
     @Override
     public Optional<String> getHelp() {
-        return Optional.of("Искать какие-либо полезные предметы вокруг (требует 2 единицы энергии)");
+        return Optional.of("Искать какие-либо полезные предметы вокруг (требует 4 единицы энергии).");
     }
 
 }

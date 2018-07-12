@@ -25,6 +25,11 @@ public class ParticipatingCommand implements ICommandHandler {
         }
         return World.THIS.setPlayerState(player, GamePlayerState.GATHER);
     }
+    
+    @Override
+    public Optional<String> getHelp() {
+        return Optional.of("Зарегистрироваться на игру. Отменить участие можно с помощью %гм участвую 0");
+    }
 
     @Override
     public boolean pregameAllowed() {

@@ -11,7 +11,7 @@ public class SearchFatigueEffect extends AbstractEffect implements IFatigueEffec
 
     public SearchFatigueEffect() {
         super(TYPE, "устаёт при поисках");
-        initFatigue(2);
+        initFatigue(4);
     }
 
     @Override
