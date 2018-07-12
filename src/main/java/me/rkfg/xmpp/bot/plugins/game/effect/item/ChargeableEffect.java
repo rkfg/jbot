@@ -23,6 +23,7 @@ public class ChargeableEffect extends AbstractEffect implements IBattleEffect {
     private static final List<String> KEYS = Arrays.asList("atk", "def", "str", "prt");
     private static final List<TypedAttribute<Integer>> EFFECT_ATTRS = Arrays.asList(ATK, DEF, STR, PRT);
     private static final List<String> MESSAGES = Arrays.asList("Способность атаковать", "Способность защищаться", "Сила", "Броня");
+    public static final TypedAttribute<String> CHARGETYPE = TypedAttribute.of("chargetype");
 
     public ChargeableEffect() {
         super(TYPE, "заряжаемое");
@@ -48,6 +49,7 @@ public class ChargeableEffect extends AbstractEffect implements IBattleEffect {
             setAttribute(CHARGES, ch);
             setAttribute(MAXCHARGES, ch);
         });
+        getParameterByKey("type").ifPresent(t -> setAttribute(CHARGETYPE, t));
         enqueueStatsEvent();
     }
 
