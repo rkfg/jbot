@@ -3,7 +3,11 @@ package me.rkfg.xmpp.bot.plugins.game.effect;
 import java.util.Collection;
 
 import me.rkfg.xmpp.bot.plugins.game.World;
+import me.rkfg.xmpp.bot.plugins.game.event.EquipEvent;
+import me.rkfg.xmpp.bot.plugins.game.event.EquipEvent.EquippedEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
+import me.rkfg.xmpp.bot.plugins.game.event.UnequipEvent;
+import me.rkfg.xmpp.bot.plugins.game.event.UnequipEvent.UnequippedEvent;
 import me.rkfg.xmpp.bot.plugins.game.misc.Utils;
 
 public class DeadEffect extends AbstractEffect {
@@ -16,6 +20,9 @@ public class DeadEffect extends AbstractEffect {
 
     @Override
     public Collection<IEvent> processEvent(IEvent event) {
+        if (event.isOfAnyType(EquipEvent.TYPE, EquippedEvent.TYPE, UnequipEvent.TYPE, UnequippedEvent.TYPE)) {
+            return noEvent();
+        }
         return cancelEvent(); // dead man reacts to no events
     }
 

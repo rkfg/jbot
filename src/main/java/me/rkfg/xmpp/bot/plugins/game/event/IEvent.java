@@ -27,4 +27,13 @@ public interface IEvent extends IHasAttributes, IHasType, IHasDirection, IHasDes
 
     public boolean isCancelled();
 
+    default boolean isOfAnyType(String... type) {
+        for (String t : type) {
+            if (isOfType(t)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
