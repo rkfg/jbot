@@ -44,7 +44,7 @@ public class World extends Player {
     private ArmorRepository armorRepository;
     private EffectRepository effectRepository;
     private UsableRepository usableRepository;
-    private Timer timer = new Timer("Game clock", true);
+    private Timer timer;
 
     public World() {
         super("ZAWARUDO");
@@ -68,6 +68,7 @@ public class World extends Player {
     }
 
     public void startTime() {
+        timer = new Timer("Game clock", true);
         timer.scheduleAtFixedRate(new TimerTask() {
 
             @Override
@@ -147,7 +148,7 @@ public class World extends Player {
     public MessageRepository getMessageRepository() {
         return messageRepository;
     }
-    
+
     public WeaponRepository getWeaponRepository() {
         return weaponRepository;
     }
