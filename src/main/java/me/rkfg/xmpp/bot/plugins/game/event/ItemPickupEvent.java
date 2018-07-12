@@ -14,7 +14,7 @@ public class ItemPickupEvent extends AbstractEvent {
     public ItemPickupEvent(IItem item) {
         super(TYPE);
         setAttribute(ITEM, item);
-        item.getDescription().ifPresent(d -> setDescription(String.format("%s уходит в рюкзак.", capitalize(d))));
+        item.getDescription().ifPresent(d -> setDescription(String.format("Вы кладёте %s в рюкзак.", capitalize(d))));
     }
 
     @Override
