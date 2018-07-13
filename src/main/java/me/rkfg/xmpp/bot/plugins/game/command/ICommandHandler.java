@@ -13,7 +13,7 @@ public interface ICommandHandler {
     Optional<String> exec(IPlayer player, Stream<String> args);
 
     default Optional<String> getHelp() {
-        return Optional.empty();
+        return Optional.of("Нет справки по этой команде.");
     }
 
     default boolean deadAllowed() {
