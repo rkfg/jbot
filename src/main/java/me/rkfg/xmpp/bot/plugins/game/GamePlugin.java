@@ -18,6 +18,7 @@ import me.rkfg.xmpp.bot.plugins.game.command.AmbushCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.AttackCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.DefaultCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.DescribeCommand;
+import me.rkfg.xmpp.bot.plugins.game.command.DropItemCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.EquipCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.HideCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.ICommandHandler;
@@ -104,6 +105,7 @@ public class GamePlugin extends CommandPlugin {
         registerHandler(new DescribeCommand());
         registerHandler(new ParticipatingCommand());
         registerHandler(new ReadyCommand());
+        registerHandler(new DropItemCommand());
         registerHandler(new ManCommand(handlers));
     }
 
