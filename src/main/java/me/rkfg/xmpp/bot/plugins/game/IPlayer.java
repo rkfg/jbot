@@ -5,6 +5,7 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 import java.util.List;
 import java.util.Optional;
 
+import me.rkfg.xmpp.bot.plugins.game.event.ItemPickupEvent;
 import me.rkfg.xmpp.bot.plugins.game.item.IArmor;
 import me.rkfg.xmpp.bot.plugins.game.item.IItem;
 import me.rkfg.xmpp.bot.plugins.game.item.ISlot;
@@ -49,7 +50,9 @@ public interface IPlayer extends IGameObject, IHasStats {
 
     boolean enqueueUnequipItem(TypedAttribute<ISlot> slot);
 
-    boolean enqueuePickup(IItem item);
+    default boolean enqueuePickup(IItem item) {
+        return enqueueEvent(new ItemPickupEvent(item));
+    }
 
     GamePlayerState getState();
 

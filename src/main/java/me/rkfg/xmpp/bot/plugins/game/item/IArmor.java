@@ -5,7 +5,9 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 import java.util.Optional;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
+import me.rkfg.xmpp.bot.plugins.game.World;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
+import me.rkfg.xmpp.bot.plugins.game.repository.IContentRepository;
 
 public interface IArmor extends IStatsItem {
     @Override
@@ -34,9 +36,14 @@ public interface IArmor extends IStatsItem {
     default String getStatsStr() {
         return String.format(" З:%d/Б:%d [б]", getDefence(), getProtection());
     }
-    
+
     @Override
     default Type getItemType() {
         return Type.ARMOR;
+    }
+
+    @Override
+    default Optional<IContentRepository> getContentRepository() {
+        return Optional.of(World.THIS.getArmorRepository());
     }
 }

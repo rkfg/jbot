@@ -38,28 +38,7 @@ public class SearchEvent extends AbstractEvent {
             if (diff > 20) {
                 tier = 4;
             }
-            Optional<? extends IItem> found = Optional.empty();
-            while (tier > 0 && !found.isPresent()) {
-                int type = Utils.dice("1d3");
-                Optional<IObjectRepository<? extends IItem>> repo = Optional.empty();
-                switch (type) {
-                case 1:
-                    repo = Optional.of(World.THIS.getWeaponRepository());
-                    break;
-                case 2:
-                    repo = Optional.of(World.THIS.getArmorRepository());
-                    break;
-                case 3:
-                    repo = Optional.of(World.THIS.getUsableRepository());
-                    break;
-                default:
-                    return Optional.empty();
-                }
-                final int t = tier;
-                found = repo.flatMap(r -> r.getRandomObjectByTier(t));
-                tier--;
-            }
-            return found;
+            return getRandomItem(tier);
         });
         result.ifPresent(f -> {
             getTarget().log(String.format("Вы нашли %s: %s", unboxString(f.getFittingSlot().map(TypedAttribute::getAccusativeName)),
@@ -69,5 +48,30 @@ public class SearchEvent extends AbstractEvent {
         if (!result.isPresent()) {
             getTarget().log("Вы не смогли обнаружить ничего полезного.");
         }
+    }
+
+    public static Optional<? extends IItem> getRandomItem(int tier) {
+        Optional<? extends IItem> found = Optional.empty();
+        while (tier > 0 && !found.isPresent()) {
+            int type = Utils.dice("1d3");
+            Optional<IObjectRepository<? extends IItem>> repo;
+            switch (type) {
+            case 1:
+                repo = Optional.of(World.THIS.getWeaponRepository());
+                break;
+            case 2:
+                repo = Optional.of(World.THIS.getArmorRepository());
+                break;
+            case 3:
+                repo = Optional.of(World.THIS.getUsableRepository());
+                break;
+            default:
+                return Optional.empty();
+            }
+            final int t = tier;
+            found = repo.flatMap(r -> r.getRandomObjectByTier(t));
+            tier--;
+        }
+        return found;
     }
 }

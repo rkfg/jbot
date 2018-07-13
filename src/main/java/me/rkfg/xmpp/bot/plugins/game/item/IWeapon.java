@@ -5,7 +5,9 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 import java.util.Optional;
 
 import me.rkfg.xmpp.bot.plugins.game.IGameObject;
+import me.rkfg.xmpp.bot.plugins.game.World;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
+import me.rkfg.xmpp.bot.plugins.game.repository.IContentRepository;
 
 public interface IWeapon extends IStatsItem {
 
@@ -39,9 +41,15 @@ public interface IWeapon extends IStatsItem {
     default String getStatsStr() {
         return String.format(" А:%d/З:%d/С:%d [о]", getAttack(), getDefence(), getStrength());
     }
-    
+
     @Override
     default Type getItemType() {
         return Type.WEAPON;
     }
+
+    @Override
+    default Optional<IContentRepository> getContentRepository() {
+        return Optional.of(World.THIS.getWeaponRepository());
+    }
+
 }

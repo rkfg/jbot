@@ -21,7 +21,6 @@ import me.rkfg.xmpp.bot.plugins.game.effect.LootEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.SearchFatigueEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.StaminaRegenEffect;
 import me.rkfg.xmpp.bot.plugins.game.event.EquipEvent;
-import me.rkfg.xmpp.bot.plugins.game.event.ItemPickupEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.UnequipEvent;
 import me.rkfg.xmpp.bot.plugins.game.exception.NotEquippableException;
 import me.rkfg.xmpp.bot.plugins.game.item.IArmor;
@@ -238,11 +237,6 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
             }
             return false;
         }).orElse(true);
-    }
-
-    @Override
-    public boolean enqueuePickup(IItem item) {
-        return enqueueEvent(new ItemPickupEvent(item));
     }
 
     @Override

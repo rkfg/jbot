@@ -10,6 +10,7 @@ import me.rkfg.xmpp.bot.plugins.game.effect.IEffect;
 import me.rkfg.xmpp.bot.plugins.game.misc.IHasAttributes;
 import me.rkfg.xmpp.bot.plugins.game.misc.IHasType;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
+import me.rkfg.xmpp.bot.plugins.game.repository.IContentRepository;
 
 public interface IItem extends IGameObject, IHasAttributes, IHasType {
 
@@ -57,6 +58,10 @@ public interface IItem extends IGameObject, IHasAttributes, IHasType {
 
     default Type getItemType() {
         return Type.NONE;
+    }
+
+    default Optional<IContentRepository> getContentRepository() {
+        return Optional.empty();
     }
 
 }
