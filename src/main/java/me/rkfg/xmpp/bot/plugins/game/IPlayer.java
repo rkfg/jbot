@@ -12,9 +12,10 @@ import me.rkfg.xmpp.bot.plugins.game.item.ISlot;
 import me.rkfg.xmpp.bot.plugins.game.item.IWeapon;
 import me.rkfg.xmpp.bot.plugins.game.misc.Attrs.GamePlayerState;
 import me.rkfg.xmpp.bot.plugins.game.misc.IHasStats;
+import me.rkfg.xmpp.bot.plugins.game.misc.IHasTraits;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 
-public interface IPlayer extends IGameObject, IHasStats {
+public interface IPlayer extends IGameObject, IHasStats, IHasTraits {
 
     boolean isAlive();
 

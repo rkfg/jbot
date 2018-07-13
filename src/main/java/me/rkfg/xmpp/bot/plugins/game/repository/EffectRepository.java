@@ -11,6 +11,9 @@ import me.rkfg.xmpp.bot.plugins.game.effect.IEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.NoGuardSleepEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.SleepEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.StatsEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.TraitEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.TraitStatsEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.item.AlcoEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.ChargeableEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.CursedEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.ItemStatEffect;
@@ -27,6 +30,7 @@ public class EffectRepository extends AbstractContentRepository<IEffect> {
 
     @Override
     public void loadContent() {
+        addEffect(AlcoEffect.class);
         addEffect(BleedEffect.class);
         addEffect(ChargeableEffect.class);
         addEffect(CursedEffect.class);
@@ -39,6 +43,8 @@ public class EffectRepository extends AbstractContentRepository<IEffect> {
         addEffect(RudeDrawEffect.class);
         addEffect(RudeDrawingsEffect.class);
         addEffect(SetEffect.class);
+        addEffect(TraitStatsEffect.class);
+        addEffect(TraitEffect.class);
     }
 
     private void addEffect(Class<? extends IEffect> clazz) {

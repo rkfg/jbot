@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 import me.rkfg.xmpp.bot.Main;
 import me.rkfg.xmpp.bot.message.Message;
-import me.rkfg.xmpp.bot.plugins.game.effect.StatsEffect;
+import me.rkfg.xmpp.bot.plugins.game.event.EquipEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.RenameEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
 import me.rkfg.xmpp.bot.plugins.game.misc.Attrs.GamePlayerState;
@@ -23,6 +23,7 @@ import me.rkfg.xmpp.bot.plugins.game.repository.ArmorRepository;
 import me.rkfg.xmpp.bot.plugins.game.repository.EffectRepository;
 import me.rkfg.xmpp.bot.plugins.game.repository.MessageRepository;
 import me.rkfg.xmpp.bot.plugins.game.repository.NameRepository;
+import me.rkfg.xmpp.bot.plugins.game.repository.TraitsRepository;
 import me.rkfg.xmpp.bot.plugins.game.repository.UsableRepository;
 import me.rkfg.xmpp.bot.plugins.game.repository.WeaponRepository;
 
@@ -38,6 +39,7 @@ public class World extends Player {
     private ArmorRepository armorRepository;
     private EffectRepository effectRepository;
     private UsableRepository usableRepository;
+    private TraitsRepository traitsRepository;
     private Timer timer;
 
     public World() {
@@ -59,6 +61,8 @@ public class World extends Player {
         armorRepository.loadContent();
         usableRepository = new UsableRepository();
         usableRepository.loadContent();
+        traitsRepository = new TraitsRepository();
+        traitsRepository.loadContent();
     }
 
     public void startTime() {
@@ -88,22 +92,16 @@ public class World extends Player {
 
     private void generateTraits(IPlayer player) {
         player.as(MUTABLEPLAYER_OBJ).ifPresent(IMutablePlayer::reset);
-        StatsEffect statsEffectFat = new StatsEffect("fat", "жиробасина");
-        statsEffectFat.setStatChange(ATK, 1);
-        statsEffectFat.setStatChange(DEF, -1);
-        StatsEffect statsEffectAlco = new StatsEffect("alcoholic", "алкашня");
-        statsEffectAlco.setStatChange(DEF, -1);
-        statsEffectAlco.setStatChange(PRT, -1);
-        player.enqueueAttachEffect(statsEffectFat);
-        player.enqueueAttachEffect(statsEffectAlco);
+        traitsRepository.getRandomObject().ifPresent(player::enqueueAttachEffect);
         weaponRepository.getObjectById("pen").ifPresent(player::enqueueEquipItem);
-        // weaponRepository.getRandomObjectByTier(1).ifPresent(w -> player.enqueueEvent(new EquipEvent(w)));
+        weaponRepository.getRandomObjectByTier(1).ifPresent(w -> player.enqueueEvent(new EquipEvent(w)));
         armorRepository.getRandomObjectByTier(1).ifPresent(player::enqueueEquipItem);
         weaponRepository.getObjectById("dildo").ifPresent(player::enqueuePickup);
         weaponRepository.getObjectById("lasersaw").ifPresent(player::enqueuePickup);
         usableRepository.getObjectById("bandage").ifPresent(player::enqueuePickup);
         usableRepository.getObjectById("speedhack").ifPresent(player::enqueuePickup);
         usableRepository.getObjectById("energycell").ifPresent(player::enqueuePickup);
+        usableRepository.getObjectById("vodka").ifPresent(player::enqueuePickup);
     }
 
     public void announce(String message) {
