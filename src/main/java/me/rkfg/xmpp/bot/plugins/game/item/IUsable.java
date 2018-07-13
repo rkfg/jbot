@@ -20,4 +20,9 @@ public interface IUsable extends IItem {
             return null;
         });
     }
+    
+    @Override
+    default Type getItemType() {
+        return Type.USABLE;
+    }
 }

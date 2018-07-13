@@ -12,6 +12,11 @@ import me.rkfg.xmpp.bot.plugins.game.misc.IHasType;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 
 public interface IItem extends IGameObject, IHasAttributes, IHasType {
+
+    public enum Type {
+        NONE, WEAPON, ARMOR, USABLE
+    }
+
     Optional<TypedAttribute<ISlot>> getFittingSlot();
 
     Optional<IGameObject> getOwner();
@@ -48,6 +53,10 @@ public interface IItem extends IGameObject, IHasAttributes, IHasType {
     default String describeEffects() {
         return listEffects().stream().filter(IEffect::isVisible).map(IEffect::getDescription).filter(Optional::isPresent).map(Optional::get)
                 .reduce(commaReducer).map(s -> " [" + s + "]").orElse("");
+    }
+
+    default Type getItemType() {
+        return Type.NONE;
     }
 
 }
