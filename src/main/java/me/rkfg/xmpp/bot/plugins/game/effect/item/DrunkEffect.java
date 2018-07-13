@@ -28,10 +28,12 @@ public class DrunkEffect extends StatsEffect implements ITemporaryEffect {
                 setStatChange(STR, 2 * c);
                 setStatChange(ATK, c);
                 setStatChange(DEF, -c);
+                p.log("Алкоголизм придаёт вам сил, но лишает рассудка.");
             } else {
                 setStatChange(ATK, -c);
                 setStatChange(DEF, -c);
                 target.enqueueEvent(new StatsEvent().setAttributeChain(HP, (int) Math.round(c * 1.5)));
+                p.log("Вы поправляете здоровье алкоголем. К несчастью, сражаться в таком состоянии будет сложнее.");
             }
         }));
         super.onBeforeAttach();
