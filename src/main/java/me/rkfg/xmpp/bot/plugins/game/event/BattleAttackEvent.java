@@ -27,18 +27,35 @@ public class BattleAttackEvent extends AbstractEvent {
             final Optional<IWeapon> atkWeapon = srcPlayer.getWeapon();
             final Optional<IWeapon> defWeapon = tgtPlayer.getWeapon();
             final Optional<IArmor> defArmor = tgtPlayer.getArmor();
-            final int attack = srcPlayer.getStat(ATK) + atkWeapon.map(IWeapon::getAttack).orElse(0) + Utils.drn();
+            Integer srcAtk = srcPlayer.getStat(ATK);
+            Integer srcWeaponAtk = atkWeapon.map(IWeapon::getAttack).orElse(0);
+            int srcDRN = Utils.drn();
+            final int attack = srcAtk + srcWeaponAtk + srcDRN;
             setAttribute(ATK, attack);
-            final int defence = tgtPlayer.getStat(DEF) + defWeapon.map(IWeapon::getDefence).orElse(0)
-                    + defArmor.map(IArmor::getDefence).orElse(0) + Utils.drn();
+            Integer tgtDef = tgtPlayer.getStat(DEF);
+            Integer tgtWeaponDef = defWeapon.map(IWeapon::getDefence).orElse(0);
+            Integer tgtArmorDef = defArmor.map(IArmor::getDefence).orElse(0);
+            int tgtDRN = Utils.drn();
+            final int defence = tgtDef + tgtWeaponDef + tgtArmorDef + tgtDRN;
             setAttribute(DEF, defence);
-            final int strength = srcPlayer.getStat(STR) + atkWeapon.map(IWeapon::getStrength).orElse(0) + Utils.drn();
+            Integer srcStr = srcPlayer.getStat(STR);
+            Integer srcWeaponStr = atkWeapon.map(IWeapon::getStrength).orElse(0);
+            int strDRN = Utils.drn();
+            final int strength = srcStr + srcWeaponStr + strDRN;
             setAttribute(STR, strength);
-            final int protection = tgtPlayer.getStat(PRT) + defArmor.map(IArmor::getProtection).orElse(0) + Utils.drn();
+            Integer tgtPrt = tgtPlayer.getStat(PRT);
+            Integer tgtArmorPrt = defArmor.map(IArmor::getProtection).orElse(0);
+            int prtDRN = Utils.drn();
+            final int protection = tgtPrt + tgtArmorPrt + prtDRN;
             setAttribute(PRT, protection);
             final int damage = Math.max(strength - protection, 0);
             setAttribute(SUCCESSFUL, attack > defence && damage > 0);
             setAttribute(HP, damage);
+            log.debug("Battle: {} ATK + {} WPNATK + {} DRN == {} vs {} DEF + {} WPNDEF + {} ARMDEF + {} DRN == {}", srcAtk, srcWeaponAtk,
+                    srcDRN, attack, tgtDef, tgtWeaponDef, tgtArmorDef, tgtDRN, defence);
+            log.debug("Battle success: {}, {} STR + {} WPNSTR + {} DRN == {} vs {} PRT + {} ARMPRT + {} DRN == {}, HP == {}",
+                    getAttribute(SUCCESSFUL).orElse(false), srcStr, srcWeaponStr, strDRN, strength, tgtPrt, tgtArmorPrt, prtDRN, protection,
+                    damage);
         } catch (RuntimeException e) {
             log.warn(e.getMessage());
         }
