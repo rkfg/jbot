@@ -10,7 +10,7 @@ public class HideFatigueEffect extends AbstractEffect implements IFatigueEffect 
 
     public HideFatigueEffect() {
         super(TYPE, "устаёт от скрытности");
-        initFatigue(6);
+        initFatigue(2);
     }
 
     @Override
