@@ -57,6 +57,9 @@ public class Attrs {
     public static final TypedAttribute<String> DESC_CNT = TypedAttribute.of("desccnt");
     public static final IndexPointer<String> DESC_IDX = IndexPointer.named("descidx");
 
+    public static final TypedAttribute<String> GROUP_ID = TypedAttribute.of("groupid");
+    public static final IndexPointer<String> GROUP_IDX = IndexPointer.named("groupidx");
+
     public static final TypedAttribute<String> DESC_V_CNT = TypedAttribute.of("descvcnt");
 
     public static final TypedAttribute<List<String>> EFFECT_PARAMS = TypedAttribute.of("effectparams");

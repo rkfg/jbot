@@ -28,20 +28,21 @@ public class TraitsRepository extends AbstractContentRepository<IEffect> impleme
     protected Optional<TypedAttributeMap> parse(String[] parts) {
         TypedAttributeMap result = new TypedAttributeMap();
         result.put(CONTENT_ID, parts[0]);
-        processEffects(result, parts[1]);
-        result.put(DESC_CNT, parts[2]);
-        result.put(DESC_V_CNT, parts[3]);
+        result.put(GROUP_ID, parts[1]);
+        processEffects(result, parts[2]);
+        result.put(DESC_CNT, parts[3]);
+        result.put(DESC_V_CNT, parts[4]);
         return Optional.of(result);
     }
 
     @Override
     protected int getMaxParts() {
-        return 4;
+        return 5;
     }
 
     @Override
     protected int getMinParts() {
-        return 4;
+        return 5;
     }
 
     @Override
