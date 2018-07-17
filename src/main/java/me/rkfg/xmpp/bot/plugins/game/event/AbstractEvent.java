@@ -58,7 +58,7 @@ public abstract class AbstractEvent implements IEvent {
     }
 
     @Override
-    public void setCancelled() {
+    public void cancel() {
         cancelled = true;
     }
 

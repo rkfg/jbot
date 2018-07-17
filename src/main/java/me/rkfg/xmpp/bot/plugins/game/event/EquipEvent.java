@@ -39,7 +39,7 @@ public class EquipEvent extends AbstractEvent {
                 p.enqueueEvent(new EquippedEvent());
             } catch (NotEquippableException e) {
                 target.log("Не удалось надеть %s: %s", desc, e.getMessage());
-                setCancelled();
+                cancel();
             }
         }));
     }

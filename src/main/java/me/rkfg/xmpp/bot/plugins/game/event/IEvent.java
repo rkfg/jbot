@@ -23,7 +23,7 @@ public interface IEvent extends IHasAttributes, IHasType, IHasDirection, IHasDes
         return matchByTypeAttr(EffectEvent.TYPE, EffectEvent.DETACH_EFFECT, effectType);
     }
 
-    public void setCancelled();
+    public void cancel();
 
     public boolean isCancelled();
 
