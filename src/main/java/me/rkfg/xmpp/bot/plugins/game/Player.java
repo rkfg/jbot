@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import me.rkfg.xmpp.bot.plugins.game.effect.AbstractEffectReceiver;
 import me.rkfg.xmpp.bot.plugins.game.effect.AmbushFatigueEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.BattleAuraEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.BattleFatigueEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.DeadEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.EquipRedirectorEffect;
@@ -267,6 +268,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
         enqueueAttachEffect(new StaminaRegenEffect());
         enqueueAttachEffect(new EquipRedirectorEffect());
         enqueueAttachEffect(new LootEffect());
+        enqueueAttachEffect(new BattleAuraEffect());
         setState(GamePlayerState.PLAYING);
     }
 
