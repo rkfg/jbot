@@ -47,7 +47,7 @@ public class TraitsRepository extends AbstractContentRepository<IEffect> impleme
 
     @Override
     protected void doIndex(TypedAttributeMap item) {
-        // no index required
+        indexAttr(item, GROUP_ID, GROUP_IDX);
     }
 
 }
