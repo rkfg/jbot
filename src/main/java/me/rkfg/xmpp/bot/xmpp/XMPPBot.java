@@ -30,7 +30,6 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.iqversion.packet.Version;
 import org.jivesoftware.smackx.muc.MultiUserChat;
-import org.jivesoftware.smackx.ping.PingFailedListener;
 import org.jivesoftware.smackx.ping.PingManager;
 import org.jxmpp.util.XmppStringUtils;
 import org.slf4j.Logger;
@@ -40,13 +39,11 @@ import me.rkfg.xmpp.bot.BotBase;
 import me.rkfg.xmpp.bot.Main;
 import me.rkfg.xmpp.bot.message.XMPPMessage;
 import me.rkfg.xmpp.bot.plugins.MessagePlugin;
-import ru.ppsrk.gwt.server.SettingsManager;
 
 public class XMPPBot extends BotBase {
 
     private Logger log = LoggerFactory.getLogger(Main.class);
     private MUCManager mucManager = new MUCManager();
-    private SettingsManager sm = SettingsManager.getInstance();
     private ExecutorService outgoingMsgsExecutor = Executors.newSingleThreadExecutor();
     private ExecutorService commandExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 4);
     private XMPPTCPConnection connection;
@@ -68,7 +65,7 @@ public class XMPPBot extends BotBase {
         connection.addConnectionListener(new AbstractConnectionListener() {
             @Override
             public void reconnectionSuccessful() {
-                log.warn("Reconnected, rejoining mucs.", org.apache.commons.lang3.StringUtils.join((Object[]) mucs, ", "));
+                log.warn("Reconnected, rejoining mucs: {}", org.apache.commons.lang3.StringUtils.join((Object[]) mucs, ", "));
                 try {
                     joinMUCs(connection, mucs);
                 } catch (NotConnectedException e) {
@@ -93,11 +90,8 @@ public class XMPPBot extends BotBase {
         });
         connect();
         ChatManager.setDefaultMatchMode(MatchMode.SUPPLIED_JID);
-        getChatManagerInstance().addChatListener((Chat chat, boolean createdLocally) -> {
-            chat.addMessageListener((Chat chat2, Message message) -> {
-                XMPPBot.this.processMessage(new ChatAdapterImpl(chat2), message);
-            });
-        });
+        getChatManagerInstance().addChatListener((Chat chat, boolean createdLocally) -> chat
+                .addMessageListener((Chat chat2, Message message) -> processMessage(new ChatAdapterImpl(chat2), message)));
         connection.addAsyncStanzaListener(new StanzaListener() {
 
             @Override
@@ -110,19 +104,13 @@ public class XMPPBot extends BotBase {
                 try {
                     connection.sendStanza(version);
                 } catch (NotConnectedException e) {
-                    e.printStackTrace();
+                    log.warn("{}", e);
                 }
             }
         }, new AndFilter(IQTypeFilter.GET, new StanzaTypeFilter(Version.class)));
         final PingManager pingManager = PingManager.getInstanceFor(connection);
         pingManager.setPingInterval(10);
-        pingManager.registerPingFailedListener(new PingFailedListener() {
-
-            @Override
-            public void pingFailed() {
-                pingManager.setPingInterval(10);
-            }
-        });
+        pingManager.registerPingFailedListener(() -> pingManager.setPingInterval(10));
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 Thread.sleep(1000);
@@ -139,7 +127,6 @@ public class XMPPBot extends BotBase {
             joinMUCs(connection, mucs);
         } catch (XMPPException | SmackException | IOException e) {
             log.warn("Connection error: ", e);
-            return;
         }
     }
 
@@ -179,8 +166,8 @@ public class XMPPBot extends BotBase {
                                 sendMessage(chat, StringEscapeUtils.unescapeHtml4(result));
                                 break;
                             }
-                        } catch (Throwable e) {
-                            e.printStackTrace();
+                        } catch (Exception e) {
+                            log.warn("{}", e);
                         }
                     }
                 }
@@ -189,20 +176,14 @@ public class XMPPBot extends BotBase {
     }
 
     public void sendMessage(final ChatAdapter chatAdapter, final String message) {
-        outgoingMsgsExecutor.execute(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    chatAdapter.sendMessage(message);
-                    Thread.sleep(1000);
-                } catch (XMPPException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                } catch (NotConnectedException e) {
-                    e.printStackTrace();
-                }
+        outgoingMsgsExecutor.execute(() -> {
+            try {
+                chatAdapter.sendMessage(message);
+                Thread.sleep(1000);
+            } catch (XMPPException | NotConnectedException e1) {
+                log.warn("{}", e1);
+            } catch (InterruptedException e2) {
+                Thread.currentThread().interrupt();
             }
         });
     }
