@@ -56,8 +56,13 @@ public class GamePlugin extends CommandPlugin {
             }
             Optional<IPlayer> player = World.THIS.getCurrentPlayer(message);
             List<String> argsf = args;
-            return player.map(p -> processCommand(argsf, p).orElse("Используйте %гм ман [команда] для получения справки"))
-                    .orElse("Игра уже идёт, и вы в ней не участвуете.");
+            if (!player.isPresent()) {
+                return "Игра уже идёт, и вы в ней не участвуете.";
+            }
+            return player.flatMap(p -> processCommand(argsf, p)).orElseGet(() -> {
+                World.THIS.sendLogs();
+                return null;
+            });
         }
     }
 
@@ -65,12 +70,12 @@ public class GamePlugin extends CommandPlugin {
         String cmd = args.stream().findFirst().map(String::toLowerCase).orElse("");
         ICommandHandler f = findHandler(handlers, cmd);
         if (!f.deadAllowed() && !player.isAlive() && World.THIS.getState() == GamePlayerState.PLAYING) {
-            return Optional.empty();
+            return Optional.of("Используйте %гм ман [команда] для получения справки");
         }
         if (World.THIS.getState() != GamePlayerState.PLAYING && !f.pregameAllowed()) {
             return Optional.of("Эта команда не разрешена вне игры.");
         }
-        return Optional.of(f.exec(player, args.stream().skip(1)).orElseGet(player::getLog));
+        return f.exec(player, args.stream().skip(1));
     }
 
     public static ICommandHandler findHandler(Map<String, ICommandHandler> handlers, String cmd) {

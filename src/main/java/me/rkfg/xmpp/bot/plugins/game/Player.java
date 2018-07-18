@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
+import me.rkfg.xmpp.bot.Main;
 import me.rkfg.xmpp.bot.plugins.game.effect.AbstractEffectReceiver;
 import me.rkfg.xmpp.bot.plugins.game.effect.AmbushFatigueEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.BattleAuraEffect;
@@ -138,6 +139,14 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
         }
         log.clear();
         return sb.toString();
+    }
+
+    @Override
+    public void sendLogs() {
+        final String logStr = getLog();
+        if (!logStr.isEmpty()) {
+            Main.INSTANCE.sendMessage(logStr, roomId);
+        }
     }
 
     @Override

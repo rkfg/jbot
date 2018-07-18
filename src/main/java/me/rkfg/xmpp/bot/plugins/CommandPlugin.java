@@ -33,9 +33,13 @@ public abstract class CommandPlugin extends MessagePluginImpl {
             if (matcher.group(REDIRECT_GROUP) != null) {
                 target = matcher.group(REDIRECT_GROUP);
             }
-            return message.getAppeal(target) + processCommand(message, matcher);
+            final String result = processCommand(message, matcher);
+            if (result == null || result.isEmpty()) {
+                return null;
+            }
+            return message.getAppeal(target) + result;
         } catch (final ClientAuthException e) {
-            e.printStackTrace();
+            log.warn("{}", e);
         } catch (final LogicException e) {
             log.warn("LogicError while processing command: ", e);
         }

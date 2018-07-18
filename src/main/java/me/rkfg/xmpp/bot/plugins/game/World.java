@@ -263,4 +263,9 @@ public class World extends Player {
         }
     }
 
+    @Override
+    public void sendLogs() {
+        players.values().stream().forEach(IPlayer::sendLogs);
+    }
+
 }
