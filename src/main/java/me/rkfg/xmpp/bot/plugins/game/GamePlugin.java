@@ -54,8 +54,10 @@ public class GamePlugin extends CommandPlugin {
             if (argsStr != null) {
                 args = Stream.of(argsStr.split(" ")).filter(c -> !c.isEmpty()).collect(Collectors.toList());
             }
-            IPlayer player = World.THIS.getCurrentPlayer(message);
-            return processCommand(args, player).orElse("Используйте %гм ман [команда] для получения справки");
+            Optional<IPlayer> player = World.THIS.getCurrentPlayer(message);
+            List<String> argsf = args;
+            return player.map(p -> processCommand(argsf, p).orElse("Используйте %гм ман [команда] для получения справки"))
+                    .orElse("Игра уже идёт, и вы в ней не участвуете.");
         }
     }
 

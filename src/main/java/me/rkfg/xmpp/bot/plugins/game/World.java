@@ -82,8 +82,13 @@ public class World extends Player {
         timer.cancel();
     }
 
-    public IPlayer getCurrentPlayer(Message message) {
-        return players.computeIfAbsent(message.getFrom(), Player::new);
+    public Optional<IPlayer> getCurrentPlayer(Message message) {
+        return Optional.ofNullable(players.computeIfAbsent(message.getFrom(), id -> {
+            if (getState() == GamePlayerState.PLAYING) {
+                return null;
+            }
+            return new Player(id, message.getFromRoom());
+        }));
     }
 
     public List<IPlayer> listPlayers() {
@@ -215,9 +220,7 @@ public class World extends Player {
                     break;
                 }
             });
-        } else if (getState() == GamePlayerState.PLAYING)
-
-        {
+        } else if (getState() == GamePlayerState.PLAYING) {
             if (player.getState() != GamePlayerState.PLAYING) {
                 return Optional.of("Игра уже идёт, дождитесь следующего раунда.");
             } else {
