@@ -59,6 +59,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
     private TypedAttributeMap stats = new TypedAttributeMap();
     private TypedAttributeMap equipment = new TypedAttributeMap();
     private String id;
+    private String roomId = "";
     private String name = UNNAMED;
     private List<IItem> backpack = new ArrayList<>();
 
@@ -280,5 +281,15 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
     @Override
     public GamePlayerState getState() {
         return getAttribute(READY).orElse(GamePlayerState.NONE);
+    }
+
+    @Override
+    public void setRoomId(String roomId) {
+        this.roomId = roomId;
+    }
+
+    @Override
+    public String getRoomId() {
+        return roomId;
     }
 }

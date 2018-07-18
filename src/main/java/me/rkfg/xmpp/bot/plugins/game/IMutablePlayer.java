@@ -10,6 +10,8 @@ public interface IMutablePlayer extends IPlayer {
     void setId(String id);
 
     void setName(String name);
+    
+    void setRoomId(String roomId);
 
     void setDead(boolean dead);
 

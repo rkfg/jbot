@@ -83,12 +83,16 @@ public class World extends Player {
     }
 
     public Optional<IPlayer> getCurrentPlayer(Message message) {
-        return Optional.ofNullable(players.computeIfAbsent(message.getFrom(), id -> {
+        final Optional<IPlayer> player = Optional.ofNullable(players.computeIfAbsent(message.getFrom(), id -> {
             if (getState() == GamePlayerState.PLAYING) {
                 return null;
             }
-            return new Player(id, message.getFromRoom());
+            return new Player(id);
         }));
+        player.flatMap(p -> p.as(MUTABLEPLAYER_OBJ)).ifPresent(p -> {
+            p.setRoomId(message.getFromRoom());
+        });
+        return player;
     }
 
     public List<IPlayer> listPlayers() {
@@ -236,8 +240,7 @@ public class World extends Player {
             GamePlayerState r = e.getValue().getState();
             return r != GamePlayerState.READY && r != GamePlayerState.GATHER;
         }); // remove non-participating players
-        players.keySet().stream().flatMap(u -> Main.INSTANCE.getRoomsWithUser(u).stream()).distinct().filter(Main.INSTANCE::isDirectChat)
-                .forEach(roomId -> Main.INSTANCE.sendMessage("Игра начинается!", roomId));
+        players.values().stream().forEach(p -> Main.INSTANCE.sendMessage("Игра начинается!", p.getRoomId()));
         initPlayers();
         startTime();
     }

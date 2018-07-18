@@ -21,6 +21,8 @@ public interface IPlayer extends IGameObject, IHasStats, IHasTraits {
 
     String getId();
 
+    String getRoomId();
+
     String getName();
 
     void dumpStats();
