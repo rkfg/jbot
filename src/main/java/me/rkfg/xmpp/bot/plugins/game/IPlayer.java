@@ -59,6 +59,6 @@ public interface IPlayer extends IGameObject, IHasStats, IHasTraits {
 
     GamePlayerState getState();
 
-    void sendLogs();
+    void flushLogs();
 
 }

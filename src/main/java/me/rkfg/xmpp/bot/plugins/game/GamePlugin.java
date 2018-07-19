@@ -60,7 +60,7 @@ public class GamePlugin extends CommandPlugin {
                 return "Игра уже идёт, и вы в ней не участвуете.";
             }
             return player.flatMap(p -> processCommand(argsf, p)).orElseGet(() -> {
-                World.THIS.sendLogs();
+                World.THIS.flushLogs();
                 return null;
             });
         }

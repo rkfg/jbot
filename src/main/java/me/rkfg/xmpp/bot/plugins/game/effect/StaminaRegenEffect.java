@@ -36,7 +36,10 @@ public class StaminaRegenEffect extends AbstractEffect {
             int wired = p.getStat(STM) + drn();
             if (tired > wired) {
                 LoggerFactory.getLogger(getClass()).debug("{} stamina+++", p.getId());
-                return singleEvent(new StatsEvent().setAttributeChain(STM, getAttribute(REGEN).orElse(0)));
+                int regen = getAttribute(REGEN).orElse(0);
+                p.log("+%d энергии, итого %d", regen, p.getStat(STM) + regen);
+                p.flushLogs();
+                return singleEvent(new StatsEvent().setAttributeChain(STM, regen));
             } else {
                 LoggerFactory.getLogger(getClass()).debug("{} 0 stamina", p.getId());
                 return null;

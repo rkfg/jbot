@@ -142,7 +142,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
     }
 
     @Override
-    public void sendLogs() {
+    public void flushLogs() {
         final String logStr = getLog();
         if (!logStr.isEmpty()) {
             Main.INSTANCE.sendMessage(logStr, roomId);
