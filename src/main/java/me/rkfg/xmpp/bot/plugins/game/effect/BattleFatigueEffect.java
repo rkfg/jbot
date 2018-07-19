@@ -23,7 +23,7 @@ public class BattleFatigueEffect extends AbstractEffect implements IFatigueEffec
     @Override
     public Collection<IEvent> processEvent(IEvent event) {
         return processFatigue(event, "Вы слишком устали, чтобы сражаться.",
-                e -> e.isOfType(BattleInviteEvent.TYPE) && e.matchAttributeValue(FAIR, true));
+                e -> e.isOfType(BattleInviteEvent.TYPE) && e.matchAttributeValue(FAIR, true) && e.getSource() == target);
     }
 
 }
