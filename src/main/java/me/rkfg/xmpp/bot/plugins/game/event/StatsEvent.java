@@ -24,9 +24,6 @@ public class StatsEvent extends AbstractEvent {
                 if (item.getStat(HP) < 1) {
                     target.as(MUTABLEPLAYER_OBJ).ifPresent(p -> p.setDead(true));
                 }
-                if (item.getStat(STM) > 30) {
-                    item.changeStat(STM, Math.min(30 - item.getStat(STM), 0), true);
-                }
             }));
         }
     }
