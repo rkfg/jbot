@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import me.rkfg.xmpp.bot.Main;
 import me.rkfg.xmpp.bot.message.Message;
 import me.rkfg.xmpp.bot.plugins.game.event.RenameEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
@@ -236,7 +235,7 @@ public class World extends Player {
             GamePlayerState r = e.getValue().getState();
             return r != GamePlayerState.READY && r != GamePlayerState.GATHER;
         }); // remove non-participating players
-        players.values().stream().forEach(p -> Main.INSTANCE.sendMessage("Игра начинается!", p.getRoomId()));
+        players.values().stream().forEach(p -> p.log("Игра начинается!"));
         initPlayers();
         startTime();
     }
