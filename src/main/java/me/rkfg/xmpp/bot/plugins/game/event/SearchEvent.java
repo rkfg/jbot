@@ -30,14 +30,16 @@ public class SearchEvent extends AbstractEvent {
                 return;
             }
             result.ifPresent(item -> {
-                getTarget().log(String.format("Вы нашли %s: %s", unboxString(item.getFittingSlot().map(TypedAttribute::getAccusativeName)),
-                        unboxString(item.getDescription())));
                 final Optional<ISlot> slot = item.getFittingSlot().flatMap(p::getSlot);
                 Optional<IItem> slotItem = slot.flatMap(ISlot::getItem);
+                final String slotName = unboxString(item.getFittingSlot().map(TypedAttribute::getAccusativeName));
+                final String itemDesc = unboxString(item.getDescription());
                 if (!slot.isPresent() || slotItem.isPresent()) {
                     p.enqueueEvent(new ItemPickupEvent(item));
+                    p.log("Вы нашли %s: %s [№%d в рюкзаке]", slotName, itemDesc, p.getBackpack().size());
                 } else {
                     p.enqueueEquipItem(item);
+                    p.log("Вы нашли %s: %s", slotName, itemDesc);
                 }
             });
         });
