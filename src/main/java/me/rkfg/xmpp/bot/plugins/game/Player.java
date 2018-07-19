@@ -301,4 +301,19 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
     public String getRoomId() {
         return roomId;
     }
+
+    @Override
+    public Optional<String> getDescription() {
+        Optional<String> description = listEffects().stream().map(e -> capitalize(e.getDescription(Verbosity.VERBOSE).orElse(""))).filter(s -> !s.isEmpty())
+                .reduce((a, s) -> {
+                    if (a.endsWith(".")) {
+                        return a + " " + s;
+                    }
+                    return a + ". " + s;
+                });
+        if (!description.isPresent()) {
+            return Optional.of("Об этом персонаже нельзя сказать ничего особенного.");
+        }
+        return description;
+    }
 }

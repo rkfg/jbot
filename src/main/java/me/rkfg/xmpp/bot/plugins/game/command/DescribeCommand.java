@@ -29,6 +29,8 @@ public class DescribeCommand implements ICommandHandler, IUsesBackpack {
                     return describeItem(player, player.getWeapon(), "У вас в руках ничего нет.");
                 } else if ("б".equals(a)) {
                     return describeItem(player, player.getArmor(), "На вас не надето никакой брони.");
+                } else if ("с".equals(a)) {
+                    return player.getDescription();
                 }
                 return getHelp();
             }
@@ -47,7 +49,8 @@ public class DescribeCommand implements ICommandHandler, IUsesBackpack {
 
     @Override
     public Optional<String> getHelp() {
-        return Optional.of("Получить описание предмета в рюкзаке (укажите номер), оружия в руках (буква о) или надетой брони (буква б).");
+        return Optional.of(
+                "Получить описание предмета в рюкзаке (укажите номер), оружия в руках (буква о), надетой брони (буква б) или самого себя (буква с).");
     }
 
 }
