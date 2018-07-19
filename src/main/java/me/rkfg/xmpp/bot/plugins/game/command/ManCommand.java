@@ -42,4 +42,9 @@ public class ManCommand implements ICommandHandler {
         return true;
     }
 
+    @Override
+    public boolean deadAllowed() {
+        return true;
+    }
+
 }
