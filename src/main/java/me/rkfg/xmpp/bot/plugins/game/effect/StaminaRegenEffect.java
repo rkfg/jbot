@@ -32,6 +32,9 @@ public class StaminaRegenEffect extends AbstractEffect {
             return super.processEvent(event);
         }
         return target.as(PLAYER_OBJ).map(p -> {
+            if (!p.isAlive()) {
+                return null;
+            }
             int tired = p.getStat(HP) / 2 + drn();
             int wired = p.getStat(STM) + drn();
             if (tired > wired) {
