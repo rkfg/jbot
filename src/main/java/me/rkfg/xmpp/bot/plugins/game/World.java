@@ -1,6 +1,7 @@
 package me.rkfg.xmpp.bot.plugins.game;
 
 import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
+import static me.rkfg.xmpp.bot.plugins.game.misc.Utils.*;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,10 +13,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import me.rkfg.xmpp.bot.Main;
 import me.rkfg.xmpp.bot.message.Message;
-import me.rkfg.xmpp.bot.plugins.game.event.EquipEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.RenameEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
 import me.rkfg.xmpp.bot.plugins.game.misc.Attrs.GamePlayerState;
@@ -101,16 +102,11 @@ public class World extends Player {
 
     private void generateTraits(IPlayer player) {
         player.as(MUTABLEPLAYER_OBJ).ifPresent(IMutablePlayer::reset);
-        traitsRepository.getRandomObject().ifPresent(player::enqueueAttachEffect);
-        weaponRepository.getObjectById("pen").ifPresent(player::enqueueEquipItem);
-        weaponRepository.getRandomObjectByTier(1).ifPresent(w -> player.enqueueEvent(new EquipEvent(w)));
-        armorRepository.getRandomObjectByTier(1).ifPresent(player::enqueueEquipItem);
-        weaponRepository.getObjectById("dildo").ifPresent(player::enqueuePickup);
-        weaponRepository.getObjectById("lasersaw").ifPresent(player::enqueuePickup);
-        usableRepository.getObjectById("bandage").ifPresent(player::enqueuePickup);
-        usableRepository.getObjectById("speedhack").ifPresent(player::enqueuePickup);
-        usableRepository.getObjectById("energycell").ifPresent(player::enqueuePickup);
-        usableRepository.getObjectById("vodka").ifPresent(player::enqueuePickup);
+        Stream.of("const", "mental", "addict").forEach(s -> {
+            if (dice("1d6") < 5) {
+                traitsRepository.getRandomObject(GROUP_IDX, s).ifPresent(player::enqueueAttachEffect);
+            }
+        });
     }
 
     public void announce(String message) {
