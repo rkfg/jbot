@@ -29,6 +29,7 @@ import me.rkfg.xmpp.bot.plugins.game.repository.WeaponRepository;
 
 public class World extends Player {
 
+    private static final int TICKRATE = 15;
     public static final World THIS = new World();
     private Map<String, IPlayer> players = new HashMap<>();
     private NameRepository nameRepository;
@@ -75,7 +76,7 @@ public class World extends Player {
                     players.values().forEach(p -> p.enqueueEvent(new TickEvent()));
                 }
             }
-        }, TimeUnit.SECONDS.toMillis(5), TimeUnit.SECONDS.toMillis(5));
+        }, TimeUnit.SECONDS.toMillis(TICKRATE), TimeUnit.SECONDS.toMillis(TICKRATE));
     }
 
     private void stopTime() {
