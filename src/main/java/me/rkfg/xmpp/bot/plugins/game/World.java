@@ -254,6 +254,8 @@ public class World extends Player {
             IPlayer player = entry.getValue();
             generateTraits(player);
             player.enqueueEvent(new RenameEvent(name));
+            player.getDescription().ifPresent(player::log);
+            player.dumpStats();
             pIdx++;
         }
     }
