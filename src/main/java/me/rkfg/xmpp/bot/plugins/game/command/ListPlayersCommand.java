@@ -35,5 +35,10 @@ public class ListPlayersCommand implements ICommandHandler {
     public Collection<String> getCommand() {
         return Arrays.asList("игроки");
     }
+    
+    @Override
+    public boolean deadAllowed() {
+        return true;
+    }
 
 }
