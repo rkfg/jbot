@@ -24,7 +24,10 @@ public class AttackCommand implements ICommandHandler {
             IPlayer defender = getFirstIntegerArg(args).filter(v -> v > 0 && v <= playersList.size()).map(i -> playersList.get(i - 1))
                     .orElseThrow(NumberFormatException::new);
             if (defender == attacker) {
-                return Optional.of("нельзя атаковать себя");
+                return Optional.of("нельзя атаковать себя.");
+            }
+            if (!defender.isAlive()) {
+                return Optional.of(defender.getName() + " мёртв.");
             }
             attacker.enqueueEvent(new BattleEvent(attacker, defender));
         } catch (NumberFormatException e) {
