@@ -16,6 +16,8 @@ import me.rkfg.xmpp.bot.plugins.game.item.IItem;
 
 public class RebuildItemsCommand implements ICommandHandler, IUsesBackpack {
 
+    private static final int REBUILD_RETRIES = 10;
+
     @Override
     public Collection<String> getCommand() {
         return asList("пересобрать");
@@ -30,7 +32,21 @@ public class RebuildItemsCommand implements ICommandHandler, IUsesBackpack {
             }
             List<IItem> items = itemIdxs.stream().map(Integer::valueOf).map(i -> getBackpackItem(i, player)).collect(Collectors.toList());
             Integer resultTier = (int) (items.stream().mapToInt(this::getItemTier).average().orElse(0)) + items.size() / 3;
-            Optional<? extends IItem> randomItem = SearchEvent.getRandomItem(resultTier);
+            boolean retry = true;
+            int tries = REBUILD_RETRIES;
+            Optional<? extends IItem> randomItem = Optional.empty();
+            while (retry && tries > 0) {
+                randomItem = SearchEvent.getRandomItem(resultTier);
+                retry = randomItem.map(i -> {
+                    for (IItem item : items) {
+                        if (item.getType().equals(i.getType())) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }).orElse(false);
+                tries--;
+            }
             if (!randomItem.isPresent()) {
                 player.log("Вам не удалось собрать из этих предметов ничего полезного.");
             } else {
