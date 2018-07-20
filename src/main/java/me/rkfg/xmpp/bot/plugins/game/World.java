@@ -80,7 +80,9 @@ public class World extends Player {
     }
 
     private void stopTime() {
-        timer.cancel();
+        if (timer != null) {
+            timer.cancel();
+        }
     }
 
     public Optional<IPlayer> getCurrentPlayer(Message message) {
@@ -154,6 +156,10 @@ public class World extends Player {
 
     public UsableRepository getUsableRepository() {
         return usableRepository;
+    }
+
+    public TraitsRepository getTraitsRepository() {
+        return traitsRepository;
     }
 
     public void defaultCommand(IPlayer player) {
