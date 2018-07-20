@@ -50,6 +50,7 @@ public class SearchEvent extends AbstractEvent {
         int search = p.getStat(ATK) + p.getStat(DEF) + p.getStat(STM) + p.getStat(LCK) + Utils.drn();
         int territory = 30 + Utils.drn();
         int diff = search - territory;
+        log.debug("Search: {}, territory: {}, diff: {}", search, territory, diff);
         if (diff < 1) {
             return Optional.empty();
         }
@@ -63,6 +64,7 @@ public class SearchEvent extends AbstractEvent {
         if (diff > 20) {
             tier = 4;
         }
+        log.debug("Tier: {}", tier);
         return getRandomItem(tier);
     }
 
