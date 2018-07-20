@@ -8,8 +8,6 @@ import java.util.Optional;
 import me.rkfg.xmpp.bot.plugins.game.effect.BleedEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.DeadEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.IEffect;
-import me.rkfg.xmpp.bot.plugins.game.effect.NoGuardSleepEffect;
-import me.rkfg.xmpp.bot.plugins.game.effect.SleepEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.StatsEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.TraitEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.TraitStatsEffect;
@@ -36,8 +34,6 @@ public class EffectRepository extends AbstractContentRepository<IEffect> {
         addEffect(CursedEffect.class);
         addEffect(DeadEffect.class);
         addEffect(ItemStatEffect.class);
-        addEffect(NoGuardSleepEffect.class);
-        addEffect(SleepEffect.class);
         addEffect(StatsEffect.class);
         addEffect(RechargeEffect.class);
         addEffect(RudeDrawEffect.class);
