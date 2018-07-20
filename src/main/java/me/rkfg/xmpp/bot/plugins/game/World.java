@@ -79,7 +79,7 @@ public class World extends Player {
         }, TimeUnit.SECONDS.toMillis(TICKRATE), TimeUnit.SECONDS.toMillis(TICKRATE));
     }
 
-    private void stopTime() {
+    public void stopTime() {
         if (timer != null) {
             timer.cancel();
         }
@@ -265,6 +265,12 @@ public class World extends Player {
             player.dumpStats();
             pIdx++;
         }
+    }
+
+    @Override
+    public void reset() {
+        resetEffects();
+        players.clear();
     }
 
     @Override

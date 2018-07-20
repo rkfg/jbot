@@ -5,6 +5,7 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 import java.util.List;
 import java.util.Optional;
 
+import me.rkfg.xmpp.bot.plugins.game.effect.IAttachDetachEffect;
 import me.rkfg.xmpp.bot.plugins.game.event.ItemPickupEvent;
 import me.rkfg.xmpp.bot.plugins.game.item.IArmor;
 import me.rkfg.xmpp.bot.plugins.game.item.IItem;
@@ -15,7 +16,7 @@ import me.rkfg.xmpp.bot.plugins.game.misc.IHasStats;
 import me.rkfg.xmpp.bot.plugins.game.misc.IHasTraits;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 
-public interface IPlayer extends IGameObject, IHasStats, IHasTraits {
+public interface IPlayer extends IGameObject, IHasStats, IHasTraits, IAttachDetachEffect {
 
     boolean isAlive();
 
