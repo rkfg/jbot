@@ -38,7 +38,6 @@ public class TestGame {
 
     @BeforeAll
     static void initWorld() {
-        World.THIS.init();
         try {
             Field field = Main.class.getDeclaredField("INSTANCE");
             field.setAccessible(true);
@@ -49,6 +48,7 @@ public class TestGame {
         } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
             fail(e);
         }
+        World.THIS.init();
     }
 
     public void setRandom(List<Integer> numbers) {
