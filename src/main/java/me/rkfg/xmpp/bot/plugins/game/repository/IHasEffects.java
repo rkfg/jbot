@@ -67,8 +67,7 @@ public interface IHasEffects extends IContentRepository {
     }
 
     default <T extends IAttachDetachEffect> T attachEffects(T item, TypedAttributeMap content) {
-        content.get(EFFECTS).ifPresent(
-                fx -> fx.stream().map(this::instantiateEffect).filter(Optional::isPresent).map(Optional::get).forEach(item::attachEffect));
+        content.get(EFFECTS).ifPresent(fx -> fx.stream().map(this::instantiateEffect).forEach(e -> e.ifPresent(item::attachEffect)));
         return item;
     }
 

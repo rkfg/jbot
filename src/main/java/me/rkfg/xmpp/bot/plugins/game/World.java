@@ -127,8 +127,7 @@ public class World extends Player {
         }
         if (getState() == GamePlayerState.GATHER) {
             stopTime();
-            players.values().stream().map(p -> p.as(MUTABLEPLAYER_OBJ)).filter(Optional::isPresent).map(Optional::get)
-                    .forEach(p -> p.setState(GamePlayerState.NONE));
+            players.values().stream().map(p -> p.as(MUTABLEPLAYER_OBJ)).forEach(p -> p.ifPresent(pp -> pp.setState(GamePlayerState.NONE)));
         }
     }
 

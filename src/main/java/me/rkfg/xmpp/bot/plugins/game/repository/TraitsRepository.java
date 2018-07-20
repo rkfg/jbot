@@ -19,8 +19,7 @@ public class TraitsRepository extends AbstractContentRepository<IEffect> impleme
     public Optional<IEffect> contentToObject(TypedAttributeMap content) {
         StatsEffect result = new StatsEffect(content.get(CONTENT_ID).orElse(""), content.get(DESC_CNT).orElse(""));
         setObjectVerboseDescription(content, result);
-        content.get(EFFECTS).ifPresent(
-                fx -> fx.stream().map(this::instantiateEffect).filter(Optional::isPresent).map(Optional::get).forEach(result::addEffect));
+        content.get(EFFECTS).ifPresent(fx -> fx.stream().map(this::instantiateEffect).forEach(e -> e.ifPresent(result::addEffect)));
         return Optional.of(result);
     }
 
