@@ -47,6 +47,8 @@ public class BattleEvent extends AbstractEvent {
                 attacker.log("bend", keys, vals);
                 defender.log("bend", keys, vals);
             }
+            attacker.dumpStats();
+            defender.dumpStats();
         }));
     }
 
