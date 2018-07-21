@@ -352,13 +352,13 @@ public class TestGame {
         assertEquals(Optional.empty(), player1.getWeapon());
         useCommand.exec(player1, Stream.of("1")); // should fail as no weapon is equipped
         assertEquals(2, player1.getBackpack().size());
-        
+
         // check that charges aren't used and not applied to the weapon
         assertEquals(0, (int) player1.getBackpack().get(1).as(WEAPON_OBJ).flatMap(w -> w.getEffect(ChargeableEffect.TYPE))
                 .flatMap(e -> e.getAttribute(ChargeableEffect.CHARGES)).orElse(-1));
         assertTrue(player1.getBackpack().get(0).as(ITEM_OBJ).map(i -> i.hasEffect(RechargeEffect.TYPE)).orElse(false));
         assertEquals(1, (int) player1.getBackpack().get(0).as(ITEM_OBJ).flatMap(e -> e.getAttribute(USE_CNT)).orElse(-1));
-        
+
         // equip the weapon back and use the recharge
         new EquipCommand().exec(player1, Stream.of("2"));
         useCommand.exec(player1, Stream.of("1"));
@@ -373,7 +373,50 @@ public class TestGame {
         assertEquals(10, (int) player2.getStat(STM));
     }
 
-    private int getWeaponCharges(IMutablePlayer player) {
+    @Test
+    public void testItemSet() {
+        equipWeapon(player1, "console");
+        assertEquals(2, (int) player1.getWeapon().map(w -> w.getStat(ATK)).orElse(0));
+        setDRN(2, 3, 2, 2, 4, 2, 3, 2);
+        player1.enqueueEvent(new BattleEvent(player1, player2)); // should deduce 2 hp
+        assertEquals(29, (int) player1.getStat(HP));
+        assertEquals(28, (int) player2.getStat(HP));
+        assertEquals(5, (int) player1.getStat(STM));
+        assertEquals(10, (int) player2.getStat(STM));
+        equipArmor(player1, "cheats");
+        assertEquals(3, (int) player1.getWeapon().map(w -> w.getStat(ATK)).orElse(0));
+        assertEquals(5, (int) player1.getArmor().map(a -> a.getStat(DEF)).orElse(0));
+
+        // try set in battle
+        setDRN(2, 4, 2, 2, 7, 2, 3, 2);
+        player1.enqueueEvent(new BattleEvent(player1, player2));
+        assertEquals(29, (int) player1.getStat(HP));
+        assertEquals(26, (int) player2.getStat(HP));
+        assertEquals(0, (int) player1.getStat(STM));
+        assertEquals(10, (int) player2.getStat(STM));
+
+        player1.setAttribute(STM, 5);
+        setDRN(2, 4, 2, 2, 8, 2, 3, 2);
+        player1.enqueueEvent(new BattleEvent(player1, player2));
+        assertEquals(29, (int) player1.getStat(HP));
+        assertEquals(24, (int) player2.getStat(HP));
+        assertEquals(0, (int) player1.getStat(STM));
+        assertEquals(10, (int) player2.getStat(STM));
+
+        player1.enqueueUnequipItem(WEAPON_SLOT);
+        assertEquals(4, (int) player1.getArmor().map(a -> a.getStat(DEF)).orElse(0));
+        equipWeapon(player1, "console");
+        assertEquals(5, (int) player1.getArmor().map(a -> a.getStat(DEF)).orElse(0));
+        assertEquals(3, (int) player1.getWeapon().map(w -> w.getStat(ATK)).orElse(0));
+        player1.enqueueUnequipItem(ARMOR_SLOT);
+        assertEquals(2, (int) player1.getWeapon().map(w -> w.getStat(ATK)).orElse(0));
+    }
+
+    private void equipArmor(IPlayer player, String type) {
+        World.THIS.getArmorRepository().getObjectById(type).ifPresent(player::enqueueEquipItem);
+    }
+
+    private int getWeaponCharges(IPlayer player) {
         return player.getWeapon().flatMap(w -> w.getEffect(ChargeableEffect.TYPE)).flatMap(e -> e.getAttribute(ChargeableEffect.CHARGES))
                 .orElse(-1);
     }
