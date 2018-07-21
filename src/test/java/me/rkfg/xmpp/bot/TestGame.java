@@ -10,7 +10,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,12 +24,20 @@ import org.slf4j.LoggerFactory;
 
 import me.rkfg.xmpp.bot.message.MatrixMessage;
 import me.rkfg.xmpp.bot.plugins.game.IMutablePlayer;
+import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.World;
+import me.rkfg.xmpp.bot.plugins.game.command.EquipCommand;
+import me.rkfg.xmpp.bot.plugins.game.command.UnequipCommand;
+import me.rkfg.xmpp.bot.plugins.game.command.UseCommand;
 import me.rkfg.xmpp.bot.plugins.game.effect.AmbushEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.HideEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.item.ChargeableEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.item.RechargeEffect;
 import me.rkfg.xmpp.bot.plugins.game.event.BattleEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.RenameEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
+import me.rkfg.xmpp.bot.plugins.game.item.IItem;
+import me.rkfg.xmpp.bot.plugins.game.item.IWeapon;
 import me.rkfg.xmpp.bot.plugins.game.misc.Attrs.GamePlayerState;
 import me.rkfg.xmpp.bot.plugins.game.misc.Utils;
 
@@ -42,19 +52,23 @@ public class TestGame {
     private static Logger log = LoggerFactory.getLogger(TestGame.class);
     private static Random randomMock;
 
+    private static void setStaticField(Class<?> clazz, String fieldname, Object value)
+            throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+        Field field = clazz.getDeclaredField(fieldname);
+        field.setAccessible(true);
+        Field modifiers = Field.class.getDeclaredField("modifiers");
+        modifiers.setAccessible(true);
+        modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+        field.set(null, value);
+    }
+
     @BeforeAll
     static void initWorld() {
         try {
-            Field field = Main.class.getDeclaredField("INSTANCE");
-            field.setAccessible(true);
-            Field modifiers = Field.class.getDeclaredField("modifiers");
-            modifiers.setAccessible(true);
-            modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-            field.set(null, mock(IBot.class));
-            Field rndField = Utils.class.getDeclaredField("rnd");
-            rndField.setAccessible(true);
+            assertNotNull(World.THIS);
+            setStaticField(Main.class, "INSTANCE", mock(IBot.class));
             randomMock = Mockito.mock(Random.class);
-            rndField.set(null, randomMock);
+            setStaticField(Utils.class, "rnd", randomMock);
         } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
             fail(e);
         }
@@ -143,43 +157,100 @@ public class TestGame {
     }
 
     @Test
-    public void testVictory() {
-        setDRN(3, 2, 40, 2, 3, 2, 3, 2);
-        World.THIS.getWeaponRepository().getObjectById("ironrod").ifPresent(player2::enqueuePickup);
+    public void testWeapon() {
+        setDRN(2, 2, 2, 2, 2, 2, 2, 2);
+        equipWeapon(player1, "gauntlet");
+        assertEquals("gauntlet", player1.getWeapon().map(IWeapon::getType).orElseGet(() -> fail("no weapon")));
         player1.enqueueEvent(new BattleEvent(player1, player2));
         assertEquals(30, (int) player1.getStat(HP));
+        assertEquals(29, (int) player2.getStat(HP));
+        assertEquals(5, (int) player1.getStat(STM));
+        assertEquals(10, (int) player2.getStat(STM));
+    }
+
+    @Test
+    public void testWeapon2() {
+        setDRN(2, 2, 2, 2, 2, 2, 3, 2);
+        equipWeapon(player1, "ironrod");
+        assertEquals("ironrod", player1.getWeapon().map(IWeapon::getType).orElseGet(() -> fail("no weapon")));
+        player1.enqueueEvent(new BattleEvent(player1, player2));
+        assertEquals(29, (int) player1.getStat(HP));
+        assertEquals(28, (int) player2.getStat(HP));
+        assertEquals(5, (int) player1.getStat(STM));
+        assertEquals(10, (int) player2.getStat(STM));
+    }
+
+    @Test
+    public void testVictory() {
+        // only two players participate in this round
+        World.THIS.setState(GamePlayerState.GATHER);
+        World.THIS.setPlayerState(player3, GamePlayerState.NONE);
+        World.THIS.setPlayerState(player4, GamePlayerState.NONE);
+        World.THIS.setPlayerState(player5, GamePlayerState.NONE);
+        World.THIS.setPlayerState(player1, GamePlayerState.READY);
+        World.THIS.setPlayerState(player2, GamePlayerState.READY);
+        // check if the game has begun
+        assertEquals(GamePlayerState.PLAYING, World.THIS.getState());
+        World.THIS.stopTime();
+        setDRN(100, 2, 100, 2, 2, 100, 2, 100); // one-shot kill setup
+        Integer hp = player1.getStat(HP);
+        // to check for loot pickup, both backpack and equipped
+        equipWeapon(player2, "gauntlet");
+        pickupWeapon(player2, "ironrod");
+        player1.enqueueEvent(new BattleEvent(player1, player2));
+        assertEquals(hp, player1.getStat(HP));
         assertEquals(0, (int) player2.getStat(HP));
         assertEquals(5, (int) player1.getStat(STM));
         assertEquals(10, (int) player2.getStat(STM));
+        // check deaths
         assertTrue(player1.isAlive());
         assertFalse(player2.isAlive());
-        assertEquals(1, player1.getBackpack().size());
+        // check loot
+        final List<IItem> backpack = player1.getBackpack();
+        assertEquals(2, backpack.size());
+        assertTrue(backpack.stream().anyMatch(i -> i.getType().equals("ironrod")));
+        assertTrue(backpack.stream().anyMatch(i -> i.getType().equals("gauntlet")));
         assertEquals(0, player2.getBackpack().size());
+        // check for victory, the game mode should switch to gather
+        assertEquals(GamePlayerState.GATHER, World.THIS.getState());
     }
 
     @Test
     public void testHide() {
         setDRN(3, 3);
         player2.enqueueToggleEffect(new HideEffect());
+        assertTrue(player2.hasEffect(HideEffect.TYPE));
         assertEquals(8, (int) player2.getStat(STM));
         player1.enqueueEvent(new BattleEvent(player1, player2));
+        assertTrue(player2.hasEffect(HideEffect.TYPE));
+
+        player2.enqueueToggleEffect(new HideEffect());
+        assertFalse(player2.hasEffect(HideEffect.TYPE));
+        assertEquals(8, (int) player2.getStat(STM));
+
+        player2.enqueueToggleEffect(new HideEffect());
+        assertTrue(player2.hasEffect(HideEffect.TYPE));
+
         assertEquals(30, (int) player1.getStat(HP));
         assertEquals(30, (int) player2.getStat(HP));
         assertEquals(5, (int) player1.getStat(STM));
-        assertEquals(8, (int) player2.getStat(STM));
+        assertEquals(6, (int) player2.getStat(STM));
         setDRN(3, 4, 3, 2, 3, 2, 3, 2, 3, 2);
         player1.enqueueEvent(new BattleEvent(player1, player2));
+        assertFalse(player2.hasEffect(HideEffect.TYPE));
         assertEquals(29, (int) player1.getStat(HP));
         assertEquals(29, (int) player2.getStat(HP));
         assertEquals(0, (int) player1.getStat(STM));
-        assertEquals(8, (int) player2.getStat(STM));
+        assertEquals(6, (int) player2.getStat(STM));
     }
 
     @Test
     public void testAmbushFound() {
         setDRN(3, 3, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2);
         player2.enqueueToggleEffect(new AmbushEffect());
+        assertTrue(player2.hasEffect(AmbushEffect.TYPE));
         player1.enqueueEvent(new BattleEvent(player1, player2));
+        assertFalse(player2.hasEffect(AmbushEffect.TYPE));
         assertEquals(30, (int) player1.getStat(HP));
         assertEquals(29, (int) player2.getStat(HP));
     }
@@ -188,7 +259,9 @@ public class TestGame {
     public void testAmbushSuccess() {
         setDRN(4, 3, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2);
         player2.enqueueToggleEffect(new AmbushEffect());
+        assertTrue(player2.hasEffect(AmbushEffect.TYPE));
         player1.enqueueEvent(new BattleEvent(player1, player2));
+        assertFalse(player2.hasEffect(AmbushEffect.TYPE));
         assertEquals(29, (int) player1.getStat(HP));
         assertEquals(30, (int) player2.getStat(HP));
     }
@@ -223,8 +296,107 @@ public class TestGame {
         assertEquals(GamePlayerState.NONE, player5.getState());
     }
 
+    @Test
+    public void testWeaponSwap() {
+        setDRN(2, 2, 2, 2, 2, 2, 2, 2);
+        equipWeapon(player1, "gauntlet");
+        assertEquals("gauntlet", player1.getWeapon().map(IWeapon::getType).orElseGet(() -> fail("no weapon")));
+        equipWeapon(player1, "ironrod");
+        assertEquals("ironrod", player1.getWeapon().map(IWeapon::getType).orElseGet(() -> fail("no weapon")));
+        final List<IItem> backpack = player1.getBackpack();
+        assertEquals(1, backpack.size());
+        assertEquals("gauntlet", backpack.get(0).getType());
+    }
+
+    @Test
+    public void testRecharge() {
+        flushLogs();
+        pickupItem(player1, "doshirakbeef");
+        final UseCommand useCommand = new UseCommand();
+        useCommand.exec(player1, Stream.of("1"));
+        useCommand.exec(player1, Stream.of("1"));
+        assertEquals(20, (int) player1.getStat(STM));
+        setDRN(2, 3, 2, 4, 2, 2, 2, 2);
+        equipWeapon(player1, "lasersaw");
+        assertTrue(player1.getWeapon().map(w -> w.hasEffect(ChargeableEffect.TYPE)).orElse(false));
+        assertEquals(3, getWeaponCharges(player1));
+        player1.enqueueEvent(new BattleEvent(player1, player2));
+        setDRN(2, 3, 2, 4, 2, 2, 2, 2);
+        player1.enqueueEvent(new BattleEvent(player1, player2));
+        setDRN(2, 3, 2, 4, 2, 2, 2, 2);
+        player1.enqueueEvent(new BattleEvent(player1, player2));
+        assertEquals(30, (int) player1.getStat(HP));
+        assertEquals(27, (int) player2.getStat(HP));
+        assertEquals(5, (int) player1.getStat(STM));
+        assertEquals(10, (int) player2.getStat(STM));
+        assertEquals(0, getWeaponCharges(player1));
+        setDRN(2, 2, 2, 2, 2, 2, 2, 2);
+        player1.enqueueEvent(new BattleEvent(player1, player2)); // should deduce 1 hp when discharged
+        assertEquals(30, (int) player1.getStat(HP));
+        assertEquals(26, (int) player2.getStat(HP));
+        assertEquals(0, (int) player1.getStat(STM));
+        assertEquals(10, (int) player2.getStat(STM));
+
+        pickupItem(player1, "doshirakbeef");
+        useCommand.exec(player1, Stream.of("1"));
+        useCommand.exec(player1, Stream.of("1"));
+        assertEquals(10, (int) player1.getStat(STM));
+
+        // pickup recharge item, check if it disappears on use
+        pickupItem(player1, "energycell");
+        assertEquals(1, (int) player1.getBackpack().get(0).as(ITEM_OBJ).flatMap(e -> e.getAttribute(USE_CNT)).orElse(-1));
+
+        // unequip weapon and test if item use fails
+        new UnequipCommand().exec(player1, Stream.of("о"));
+        assertEquals(2, player1.getBackpack().size());
+        assertEquals(Optional.empty(), player1.getWeapon());
+        useCommand.exec(player1, Stream.of("1")); // should fail as no weapon is equipped
+        assertEquals(2, player1.getBackpack().size());
+        
+        // check that charges aren't used and not applied to the weapon
+        assertEquals(0, (int) player1.getBackpack().get(1).as(WEAPON_OBJ).flatMap(w -> w.getEffect(ChargeableEffect.TYPE))
+                .flatMap(e -> e.getAttribute(ChargeableEffect.CHARGES)).orElse(-1));
+        assertTrue(player1.getBackpack().get(0).as(ITEM_OBJ).map(i -> i.hasEffect(RechargeEffect.TYPE)).orElse(false));
+        assertEquals(1, (int) player1.getBackpack().get(0).as(ITEM_OBJ).flatMap(e -> e.getAttribute(USE_CNT)).orElse(-1));
+        
+        // equip the weapon back and use the recharge
+        new EquipCommand().exec(player1, Stream.of("2"));
+        useCommand.exec(player1, Stream.of("1"));
+        assertEquals(3, getWeaponCharges(player1));
+        assertEquals(0, player1.getBackpack().size());
+
+        setDRN(2, 2, 2, 2, 2, 2, 2, 2);
+        player1.enqueueEvent(new BattleEvent(player1, player2)); // should deduce 3 hp when charged
+        assertEquals(30, (int) player1.getStat(HP));
+        assertEquals(23, (int) player2.getStat(HP));
+        assertEquals(5, (int) player1.getStat(STM));
+        assertEquals(10, (int) player2.getStat(STM));
+    }
+
+    private int getWeaponCharges(IMutablePlayer player) {
+        return player.getWeapon().flatMap(w -> w.getEffect(ChargeableEffect.TYPE)).flatMap(e -> e.getAttribute(ChargeableEffect.CHARGES))
+                .orElse(-1);
+    }
+
+    private void flushLogs() {
+        player1.getLog();
+        player2.getLog();
+    }
+
     protected void dumpLogs() {
         log.info("Player 1 log: {}", player1.getLog());
         log.info("Player 2 log: {}", player2.getLog());
+    }
+
+    protected void pickupWeapon(IPlayer player, String type) {
+        World.THIS.getWeaponRepository().getObjectById(type).ifPresent(player::enqueuePickup);
+    }
+
+    private void pickupItem(IPlayer player, String type) {
+        World.THIS.getUsableRepository().getObjectById(type).ifPresent(player::enqueuePickup);
+    }
+
+    protected void equipWeapon(IPlayer player, String type) {
+        World.THIS.getWeaponRepository().getObjectById(type).ifPresent(player::enqueueEquipItem);
     }
 }
