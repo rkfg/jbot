@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
+import me.rkfg.xmpp.bot.plugins.game.effect.SpeechFatigueEffect;
 import me.rkfg.xmpp.bot.plugins.game.event.SpeechEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.SpeechEvent.Volume;
 
@@ -40,7 +41,7 @@ public class WhisperCommand implements ICommandHandler {
 
     @Override
     public Optional<String> getHelp() {
-        return Optional.of(
-                "прошептать что-нибудь другому игроку. Укажите номер игрока (см. %гм игроки) и далее текст сообщения. За каждые 50 символов снимется 1 энергия.");
+        return Optional.of("прошептать что-нибудь другому игроку. Укажите номер игрока (см. %гм игроки) и далее текст сообщения. За каждые "
+                + SpeechFatigueEffect.CHARS_PER_FATIGUE + " символов снимется 1 энергия.");
     }
 }

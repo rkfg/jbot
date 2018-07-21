@@ -13,6 +13,7 @@ public class SpeechFatigueEffect extends AbstractEffect implements IFatigueEffec
 
     public static final String TYPE = "speechfatigue";
     public static final TypedAttribute<Integer> WHISPER_FATIGUE = TypedAttribute.of("whisperfatigue");
+    public static final int CHARS_PER_FATIGUE = 100;
 
     public SpeechFatigueEffect() {
         super(TYPE, "усталость от ора");
@@ -30,7 +31,7 @@ public class SpeechFatigueEffect extends AbstractEffect implements IFatigueEffec
             msg += "орать";
         }
         msg += ". Попробуйте сообщение покороче или накопите энергию.";
-        int length = event.getAttribute(SpeechEvent.MESSAGE).map(String::length).orElse(0) / 50 + 1;
+        int length = event.getAttribute(SpeechEvent.MESSAGE).map(String::length).orElse(0) / CHARS_PER_FATIGUE + 1;
         return processFatigue(event, msg, e -> e.isOfType(SpeechEvent.TYPE), e -> e.getAttribute(SpeechEvent.VOLUME).flatMap(v -> {
             if (v == SpeechEvent.Volume.WHISPER) {
                 return getAttribute(WHISPER_FATIGUE);
