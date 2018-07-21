@@ -14,15 +14,15 @@ import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 public interface IGameObject extends IGameBase, IHasDescription {
 
     default boolean hasEffect(String type) {
-        return findEffect(type).isPresent();
+        return getEffect(type).isPresent();
     }
 
     boolean enqueueEvent(IEvent event);
 
-    Optional<IEffect> findEffect(String type);
+    Optional<IEffect> getEffect(String type);
 
     default <T> boolean hasMatchingEffect(String type, TypedAttribute<T> attr, T value) {
-        return findEffect(type).flatMap(e -> e.getAttribute(attr)).filter(v -> v.equals(value)).isPresent();
+        return getEffect(type).flatMap(e -> e.getAttribute(attr)).filter(v -> v.equals(value)).isPresent();
     }
 
     void enqueueEvents(Collection<IEvent> events);

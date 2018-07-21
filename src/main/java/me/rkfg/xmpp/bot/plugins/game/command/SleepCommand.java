@@ -29,7 +29,7 @@ public class SleepCommand implements ICommandHandler {
                 return getHelp();
             }
         } else {
-            return player.findEffect(SleepEffect.TYPE).map(
+            return player.getEffect(SleepEffect.TYPE).map(
                     e -> "Выбранный режим сна: " + e.getAttribute(SleepEffect.SLEEP_TYPE_ATTR).map(SleepType::getLocalized).orElse(""));
         }
         return Optional.empty();
