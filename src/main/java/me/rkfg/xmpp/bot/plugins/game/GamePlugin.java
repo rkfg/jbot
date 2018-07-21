@@ -72,7 +72,7 @@ public class GamePlugin extends CommandPlugin {
         String cmd = args.stream().findFirst().map(String::toLowerCase).orElse("");
         ICommandHandler f = findHandler(handlers, cmd);
         if (!f.deadAllowed() && !player.isAlive() && World.THIS.getState() == GamePlayerState.PLAYING) {
-            return Optional.of("Используйте %гм ман [команда] для получения справки");
+            return Optional.of("Эта команда сейчас не разрешена, так как вы умерли.");
         }
         if (World.THIS.getState() != GamePlayerState.PLAYING && !f.pregameAllowed()) {
             return Optional.of("Эта команда не разрешена вне игры.");
