@@ -11,7 +11,7 @@ import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.event.UseEvent;
 import me.rkfg.xmpp.bot.plugins.game.item.IItem;
 
-public class UseCommand implements ICommandHandler, IUsesBackpack {
+public class UseCommand implements ICommandHandler {
 
     @Override
     public Collection<String> getCommand() {

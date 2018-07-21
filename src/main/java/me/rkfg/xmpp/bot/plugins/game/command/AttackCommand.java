@@ -2,12 +2,10 @@ package me.rkfg.xmpp.bot.plugins.game.command;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
-import me.rkfg.xmpp.bot.plugins.game.World;
 import me.rkfg.xmpp.bot.plugins.game.event.BattleEvent;
 
 public class AttackCommand implements ICommandHandler {
@@ -20,9 +18,7 @@ public class AttackCommand implements ICommandHandler {
     @Override
     public Optional<String> exec(IPlayer attacker, Stream<String> args) {
         try {
-            List<IPlayer> playersList = World.THIS.listPlayers();
-            IPlayer defender = getFirstIntegerArg(args).filter(v -> v > 0 && v <= playersList.size()).map(i -> playersList.get(i - 1))
-                    .orElseThrow(NumberFormatException::new);
+            IPlayer defender = getPlayer(args);
             if (defender == attacker) {
                 return Optional.of("нельзя атаковать себя.");
             }

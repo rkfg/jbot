@@ -14,7 +14,7 @@ import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.event.SearchEvent;
 import me.rkfg.xmpp.bot.plugins.game.item.IItem;
 
-public class RebuildItemsCommand implements ICommandHandler, IUsesBackpack {
+public class RebuildItemsCommand implements ICommandHandler {
 
     private static final int REBUILD_RETRIES = 10;
 

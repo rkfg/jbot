@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.item.IItem;
 
-public class EquipCommand implements ICommandHandler, IUsesBackpack {
+public class EquipCommand implements ICommandHandler {
 
     @Override
     public Collection<String> getCommand() {

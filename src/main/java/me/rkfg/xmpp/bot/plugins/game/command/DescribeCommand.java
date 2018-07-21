@@ -11,7 +11,7 @@ import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.item.IItem;
 import me.rkfg.xmpp.bot.plugins.game.misc.IHasDescription.Verbosity;
 
-public class DescribeCommand implements ICommandHandler, IUsesBackpack {
+public class DescribeCommand implements ICommandHandler {
 
     @Override
     public Collection<String> getCommand() {
