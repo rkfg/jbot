@@ -39,6 +39,7 @@ public class HideEffect extends AbstractEffect implements IBattleEffect {
     @Override
     public void onAfterAttach() {
         target.log("Вы спрятались.");
+        target.enqueueDetachEffect(AmbushEffect.TYPE);
     }
 
     @Override

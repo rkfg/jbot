@@ -37,6 +37,7 @@ public class AmbushEffect extends AbstractEffect implements IBattleEffect {
     @Override
     public void onAfterAttach() {
         target.log("Вы засели в засаде.");
+        target.enqueueDetachEffect(HideEffect.TYPE);
     }
 
     @Override
