@@ -24,6 +24,10 @@ import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
 public class EffectRepository extends AbstractContentRepository<IEffect> {
 
+    public EffectRepository(String dataDir) {
+        super(dataDir);
+    }
+
     public static final TypedAttribute<Class<? extends IEffect>> EFFECT_CNT = TypedAttribute.of("effectcnt");
 
     @Override

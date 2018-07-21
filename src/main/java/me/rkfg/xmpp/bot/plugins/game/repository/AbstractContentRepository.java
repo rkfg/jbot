@@ -46,11 +46,16 @@ public abstract class AbstractContentRepository<O> implements IContentRepository
 
     // IndexPointer => (T => (set of conforming unique ids))
     protected TypedAttributeMap index = new TypedAttributeMap();
+    private String dataDir;
 
+    public AbstractContentRepository(String dataDir) {
+        this.dataDir = dataDir;
+    }
+    
     protected void loadContent(String filename) {
         int maxParts = getMaxParts();
         int minParts = getMinParts();
-        try (BufferedReader br = new BufferedReader(new FileReader("data" + File.separatorChar + filename))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(dataDir + File.separatorChar + filename))) {
             br.lines().filter(line -> !line.startsWith("#")).forEach(line -> {
                 String[] parts = line.split("\\|", maxParts);
                 if (parts.length >= minParts) {

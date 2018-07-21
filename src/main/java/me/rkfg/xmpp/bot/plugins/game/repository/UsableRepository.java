@@ -10,6 +10,10 @@ import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
 public class UsableRepository extends AbstractContentRepository<IUsable> implements IHasEffects {
 
+    public UsableRepository(String dataDir) {
+        super(dataDir);
+    }
+
     public class Usable extends AbstractItem implements IUsable {
 
         public Usable(TypedAttributeMap content) {

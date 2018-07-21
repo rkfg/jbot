@@ -10,6 +10,10 @@ import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
 public class ArmorRepository extends AbstractContentRepository<IArmor> implements IHasEffects {
 
+    public ArmorRepository(String dataDir) {
+        super(dataDir);
+    }
+
     public class Armor extends AbstractArmor {
 
         public Armor(TypedAttributeMap content) {

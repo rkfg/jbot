@@ -58,7 +58,7 @@ public class TestGame {
         } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
             fail(e);
         }
-        World.THIS.init();
+        World.THIS.init("data_test");
     }
 
     public void setRandom(Integer... numbers) {

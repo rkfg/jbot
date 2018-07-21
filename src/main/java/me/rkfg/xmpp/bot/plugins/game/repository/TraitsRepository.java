@@ -10,6 +10,10 @@ import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
 public class TraitsRepository extends AbstractContentRepository<IEffect> implements IHasEffects {
 
+    public TraitsRepository(String dataDir) {
+        super(dataDir);
+    }
+
     @Override
     public void loadContent() {
         loadContent("traits.txt");

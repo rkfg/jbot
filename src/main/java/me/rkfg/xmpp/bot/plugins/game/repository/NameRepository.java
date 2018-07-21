@@ -8,6 +8,10 @@ import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
 public class NameRepository extends AbstractContentRepository<String> {
 
+    public NameRepository(String dataDir) {
+        super(dataDir);
+    }
+
     private int counter = 1;
 
     @Override

@@ -40,7 +40,7 @@ public class GamePlugin extends CommandPlugin {
 
     @Override
     public void init() {
-        World.THIS.init();
+        World.THIS.init("data");
         setupHandlers();
     }
 

@@ -48,21 +48,21 @@ public class World extends Player {
         setState(GamePlayerState.GATHER);
     }
 
-    public void init() {
-        nameRepository = new NameRepository();
+    public void init(String dataDir) {
+        nameRepository = new NameRepository(dataDir);
         nameRepository.loadContent();
         names = nameRepository.getAllContent().stream().map(tm -> tm.get(DESC_CNT)).map(Optional::get).collect(Collectors.toList());
-        messageRepository = new MessageRepository();
+        messageRepository = new MessageRepository(dataDir);
         messageRepository.loadContent();
-        effectRepository = new EffectRepository();
+        effectRepository = new EffectRepository(dataDir);
         effectRepository.loadContent();
-        weaponRepository = new WeaponRepository();
+        weaponRepository = new WeaponRepository(dataDir);
         weaponRepository.loadContent();
-        armorRepository = new ArmorRepository();
+        armorRepository = new ArmorRepository(dataDir);
         armorRepository.loadContent();
-        usableRepository = new UsableRepository();
+        usableRepository = new UsableRepository(dataDir);
         usableRepository.loadContent();
-        traitsRepository = new TraitsRepository();
+        traitsRepository = new TraitsRepository(dataDir);
         traitsRepository.loadContent();
     }
 
