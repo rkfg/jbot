@@ -17,6 +17,7 @@ import me.rkfg.xmpp.bot.plugins.game.item.IItem;
 public class RebuildItemsCommand implements ICommandHandler {
 
     private static final int REBUILD_RETRIES = 10;
+    private static final int ITEMS_REQUIRED = 2;
 
     @Override
     public Collection<String> getCommand() {
@@ -27,11 +28,11 @@ public class RebuildItemsCommand implements ICommandHandler {
     public Optional<String> exec(IPlayer player, Stream<String> args) {
         List<String> itemIdxs = args.collect(Collectors.toList());
         try {
-            if (itemIdxs.size() < 3) {
+            if (itemIdxs.size() < ITEMS_REQUIRED) {
                 throw new NumberFormatException();
             }
             List<IItem> items = itemIdxs.stream().map(Integer::valueOf).map(i -> getBackpackItem(i, player)).collect(Collectors.toList());
-            Integer resultTier = (int) (items.stream().mapToInt(this::getItemTier).average().orElse(0)) + items.size() / 3;
+            Integer resultTier = (int) (items.stream().mapToInt(this::getItemTier).average().orElse(0)) + items.size() / ITEMS_REQUIRED;
             boolean retry = true;
             int tries = REBUILD_RETRIES;
             Optional<? extends IItem> randomItem = Optional.empty();
