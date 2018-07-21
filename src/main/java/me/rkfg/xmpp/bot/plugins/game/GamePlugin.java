@@ -32,6 +32,8 @@ import me.rkfg.xmpp.bot.plugins.game.command.SearchCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.UnequipCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.UnknownCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.UseCommand;
+import me.rkfg.xmpp.bot.plugins.game.command.WhisperCommand;
+import me.rkfg.xmpp.bot.plugins.game.command.YellCommand;
 import me.rkfg.xmpp.bot.plugins.game.misc.Attrs.GamePlayerState;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
@@ -113,6 +115,8 @@ public class GamePlugin extends CommandPlugin {
         registerHandler(new ReadyCommand());
         registerHandler(new DropItemCommand());
         registerHandler(new RebuildItemsCommand());
+        registerHandler(new WhisperCommand());
+        registerHandler(new YellCommand());
         registerHandler(new ManCommand(handlers));
     }
 
