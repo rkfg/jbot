@@ -115,8 +115,10 @@ public class World extends Player {
     }
 
     public void announce(String message) {
-        players.values().stream().filter(p -> p.getState() != GamePlayerState.NONE)
-                .forEach(p -> p.log("=== ОБЪЯВЛЕНИЕ: " + message + " ==="));
+        players.values().stream().filter(p -> p.getState() != GamePlayerState.NONE).forEach(p -> {
+            p.log("=== ОБЪЯВЛЕНИЕ: " + message + " ===");
+            p.flushLogs();
+        });
     }
 
     public void checkVictory() {
