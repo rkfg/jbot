@@ -70,7 +70,7 @@ public class TestGame extends TestBase {
 
     @Test
     public void testFat() {
-        World.THIS.getTraitsRepository().getObjectById("fat").ifPresent(player1::attachEffect);
+        applyTrait(player1, "fat");
         assertEquals(9, (int) player1.getStat(ATK));
         assertEquals(9, (int) player1.getStat(DEF));
         assertEquals(7, (int) player1.getStat(PRT));
@@ -78,7 +78,7 @@ public class TestGame extends TestBase {
 
     @Test
     public void testThin() {
-        World.THIS.getTraitsRepository().getObjectById("thin").ifPresent(player1::attachEffect);
+        applyTrait(player1, "thin");
         assertEquals(8, (int) player1.getStat(ATK));
         assertEquals(12, (int) player1.getStat(DEF));
         assertEquals(4, (int) player1.getStat(PRT));
@@ -99,12 +99,15 @@ public class TestGame extends TestBase {
     public void testWeapon() {
         setDRN(2, 2, 2, 2, 2, 2, 2, 2);
         equipWeapon(player1, W_GAUNTLET);
+        pickupItem(player2, U_ENERGYCELL);
         assertEquals(W_GAUNTLET, player1.getWeapon().map(IWeapon::getType).orElseGet(() -> fail("no weapon")));
         player1.enqueueEvent(new BattleEvent(player1, player2));
         assertEquals(30, (int) player1.getStat(HP));
         assertEquals(29, (int) player2.getStat(HP));
         assertEquals(5, (int) player1.getStat(STM));
         assertEquals(10, (int) player2.getStat(STM));
+        // check that looting wasn't triggered accidentally
+        assertEquals(0, (int) player1.getBackpack().size());
     }
 
     @Test

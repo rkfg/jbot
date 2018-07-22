@@ -22,19 +22,7 @@ public class LootEffect extends AbstractEffect implements IBattleEffect {
     }
 
     @Override
-    public Collection<IEvent> battleEnds(IEvent event) {
-        return withPlayers(event, (attacker, defender) -> {
-            if (!attacker.isAlive() && defender == target) { // I killed the attacker
-                loot(attacker);
-            }
-            if (!defender.isAlive() && attacker == target) { // I killed the defender
-                loot(defender);
-            }
-            return noEvent();
-        });
-    }
-
-    private void loot(IPlayer defeated) {
+    public Collection<IEvent> battleWon(IPlayer defeated) {
         // try to unequip everything before looting
         defeated.enqueueUnequipItem(WEAPON_SLOT);
         defeated.enqueueUnequipItem(ARMOR_SLOT);
@@ -47,6 +35,7 @@ public class LootEffect extends AbstractEffect implements IBattleEffect {
                 p.removeFromBackpack(i);
             });
         });
+        return noEvent();
     }
 
     @Override

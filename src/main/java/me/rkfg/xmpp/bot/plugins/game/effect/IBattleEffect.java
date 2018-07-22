@@ -39,10 +39,32 @@ public interface IBattleEffect extends IEffect {
         }
         if (event.isOfType(BattleEndsEvent.TYPE)) {
             result.addAll(battleEnds(event));
+            result.addAll(withPlayers(event, (attacker, defender) -> {
+                if (!attacker.isAlive() && defender == getTarget()) { // I killed the attacker
+                    return battleWon(attacker);
+                }
+                if (!defender.isAlive() && attacker == getTarget()) { // I killed the defender
+                    return battleWon(defender);
+                }
+                if (!attacker.isAlive() && attacker == getTarget()) { // I attacked and lost
+                    return battleLost(defender);
+                }
+                if (!defender.isAlive() && defender == getTarget()) { // I defended and lost
+                    return battleLost(attacker);
+                }
+                return noEvent();
+            }));
         }
         return result;
     }
 
+    default Collection<IEvent> battleLost(IPlayer defender) {
+        return noEvent();
+    }
+
+    default Collection<IEvent> battleWon(IPlayer defeated) {
+        return noEvent();
+    }
 
     default Collection<IEvent> battleInvite(IEvent event) {
         return noEvent();
