@@ -111,4 +111,7 @@ public class TestBase {
         World.THIS.getWeaponRepository().getObjectById(type).ifPresent(player::enqueueEquipItem);
     }
 
+    protected void applyTrait(IPlayer player, String type) {
+        World.THIS.getTraitsRepository().getObjectById(type).ifPresent(player::attachEffect);
+    }
 }

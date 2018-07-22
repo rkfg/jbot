@@ -22,7 +22,6 @@ import me.rkfg.xmpp.bot.plugins.game.effect.AmbushEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.HideEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.ChargeableEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.RechargeEffect;
-import me.rkfg.xmpp.bot.plugins.game.effect.trait.BazookaHandsEffect;
 import me.rkfg.xmpp.bot.plugins.game.event.BattleEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.RenameEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
@@ -350,6 +349,33 @@ public class TestGame extends TestBase {
         assertEquals(3, (int) player1.getWeapon().map(w -> w.getStat(ATK)).orElse(0));
         player1.enqueueUnequipItem(ARMOR_SLOT);
         assertEquals(2, (int) player1.getWeapon().map(w -> w.getStat(ATK)).orElse(0));
+    }
+
+    @Test
+    public void testBazookasNoWeapon() {
+        applyTrait(player1, "bazookahands");
+        assertEquals(10, (int) player1.getStat(ATK));
+        assertEquals(5, (int) player1.getStat(STR));
+        setDRN(2, 3, 2, 3, 3, 2, 2, 2);
+        player1.enqueueEvent(new BattleEvent(player1, player2));
+        assertEquals(29, (int) player1.getStat(HP));
+        assertEquals(29, (int) player2.getStat(HP));
+        assertEquals(10, (int) player1.getStat(ATK));
+        assertEquals(5, (int) player1.getStat(STR));
+    }
+
+    @Test
+    public void testBazookasWithWeapon() {
+        applyTrait(player1, "bazookahands");
+        equipWeapon(player1, W_GAUNTLET);
+        assertEquals(10, (int) player1.getStat(ATK));
+        assertEquals(5, (int) player1.getStat(STR));
+        setDRN(2, 3, 2, 3, 3, 2, 2, 2);
+        player1.enqueueEvent(new BattleEvent(player1, player2));
+        assertEquals(29, (int) player1.getStat(HP));
+        assertEquals(30, (int) player2.getStat(HP));
+        assertEquals(10, (int) player1.getStat(ATK));
+        assertEquals(5, (int) player1.getStat(STR));
     }
 
 }
