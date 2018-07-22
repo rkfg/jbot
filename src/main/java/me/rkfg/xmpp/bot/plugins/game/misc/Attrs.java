@@ -74,4 +74,5 @@ public class Attrs {
     public static final TypedAttribute<Boolean> SETEFFECTACTIVE = TypedAttribute.of("seteffectactive");
     public static final TypedAttribute<GamePlayerState> READY = TypedAttribute.of("ready");
     public static final TypedAttribute<Set<String>> TRAITS = TypedAttribute.of("traits");
+    public static final TypedAttribute<Integer> BONUS_POINTS = TypedAttribute.of("bonuspoints");
 }

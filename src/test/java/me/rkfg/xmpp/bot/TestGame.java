@@ -16,6 +16,7 @@ import org.mockito.Mockito;
 
 import me.rkfg.xmpp.bot.plugins.game.World;
 import me.rkfg.xmpp.bot.plugins.game.command.EquipCommand;
+import me.rkfg.xmpp.bot.plugins.game.command.SpendPointsCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.UnequipCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.UseCommand;
 import me.rkfg.xmpp.bot.plugins.game.effect.AmbushEffect;
@@ -379,6 +380,50 @@ public class TestGame extends TestBase {
         assertEquals(30, (int) player2.getStat(HP));
         assertEquals(10, (int) player1.getStat(ATK));
         assertEquals(5, (int) player1.getStat(STR));
+    }
+
+    @Test
+    public void testSpendBonusPoints() {
+        SpendPointsCommand command = new SpendPointsCommand();
+        defaultStats();
+        command.exec(player1, Stream.of("ааа", "зп", "п"));
+        defaultStats();
+        command.exec(player1, Stream.of(""));
+        defaultStats();
+        command.exec(player1, Stream.of("аа", "зп"));
+        assertEquals(2, (int) player1.getAttribute(BONUS_POINTS).orElse(-1));
+        assertEquals(12, (int) player1.getStat(ATK));
+        assertEquals(11, (int) player1.getStat(DEF));
+        assertEquals(5, (int) player1.getStat(STR));
+        assertEquals(5, (int) player1.getStat(PRT));
+        assertEquals(10, (int) player1.getStat(LCK));
+        assertEquals(30, (int) player1.getStat(HP));
+        assertEquals(10, (int) player1.getStat(STM));
+        command.exec(player1, Stream.of("с", "б"));
+        fullySpent();
+        command.exec(player1, Stream.of("с"));
+        fullySpent();
+    }
+
+    public void fullySpent() {
+        assertEquals(0, (int) player1.getAttribute(BONUS_POINTS).orElse(-1));
+        assertEquals(12, (int) player1.getStat(ATK));
+        assertEquals(11, (int) player1.getStat(DEF));
+        assertEquals(6, (int) player1.getStat(STR));
+        assertEquals(6, (int) player1.getStat(PRT));
+        assertEquals(10, (int) player1.getStat(LCK));
+        assertEquals(30, (int) player1.getStat(HP));
+        assertEquals(10, (int) player1.getStat(STM));
+    }
+
+    public void defaultStats() {
+        assertEquals(10, (int) player1.getStat(ATK));
+        assertEquals(10, (int) player1.getStat(DEF));
+        assertEquals(5, (int) player1.getStat(STR));
+        assertEquals(5, (int) player1.getStat(PRT));
+        assertEquals(10, (int) player1.getStat(LCK));
+        assertEquals(30, (int) player1.getStat(HP));
+        assertEquals(10, (int) player1.getStat(STM));
     }
 
 }

@@ -103,6 +103,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
             return attr.getName() + ": " + (modStat.equals(stat) ? stat : modStat + " (" + stat + ")");
         })).filter(Optional::isPresent).map(Optional::get).reduce(pipeReducer).orElse("нет стат");
         sb.append(statsStr);
+        stats.get(BONUS_POINTS).filter(p -> p > 0).ifPresent(p -> sb.append(" | Бонусные очки: ").append(p));
         final String effectsStr = listEffects().stream().filter(IEffect::isVisible)
                 .map(effect -> effect.getDescription().orElse(effect.getType())).reduce(pipeReducer).orElse("нет эффектов");
         sb.append("\nЭффекты: ").append(effectsStr);
@@ -270,6 +271,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
         stats.put(PRT, 5);
         stats.put(LCK, 10);
         stats.put(STM, 10);
+        stats.put(BONUS_POINTS, 5);
         equipment.put(WEAPON_SLOT, new Slot("держит в руках"));
         equipment.put(ARMOR_SLOT, new Slot("одет в"));
         enqueueAttachEffect(new BattleFatigueEffect());
@@ -306,8 +308,8 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
 
     @Override
     public Optional<String> getDescription() {
-        Optional<String> description = listEffects().stream().map(e -> capitalize(e.getDescription(Verbosity.VERBOSE).orElse(""))).filter(s -> !s.isEmpty())
-                .reduce((a, s) -> {
+        Optional<String> description = listEffects().stream().map(e -> capitalize(e.getDescription(Verbosity.VERBOSE).orElse("")))
+                .filter(s -> !s.isEmpty()).reduce((a, s) -> {
                     if (a.endsWith(".")) {
                         return a + " " + s;
                     }
