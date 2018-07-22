@@ -1,9 +1,12 @@
-package me.rkfg.xmpp.bot.plugins.game.effect;
+package me.rkfg.xmpp.bot.plugins.game.effect.trait;
 
 import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
 import java.util.Collection;
 
+import me.rkfg.xmpp.bot.plugins.game.effect.AbstractEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.IBattleEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.StatsEffect;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 
 public class BattleAuraEffect extends AbstractEffect implements IBattleEffect {
