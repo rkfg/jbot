@@ -1,14 +1,9 @@
 package me.rkfg.xmpp.bot;
 
-import static java.util.Arrays.*;
 import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -18,13 +13,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.mockito.stubbing.OngoingStubbing;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import me.rkfg.xmpp.bot.message.MatrixMessage;
-import me.rkfg.xmpp.bot.plugins.game.IMutablePlayer;
-import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.World;
 import me.rkfg.xmpp.bot.plugins.game.command.EquipCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.UnequipCommand;
@@ -33,6 +22,7 @@ import me.rkfg.xmpp.bot.plugins.game.effect.AmbushEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.HideEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.ChargeableEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.RechargeEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.trait.BazookaHandsEffect;
 import me.rkfg.xmpp.bot.plugins.game.event.BattleEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.RenameEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
@@ -41,26 +31,7 @@ import me.rkfg.xmpp.bot.plugins.game.item.IWeapon;
 import me.rkfg.xmpp.bot.plugins.game.misc.Attrs.GamePlayerState;
 import me.rkfg.xmpp.bot.plugins.game.misc.Utils;
 
-public class TestGame {
-
-    private IMutablePlayer player1;
-    private IMutablePlayer player2;
-    private IMutablePlayer player3;
-    private IMutablePlayer player4;
-    private IMutablePlayer player5;
-
-    private static Logger log = LoggerFactory.getLogger(TestGame.class);
-    private static Random randomMock;
-
-    private static void setStaticField(Class<?> clazz, String fieldname, Object value)
-            throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-        Field field = clazz.getDeclaredField(fieldname);
-        field.setAccessible(true);
-        Field modifiers = Field.class.getDeclaredField("modifiers");
-        modifiers.setAccessible(true);
-        modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-        field.set(null, value);
-    }
+public class TestGame extends TestBase {
 
     @BeforeAll
     static void initWorld() {
@@ -73,33 +44,6 @@ public class TestGame {
             fail(e);
         }
         World.THIS.init("data_test");
-    }
-
-    public void setRandom(Integer... numbers) {
-        setRandom(asList(numbers));
-    }
-
-    public void setRandom(List<Integer> numbers) {
-        OngoingStubbing<Integer> stubbing = when(randomMock.nextInt(anyInt()));
-        for (Integer n : numbers) {
-            stubbing = stubbing.thenReturn(n);
-        }
-    }
-
-    public void setDRN(int... numbers) {
-        List<Integer> result = new LinkedList<>();
-        for (int n : numbers) {
-            List<Integer> numResult = new LinkedList<>();
-            while (n > 10) {
-                numResult.add(5);
-                n -= 5;
-            }
-            int dice1 = Math.floorDiv(n, 2);
-            numResult.add(dice1 - 1);
-            numResult.add(n - dice1 - 1);
-            result.addAll(numResult);
-        }
-        setRandom(result);
     }
 
     @BeforeEach
@@ -123,10 +67,6 @@ public class TestGame {
         player5.enqueueEvent(new RenameEvent("Игрок 5"));
         World.THIS.setState(GamePlayerState.PLAYING);
         World.THIS.stopTime();
-    }
-
-    private IMutablePlayer createPlayer(String id) {
-        return World.THIS.getCurrentPlayer(new MatrixMessage(null, null, id, id)).flatMap(p -> p.as(MUTABLEPLAYER_OBJ)).orElse(null);
     }
 
     @Test
@@ -159,8 +99,8 @@ public class TestGame {
     @Test
     public void testWeapon() {
         setDRN(2, 2, 2, 2, 2, 2, 2, 2);
-        equipWeapon(player1, "gauntlet");
-        assertEquals("gauntlet", player1.getWeapon().map(IWeapon::getType).orElseGet(() -> fail("no weapon")));
+        equipWeapon(player1, W_GAUNTLET);
+        assertEquals(W_GAUNTLET, player1.getWeapon().map(IWeapon::getType).orElseGet(() -> fail("no weapon")));
         player1.enqueueEvent(new BattleEvent(player1, player2));
         assertEquals(30, (int) player1.getStat(HP));
         assertEquals(29, (int) player2.getStat(HP));
@@ -171,8 +111,8 @@ public class TestGame {
     @Test
     public void testWeapon2() {
         setDRN(2, 2, 2, 2, 2, 2, 3, 2);
-        equipWeapon(player1, "ironrod");
-        assertEquals("ironrod", player1.getWeapon().map(IWeapon::getType).orElseGet(() -> fail("no weapon")));
+        equipWeapon(player1, W_IRONROD);
+        assertEquals(W_IRONROD, player1.getWeapon().map(IWeapon::getType).orElseGet(() -> fail("no weapon")));
         player1.enqueueEvent(new BattleEvent(player1, player2));
         assertEquals(29, (int) player1.getStat(HP));
         assertEquals(28, (int) player2.getStat(HP));
@@ -195,8 +135,8 @@ public class TestGame {
         setDRN(100, 2, 100, 2, 2, 100, 2, 100); // one-shot kill setup
         Integer hp = player1.getStat(HP);
         // to check for loot pickup, both backpack and equipped
-        equipWeapon(player2, "gauntlet");
-        pickupWeapon(player2, "ironrod");
+        equipWeapon(player2, W_GAUNTLET);
+        pickupWeapon(player2, W_IRONROD);
         player1.enqueueEvent(new BattleEvent(player1, player2));
         assertEquals(hp, player1.getStat(HP));
         assertEquals(0, (int) player2.getStat(HP));
@@ -208,8 +148,8 @@ public class TestGame {
         // check loot
         final List<IItem> backpack = player1.getBackpack();
         assertEquals(2, backpack.size());
-        assertTrue(backpack.stream().anyMatch(i -> i.getType().equals("ironrod")));
-        assertTrue(backpack.stream().anyMatch(i -> i.getType().equals("gauntlet")));
+        assertTrue(backpack.stream().anyMatch(i -> i.getType().equals(W_IRONROD)));
+        assertTrue(backpack.stream().anyMatch(i -> i.getType().equals(W_GAUNTLET)));
         assertEquals(0, player2.getBackpack().size());
         // check for victory, the game mode should switch to gather
         assertEquals(GamePlayerState.GATHER, World.THIS.getState());
@@ -299,25 +239,25 @@ public class TestGame {
     @Test
     public void testWeaponSwap() {
         setDRN(2, 2, 2, 2, 2, 2, 2, 2);
-        equipWeapon(player1, "gauntlet");
-        assertEquals("gauntlet", player1.getWeapon().map(IWeapon::getType).orElseGet(() -> fail("no weapon")));
-        equipWeapon(player1, "ironrod");
-        assertEquals("ironrod", player1.getWeapon().map(IWeapon::getType).orElseGet(() -> fail("no weapon")));
+        equipWeapon(player1, W_GAUNTLET);
+        assertEquals(W_GAUNTLET, player1.getWeapon().map(IWeapon::getType).orElseGet(() -> fail("no weapon")));
+        equipWeapon(player1, W_IRONROD);
+        assertEquals(W_IRONROD, player1.getWeapon().map(IWeapon::getType).orElseGet(() -> fail("no weapon")));
         final List<IItem> backpack = player1.getBackpack();
         assertEquals(1, backpack.size());
-        assertEquals("gauntlet", backpack.get(0).getType());
+        assertEquals(W_GAUNTLET, backpack.get(0).getType());
     }
 
     @Test
     public void testRecharge() {
         flushLogs();
-        pickupItem(player1, "doshirakbeef");
+        pickupItem(player1, U_DOSHIRAKBEEF);
         final UseCommand useCommand = new UseCommand();
         useCommand.exec(player1, Stream.of("1"));
         useCommand.exec(player1, Stream.of("1"));
         assertEquals(20, (int) player1.getStat(STM));
         setDRN(2, 3, 2, 4, 2, 2, 2, 2);
-        equipWeapon(player1, "lasersaw");
+        equipWeapon(player1, W_LASERSAW);
         assertTrue(player1.getWeapon().map(w -> w.hasEffect(ChargeableEffect.TYPE)).orElse(false));
         assertEquals(3, getWeaponCharges(player1));
         player1.enqueueEvent(new BattleEvent(player1, player2));
@@ -337,13 +277,13 @@ public class TestGame {
         assertEquals(0, (int) player1.getStat(STM));
         assertEquals(10, (int) player2.getStat(STM));
 
-        pickupItem(player1, "doshirakbeef");
+        pickupItem(player1, U_DOSHIRAKBEEF);
         useCommand.exec(player1, Stream.of("1"));
         useCommand.exec(player1, Stream.of("1"));
         assertEquals(10, (int) player1.getStat(STM));
 
         // pickup recharge item, check if it disappears on use
-        pickupItem(player1, "energycell");
+        pickupItem(player1, U_ENERGYCELL);
         assertEquals(1, (int) player1.getBackpack().get(0).as(ITEM_OBJ).flatMap(e -> e.getAttribute(USE_CNT)).orElse(-1));
 
         // unequip weapon and test if item use fails
@@ -375,7 +315,7 @@ public class TestGame {
 
     @Test
     public void testItemSet() {
-        equipWeapon(player1, "console");
+        equipWeapon(player1, W_CONSOLE);
         assertEquals(2, (int) player1.getWeapon().map(w -> w.getStat(ATK)).orElse(0));
         setDRN(2, 3, 2, 2, 4, 2, 3, 2);
         player1.enqueueEvent(new BattleEvent(player1, player2)); // should deduce 2 hp
@@ -383,7 +323,7 @@ public class TestGame {
         assertEquals(28, (int) player2.getStat(HP));
         assertEquals(5, (int) player1.getStat(STM));
         assertEquals(10, (int) player2.getStat(STM));
-        equipArmor(player1, "cheats");
+        equipArmor(player1, A_CHEATS);
         assertEquals(3, (int) player1.getWeapon().map(w -> w.getStat(ATK)).orElse(0));
         assertEquals(5, (int) player1.getArmor().map(a -> a.getStat(DEF)).orElse(0));
 
@@ -405,41 +345,11 @@ public class TestGame {
 
         player1.enqueueUnequipItem(WEAPON_SLOT);
         assertEquals(4, (int) player1.getArmor().map(a -> a.getStat(DEF)).orElse(0));
-        equipWeapon(player1, "console");
+        equipWeapon(player1, W_CONSOLE);
         assertEquals(5, (int) player1.getArmor().map(a -> a.getStat(DEF)).orElse(0));
         assertEquals(3, (int) player1.getWeapon().map(w -> w.getStat(ATK)).orElse(0));
         player1.enqueueUnequipItem(ARMOR_SLOT);
         assertEquals(2, (int) player1.getWeapon().map(w -> w.getStat(ATK)).orElse(0));
     }
 
-    private void equipArmor(IPlayer player, String type) {
-        World.THIS.getArmorRepository().getObjectById(type).ifPresent(player::enqueueEquipItem);
-    }
-
-    private int getWeaponCharges(IPlayer player) {
-        return player.getWeapon().flatMap(w -> w.getEffect(ChargeableEffect.TYPE)).flatMap(e -> e.getAttribute(ChargeableEffect.CHARGES))
-                .orElse(-1);
-    }
-
-    private void flushLogs() {
-        player1.getLog();
-        player2.getLog();
-    }
-
-    protected void dumpLogs() {
-        log.info("Player 1 log: {}", player1.getLog());
-        log.info("Player 2 log: {}", player2.getLog());
-    }
-
-    protected void pickupWeapon(IPlayer player, String type) {
-        World.THIS.getWeaponRepository().getObjectById(type).ifPresent(player::enqueuePickup);
-    }
-
-    private void pickupItem(IPlayer player, String type) {
-        World.THIS.getUsableRepository().getObjectById(type).ifPresent(player::enqueuePickup);
-    }
-
-    protected void equipWeapon(IPlayer player, String type) {
-        World.THIS.getWeaponRepository().getObjectById(type).ifPresent(player::enqueueEquipItem);
-    }
 }
