@@ -32,7 +32,7 @@ import me.rkfg.xmpp.bot.plugins.game.repository.WeaponRepository;
 
 public class World extends Player {
 
-    private static final int TICKRATE = 15;
+    public static final int TICKRATE = 15;
     public static final World THIS = new World();
     private Map<String, IPlayer> players = new HashMap<>();
     private NameRepository nameRepository;

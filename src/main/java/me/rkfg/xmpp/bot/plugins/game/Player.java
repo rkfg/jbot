@@ -16,6 +16,7 @@ import me.rkfg.xmpp.bot.plugins.game.effect.AmbushFatigueEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.BattleFatigueEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.DeadEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.EquipRedirectorEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.ExpiringBonusPointsEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.HideFatigueEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.IEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.LootEffect;
@@ -283,6 +284,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
         enqueueAttachEffect(new LootEffect());
         enqueueAttachEffect(new BattleAuraEffect());
         enqueueAttachEffect(new SpeechFatigueEffect());
+        enqueueAttachEffect(new ExpiringBonusPointsEffect(5, 4));
         setState(GamePlayerState.PLAYING);
     }
 

@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
+import me.rkfg.xmpp.bot.plugins.game.effect.ExpiringBonusPointsEffect;
 
 public class SpendPointsCommand implements ICommandHandler {
 
@@ -42,6 +43,9 @@ public class SpendPointsCommand implements ICommandHandler {
         }
         player.log("Распределено %d/%d очков. Осталось %d.", used, points, points - used);
         player.changeAttribute(BONUS_POINTS, -used);
+        int fused = used;
+        player.getEffect(ExpiringBonusPointsEffect.TYPE)
+                .ifPresent(e -> e.changeAttribute(ExpiringBonusPointsEffect.EXPIRING_POINTS, -fused));
         player.dumpStats();
         return Optional.empty();
     }

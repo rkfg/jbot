@@ -21,6 +21,7 @@ import me.rkfg.xmpp.bot.plugins.game.command.UnequipCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.UseCommand;
 import me.rkfg.xmpp.bot.plugins.game.effect.AmbushEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.HideEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.StaminaRegenEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.ChargeableEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.RechargeEffect;
 import me.rkfg.xmpp.bot.plugins.game.event.BattleEvent;
@@ -403,6 +404,47 @@ public class TestGame extends TestBase {
         fullySpent();
         command.exec(player1, Stream.of("с"));
         fullySpent();
+    }
+
+    @Test
+    public void testBonusPointsExpiration() {
+        SpendPointsCommand command = new SpendPointsCommand();
+        player1.detachEffect(StaminaRegenEffect.TYPE); // turn off stamina regen to prevent test failure due to ticks
+        defaultStats();
+        for (int i = 0; i < 4; ++i) {
+            player1.enqueueEvent(new TickEvent());
+        }
+        command.exec(player1, Stream.of("ааа", "зз"));
+        defaultStats();
+        assertEquals(0, (int) player1.getAttribute(BONUS_POINTS).orElse(-1));
+    }
+
+    @Test
+    public void testBonusPointsExpirationPartial() {
+        SpendPointsCommand command = new SpendPointsCommand();
+        player1.detachEffect(StaminaRegenEffect.TYPE); // turn off stamina regen to prevent test failure due to ticks
+        defaultStats();
+        command.exec(player1, Stream.of("аз"));
+        assertEquals(11, (int) player1.getStat(ATK));
+        assertEquals(11, (int) player1.getStat(DEF));
+        assertEquals(5, (int) player1.getStat(STR));
+        assertEquals(5, (int) player1.getStat(PRT));
+        assertEquals(10, (int) player1.getStat(LCK));
+        assertEquals(30, (int) player1.getStat(HP));
+        assertEquals(10, (int) player1.getStat(STM));
+        assertEquals(3, (int) player1.getAttribute(BONUS_POINTS).orElse(-1));
+        for (int i = 0; i < 4; ++i) {
+            player1.enqueueEvent(new TickEvent());
+        }
+        command.exec(player1, Stream.of("ааа", "зз"));
+        assertEquals(11, (int) player1.getStat(ATK));
+        assertEquals(11, (int) player1.getStat(DEF));
+        assertEquals(5, (int) player1.getStat(STR));
+        assertEquals(5, (int) player1.getStat(PRT));
+        assertEquals(10, (int) player1.getStat(LCK));
+        assertEquals(30, (int) player1.getStat(HP));
+        assertEquals(10, (int) player1.getStat(STM));
+        assertEquals(0, (int) player1.getAttribute(BONUS_POINTS).orElse(-1));
     }
 
     public void fullySpent() {
