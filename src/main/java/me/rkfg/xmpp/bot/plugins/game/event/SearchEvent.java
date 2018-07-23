@@ -47,21 +47,21 @@ public class SearchEvent extends AbstractEvent {
     }
 
     public Optional<? extends IItem> tryRandomItem(IPlayer p) {
-        int search = p.getStat(ATK) + p.getStat(DEF) + p.getStat(STM) + p.getStat(LCK) + Utils.drn();
-        int territory = 30 + Utils.drn();
+        int search = (p.getStat(ATK) + p.getStat(DEF) + p.getStat(LCK)) / 3 + Utils.drn();
+        int territory = Utils.drn() - 6;
         int diff = search - territory;
         log.debug("Search: {}, territory: {}, diff: {}", search, territory, diff);
         if (diff < 1) {
             return Optional.empty();
         }
         int tier = 1;
-        if (diff > 10 && diff < 16) {
+        if (diff > 16 && diff <= 21) {
             tier = 2;
         }
-        if (diff > 15 && diff < 21) {
+        if (diff > 21 && diff <= 26) {
             tier = 3;
         }
-        if (diff > 20) {
+        if (diff > 26) {
             tier = 4;
         }
         log.debug("Tier: {}", tier);

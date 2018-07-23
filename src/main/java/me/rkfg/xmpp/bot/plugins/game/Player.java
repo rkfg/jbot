@@ -271,7 +271,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
         stats.put(STR, 5);
         stats.put(PRT, 5);
         stats.put(LCK, 10);
-        stats.put(STM, 10);
+        stats.put(STM, 15);
         stats.put(BONUS_POINTS, 5);
         equipment.put(WEAPON_SLOT, new Slot("держит в руках"));
         equipment.put(ARMOR_SLOT, new Slot("одет в"));
@@ -284,7 +284,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
         enqueueAttachEffect(new LootEffect());
         enqueueAttachEffect(new BattleAuraEffect());
         enqueueAttachEffect(new SpeechFatigueEffect());
-        enqueueAttachEffect(new ExpiringBonusPointsEffect(5, 4));
+        enqueueAttachEffect(new ExpiringBonusPointsEffect(5, 8));
         setState(GamePlayerState.PLAYING);
     }
 
