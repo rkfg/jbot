@@ -2,18 +2,15 @@ package me.rkfg.xmpp.bot;
 
 import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
+import me.rkfg.xmpp.bot.plugins.game.Player;
 import me.rkfg.xmpp.bot.plugins.game.World;
 import me.rkfg.xmpp.bot.plugins.game.command.EquipCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.SpendPointsCommand;
@@ -26,26 +23,13 @@ import me.rkfg.xmpp.bot.plugins.game.effect.item.ChargeableEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.RechargeEffect;
 import me.rkfg.xmpp.bot.plugins.game.event.BattleEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.RenameEvent;
+import me.rkfg.xmpp.bot.plugins.game.event.SearchEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
 import me.rkfg.xmpp.bot.plugins.game.item.IItem;
 import me.rkfg.xmpp.bot.plugins.game.item.IWeapon;
 import me.rkfg.xmpp.bot.plugins.game.misc.Attrs.GamePlayerState;
-import me.rkfg.xmpp.bot.plugins.game.misc.Utils;
 
 public class TestGame extends TestBase {
-
-    @BeforeAll
-    static void initWorld() {
-        try {
-            assertNotNull(World.THIS);
-            setStaticField(Main.class, "INSTANCE", mock(IBot.class));
-            randomMock = Mockito.mock(Random.class);
-            setStaticField(Utils.class, "rnd", randomMock);
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-            fail(e);
-        }
-        World.THIS.init("data_test");
-    }
 
     @BeforeEach
     void init() {
@@ -93,8 +77,8 @@ public class TestGame extends TestBase {
         player1.enqueueEvent(new BattleEvent(player1, player2));
         assertEquals(29, (int) player1.getStat(HP));
         assertEquals(29, (int) player2.getStat(HP));
-        assertEquals(5, (int) player1.getStat(STM));
-        assertEquals(10, (int) player2.getStat(STM));
+        assertEquals(Player.BASE_STM - 5, (int) player1.getStat(STM));
+        assertEquals(Player.BASE_STM, (int) player2.getStat(STM));
     }
 
     @Test
@@ -106,8 +90,8 @@ public class TestGame extends TestBase {
         player1.enqueueEvent(new BattleEvent(player1, player2));
         assertEquals(30, (int) player1.getStat(HP));
         assertEquals(29, (int) player2.getStat(HP));
-        assertEquals(5, (int) player1.getStat(STM));
-        assertEquals(10, (int) player2.getStat(STM));
+        assertEquals(Player.BASE_STM - 5, (int) player1.getStat(STM));
+        assertEquals(Player.BASE_STM, (int) player2.getStat(STM));
         // check that looting wasn't triggered accidentally
         assertEquals(0, (int) player1.getBackpack().size());
     }
@@ -120,8 +104,8 @@ public class TestGame extends TestBase {
         player1.enqueueEvent(new BattleEvent(player1, player2));
         assertEquals(29, (int) player1.getStat(HP));
         assertEquals(28, (int) player2.getStat(HP));
-        assertEquals(5, (int) player1.getStat(STM));
-        assertEquals(10, (int) player2.getStat(STM));
+        assertEquals(Player.BASE_STM - 5, (int) player1.getStat(STM));
+        assertEquals(Player.BASE_STM, (int) player2.getStat(STM));
     }
 
     @Test
@@ -144,8 +128,8 @@ public class TestGame extends TestBase {
         player1.enqueueEvent(new BattleEvent(player1, player2));
         assertEquals(hp, player1.getStat(HP));
         assertEquals(0, (int) player2.getStat(HP));
-        assertEquals(5, (int) player1.getStat(STM));
-        assertEquals(10, (int) player2.getStat(STM));
+        assertEquals(Player.BASE_STM - 5, (int) player1.getStat(STM));
+        assertEquals(Player.BASE_STM, (int) player2.getStat(STM));
         // check deaths
         assertTrue(player1.isAlive());
         assertFalse(player2.isAlive());
@@ -164,28 +148,28 @@ public class TestGame extends TestBase {
         setDRN(3, 3);
         player2.enqueueToggleEffect(new HideEffect());
         assertTrue(player2.hasEffect(HideEffect.TYPE));
-        assertEquals(8, (int) player2.getStat(STM));
+        assertEquals(Player.BASE_STM - 2, (int) player2.getStat(STM));
         player1.enqueueEvent(new BattleEvent(player1, player2));
         assertTrue(player2.hasEffect(HideEffect.TYPE));
 
         player2.enqueueToggleEffect(new HideEffect());
         assertFalse(player2.hasEffect(HideEffect.TYPE));
-        assertEquals(8, (int) player2.getStat(STM));
+        assertEquals(Player.BASE_STM - 2, (int) player2.getStat(STM));
 
         player2.enqueueToggleEffect(new HideEffect());
         assertTrue(player2.hasEffect(HideEffect.TYPE));
 
         assertEquals(30, (int) player1.getStat(HP));
         assertEquals(30, (int) player2.getStat(HP));
-        assertEquals(5, (int) player1.getStat(STM));
-        assertEquals(6, (int) player2.getStat(STM));
+        assertEquals(Player.BASE_STM - 5, (int) player1.getStat(STM));
+        assertEquals(Player.BASE_STM - 4, (int) player2.getStat(STM));
         setDRN(3, 4, 3, 2, 3, 2, 3, 2, 3, 2);
         player1.enqueueEvent(new BattleEvent(player1, player2));
         assertFalse(player2.hasEffect(HideEffect.TYPE));
         assertEquals(29, (int) player1.getStat(HP));
         assertEquals(29, (int) player2.getStat(HP));
-        assertEquals(0, (int) player1.getStat(STM));
-        assertEquals(6, (int) player2.getStat(STM));
+        assertEquals(Player.BASE_STM - 10, (int) player1.getStat(STM));
+        assertEquals(Player.BASE_STM - 4, (int) player2.getStat(STM));
     }
 
     @Test
@@ -212,11 +196,11 @@ public class TestGame extends TestBase {
 
     @Test
     public void testStaminaRegenSuccess() {
-        setDRN(2, 2, 2, 6);
+        setDRN(3, 2, 2, 6);
         player1.enqueueEvent(new TickEvent());
-        assertEquals(11, (int) player1.getStat(STM));
+        assertEquals(Player.BASE_STM + 1, (int) player1.getStat(STM));
         player1.enqueueEvent(new TickEvent());
-        assertEquals(11, (int) player1.getStat(STM));
+        assertEquals(Player.BASE_STM + 1, (int) player1.getStat(STM));
     }
 
     @Test
@@ -259,7 +243,7 @@ public class TestGame extends TestBase {
         final UseCommand useCommand = new UseCommand();
         useCommand.exec(player1, Stream.of("1"));
         useCommand.exec(player1, Stream.of("1"));
-        assertEquals(20, (int) player1.getStat(STM));
+        assertEquals(Player.BASE_STM + 10, (int) player1.getStat(STM));
         setDRN(2, 3, 2, 4, 2, 2, 2, 2);
         equipWeapon(player1, W_LASERSAW);
         assertTrue(player1.getWeapon().map(w -> w.hasEffect(ChargeableEffect.TYPE)).orElse(false));
@@ -271,20 +255,20 @@ public class TestGame extends TestBase {
         player1.enqueueEvent(new BattleEvent(player1, player2));
         assertEquals(30, (int) player1.getStat(HP));
         assertEquals(27, (int) player2.getStat(HP));
-        assertEquals(5, (int) player1.getStat(STM));
-        assertEquals(10, (int) player2.getStat(STM));
+        assertEquals(Player.BASE_STM - 5, (int) player1.getStat(STM));
+        assertEquals(Player.BASE_STM, (int) player2.getStat(STM));
         assertEquals(0, getWeaponCharges(player1));
         setDRN(2, 2, 2, 2, 2, 2, 2, 2);
         player1.enqueueEvent(new BattleEvent(player1, player2)); // should deduce 1 hp when discharged
         assertEquals(30, (int) player1.getStat(HP));
         assertEquals(26, (int) player2.getStat(HP));
-        assertEquals(0, (int) player1.getStat(STM));
-        assertEquals(10, (int) player2.getStat(STM));
+        assertEquals(Player.BASE_STM - 10, (int) player1.getStat(STM));
+        assertEquals(Player.BASE_STM, (int) player2.getStat(STM));
 
         pickupItem(player1, U_DOSHIRAKBEEF);
         useCommand.exec(player1, Stream.of("1"));
         useCommand.exec(player1, Stream.of("1"));
-        assertEquals(10, (int) player1.getStat(STM));
+        assertEquals(Player.BASE_STM, (int) player1.getStat(STM));
 
         // pickup recharge item, check if it disappears on use
         pickupItem(player1, U_ENERGYCELL);
@@ -313,8 +297,8 @@ public class TestGame extends TestBase {
         player1.enqueueEvent(new BattleEvent(player1, player2)); // should deduce 3 hp when charged
         assertEquals(30, (int) player1.getStat(HP));
         assertEquals(23, (int) player2.getStat(HP));
-        assertEquals(5, (int) player1.getStat(STM));
-        assertEquals(10, (int) player2.getStat(STM));
+        assertEquals(Player.BASE_STM - 5, (int) player1.getStat(STM));
+        assertEquals(Player.BASE_STM, (int) player2.getStat(STM));
     }
 
     @Test
@@ -325,8 +309,8 @@ public class TestGame extends TestBase {
         player1.enqueueEvent(new BattleEvent(player1, player2)); // should deduce 2 hp
         assertEquals(29, (int) player1.getStat(HP));
         assertEquals(28, (int) player2.getStat(HP));
-        assertEquals(5, (int) player1.getStat(STM));
-        assertEquals(10, (int) player2.getStat(STM));
+        assertEquals(Player.BASE_STM - 5, (int) player1.getStat(STM));
+        assertEquals(Player.BASE_STM, (int) player2.getStat(STM));
         equipArmor(player1, A_CHEATS);
         assertEquals(3, (int) player1.getWeapon().map(w -> w.getStat(ATK)).orElse(0));
         assertEquals(5, (int) player1.getArmor().map(a -> a.getStat(DEF)).orElse(0));
@@ -336,8 +320,8 @@ public class TestGame extends TestBase {
         player1.enqueueEvent(new BattleEvent(player1, player2));
         assertEquals(29, (int) player1.getStat(HP));
         assertEquals(26, (int) player2.getStat(HP));
-        assertEquals(0, (int) player1.getStat(STM));
-        assertEquals(10, (int) player2.getStat(STM));
+        assertEquals(Player.BASE_STM - 10, (int) player1.getStat(STM));
+        assertEquals(Player.BASE_STM, (int) player2.getStat(STM));
 
         player1.setAttribute(STM, 5);
         setDRN(2, 4, 2, 2, 8, 2, 3, 2);
@@ -345,7 +329,7 @@ public class TestGame extends TestBase {
         assertEquals(29, (int) player1.getStat(HP));
         assertEquals(24, (int) player2.getStat(HP));
         assertEquals(0, (int) player1.getStat(STM));
-        assertEquals(10, (int) player2.getStat(STM));
+        assertEquals(Player.BASE_STM, (int) player2.getStat(STM));
 
         player1.enqueueUnequipItem(WEAPON_SLOT);
         assertEquals(4, (int) player1.getArmor().map(a -> a.getStat(DEF)).orElse(0));
@@ -399,7 +383,7 @@ public class TestGame extends TestBase {
         assertEquals(5, (int) player1.getStat(PRT));
         assertEquals(10, (int) player1.getStat(LCK));
         assertEquals(30, (int) player1.getStat(HP));
-        assertEquals(10, (int) player1.getStat(STM));
+        assertEquals(Player.BASE_STM, (int) player1.getStat(STM));
         command.exec(player1, Stream.of("с", "б"));
         fullySpent();
         command.exec(player1, Stream.of("с"));
@@ -411,7 +395,7 @@ public class TestGame extends TestBase {
         SpendPointsCommand command = new SpendPointsCommand();
         player1.detachEffect(StaminaRegenEffect.TYPE); // turn off stamina regen to prevent test failure due to ticks
         defaultStats();
-        for (int i = 0; i < 4; ++i) {
+        for (int i = 0; i < Player.BONUS_EXPIRATON_TICKS; ++i) {
             player1.enqueueEvent(new TickEvent());
         }
         command.exec(player1, Stream.of("ааа", "зз"));
@@ -431,9 +415,9 @@ public class TestGame extends TestBase {
         assertEquals(5, (int) player1.getStat(PRT));
         assertEquals(10, (int) player1.getStat(LCK));
         assertEquals(30, (int) player1.getStat(HP));
-        assertEquals(10, (int) player1.getStat(STM));
+        assertEquals(Player.BASE_STM, (int) player1.getStat(STM));
         assertEquals(3, (int) player1.getAttribute(BONUS_POINTS).orElse(-1));
-        for (int i = 0; i < 4; ++i) {
+        for (int i = 0; i < Player.BONUS_EXPIRATON_TICKS; ++i) {
             player1.enqueueEvent(new TickEvent());
         }
         command.exec(player1, Stream.of("ааа", "зз"));
@@ -443,7 +427,7 @@ public class TestGame extends TestBase {
         assertEquals(5, (int) player1.getStat(PRT));
         assertEquals(10, (int) player1.getStat(LCK));
         assertEquals(30, (int) player1.getStat(HP));
-        assertEquals(10, (int) player1.getStat(STM));
+        assertEquals(Player.BASE_STM, (int) player1.getStat(STM));
         assertEquals(0, (int) player1.getAttribute(BONUS_POINTS).orElse(-1));
     }
 
@@ -455,7 +439,7 @@ public class TestGame extends TestBase {
         assertEquals(6, (int) player1.getStat(PRT));
         assertEquals(10, (int) player1.getStat(LCK));
         assertEquals(30, (int) player1.getStat(HP));
-        assertEquals(10, (int) player1.getStat(STM));
+        assertEquals(Player.BASE_STM, (int) player1.getStat(STM));
     }
 
     public void defaultStats() {
@@ -465,7 +449,14 @@ public class TestGame extends TestBase {
         assertEquals(5, (int) player1.getStat(PRT));
         assertEquals(10, (int) player1.getStat(LCK));
         assertEquals(30, (int) player1.getStat(HP));
-        assertEquals(10, (int) player1.getStat(STM));
+        assertEquals(Player.BASE_STM, (int) player1.getStat(STM));
+    }
+
+    @Test
+    public void testSearch() {
+        setRandom(randomMock, 2);
+        setRandom(searchRandomMock, 0);
+        assertEquals("vodka", SearchEvent.getRandomItem(4).map(IItem::getType).orElse(""));
     }
 
 }

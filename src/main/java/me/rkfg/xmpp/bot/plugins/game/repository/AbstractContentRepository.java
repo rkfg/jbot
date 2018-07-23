@@ -27,7 +27,7 @@ import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 public abstract class AbstractContentRepository<O> implements IContentRepository, IObjectRepository<O> {
 
     protected Logger log = LoggerFactory.getLogger(getClass());
-    private Random rnd = new SecureRandom();
+    private static final Random rnd = new SecureRandom();
 
     // unique id => content map
     protected Map<String, TypedAttributeMap> content = new HashMap<>();
@@ -51,7 +51,7 @@ public abstract class AbstractContentRepository<O> implements IContentRepository
     public AbstractContentRepository(String dataDir) {
         this.dataDir = dataDir;
     }
-    
+
     protected void loadContent(String filename) {
         int maxParts = getMaxParts();
         int minParts = getMinParts();
@@ -81,7 +81,7 @@ public abstract class AbstractContentRepository<O> implements IContentRepository
     @Override
     public <T> Collection<TypedAttributeMap> getContent(IndexPointer<T> indexPtr, T value) {
         return index.get(indexPtr).map(m -> m.get(value))
-                .map(cntIds -> cntIds.stream().map(name -> content.get(name)).collect(Collectors.toSet())).orElse(Collections.emptySet());
+                .map(cntIds -> cntIds.stream().map(name -> content.get(name)).collect(Collectors.toList())).orElse(Collections.emptyList());
     }
 
     @Override

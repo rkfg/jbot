@@ -2,6 +2,7 @@ package me.rkfg.xmpp.bot;
 
 import static java.util.Arrays.*;
 import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -11,6 +12,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.mockito.Mockito;
 import org.mockito.stubbing.OngoingStubbing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +23,8 @@ import me.rkfg.xmpp.bot.plugins.game.IMutablePlayer;
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.World;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.ChargeableEffect;
+import me.rkfg.xmpp.bot.plugins.game.misc.Utils;
+import me.rkfg.xmpp.bot.plugins.game.repository.AbstractContentRepository;
 
 public class TestBase {
 
@@ -32,12 +37,28 @@ public class TestBase {
     protected static final String W_GAUNTLET = "gauntlet";
     protected static Logger log = LoggerFactory.getLogger(TestGame.class);
     protected static Random randomMock;
+    protected static Random searchRandomMock;
 
     protected IMutablePlayer player1;
     protected IMutablePlayer player2;
     protected IMutablePlayer player3;
     protected IMutablePlayer player4;
     protected IMutablePlayer player5;
+
+    @BeforeAll
+    static void initWorld() {
+        try {
+            assertNotNull(World.THIS);
+            setStaticField(Main.class, "INSTANCE", mock(IBot.class));
+            randomMock = Mockito.mock(Random.class);
+            setStaticField(Utils.class, "rnd", randomMock);
+            searchRandomMock = Mockito.mock(Random.class);
+            setStaticField(AbstractContentRepository.class, "rnd", searchRandomMock);
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+            fail(e);
+        }
+        World.THIS.init("data_test");
+    }
 
     protected static void setStaticField(Class<?> clazz, String fieldname, Object value)
             throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
@@ -49,12 +70,12 @@ public class TestBase {
         field.set(null, value);
     }
 
-    public void setRandom(Integer... numbers) {
-        setRandom(asList(numbers));
+    public void setRandom(Random rnd, Integer... numbers) {
+        setRandom(rnd, asList(numbers));
     }
 
-    public void setRandom(List<Integer> numbers) {
-        OngoingStubbing<Integer> stubbing = when(randomMock.nextInt(anyInt()));
+    public void setRandom(Random rnd, List<Integer> numbers) {
+        OngoingStubbing<Integer> stubbing = when(rnd.nextInt(anyInt()));
         for (Integer n : numbers) {
             stubbing = stubbing.thenReturn(n);
         }
@@ -73,7 +94,7 @@ public class TestBase {
             numResult.add(n - dice1 - 1);
             result.addAll(numResult);
         }
-        setRandom(result);
+        setRandom(randomMock, result);
     }
 
     protected IMutablePlayer createPlayer(String id) {

@@ -40,6 +40,10 @@ import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
 public class Player extends AbstractEffectReceiver implements IMutablePlayer, IMutableStats {
 
+    public static final int BONUS_EXPIRATON_TICKS = 8;
+
+    public static final int BASE_STM = 15;
+
     private static final String UNNAMED = "<безымянный>";
 
     private class LogEntry {
@@ -271,7 +275,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
         stats.put(STR, 5);
         stats.put(PRT, 5);
         stats.put(LCK, 10);
-        stats.put(STM, 15);
+        stats.put(STM, BASE_STM);
         stats.put(BONUS_POINTS, 5);
         equipment.put(WEAPON_SLOT, new Slot("держит в руках"));
         equipment.put(ARMOR_SLOT, new Slot("одет в"));
@@ -284,7 +288,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
         enqueueAttachEffect(new LootEffect());
         enqueueAttachEffect(new BattleAuraEffect());
         enqueueAttachEffect(new SpeechFatigueEffect());
-        enqueueAttachEffect(new ExpiringBonusPointsEffect(5, 8));
+        enqueueAttachEffect(new ExpiringBonusPointsEffect(5, BONUS_EXPIRATON_TICKS));
         setState(GamePlayerState.PLAYING);
     }
 
