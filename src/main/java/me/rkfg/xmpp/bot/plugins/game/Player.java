@@ -5,7 +5,6 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Utils.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -48,16 +47,14 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
 
     private class LogEntry {
         String message;
-        long timestamp;
 
         public LogEntry(String message) {
             this.message = message;
-            timestamp = System.currentTimeMillis();
         }
 
         @Override
         public String toString() {
-            return String.format("[%1$td-%<tm %<tT] %2$s", new Date(timestamp), message);
+            return message;
         }
     }
 
