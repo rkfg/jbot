@@ -8,9 +8,9 @@ public class HideFatigueEffect extends AbstractEffect implements IFatigueEffect 
 
     public static final String TYPE = "hidefatigue";
 
-    public HideFatigueEffect() {
+    public HideFatigueEffect(int stmCost) {
         super(TYPE, "устаёт от скрытности");
-        initFatigue(2);
+        initFatigue(stmCost);
     }
 
     @Override

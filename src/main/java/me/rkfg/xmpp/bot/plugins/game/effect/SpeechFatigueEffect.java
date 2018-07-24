@@ -15,10 +15,10 @@ public class SpeechFatigueEffect extends AbstractEffect implements IFatigueEffec
     public static final TypedAttribute<Integer> WHISPER_FATIGUE = TypedAttribute.of("whisperfatigue");
     public static final int CHARS_PER_FATIGUE = 100;
 
-    public SpeechFatigueEffect() {
+    public SpeechFatigueEffect(int yellStmCost, int whisperStmCost) {
         super(TYPE, "усталость от ора");
-        initFatigue(2);
-        setAttribute(WHISPER_FATIGUE, 1);
+        initFatigue(yellStmCost);
+        setAttribute(WHISPER_FATIGUE, whisperStmCost);
     }
 
     @Override

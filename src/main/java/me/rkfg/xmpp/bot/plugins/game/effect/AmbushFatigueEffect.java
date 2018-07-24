@@ -8,9 +8,9 @@ public class AmbushFatigueEffect extends AbstractEffect implements IFatigueEffec
 
     public static final String TYPE = "ambushfatigue";
 
-    public AmbushFatigueEffect() {
+    public AmbushFatigueEffect(int stmCost) {
         super(TYPE, "устаёт от засады");
-        initFatigue(7);
+        initFatigue(stmCost);
     }
     
     @Override

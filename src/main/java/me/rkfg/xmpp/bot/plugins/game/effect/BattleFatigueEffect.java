@@ -16,10 +16,6 @@ public class BattleFatigueEffect extends AbstractEffect implements IFatigueEffec
         initFatigue(stmCost);
     }
 
-    public BattleFatigueEffect() {
-        this(5);
-    }
-
     @Override
     public Collection<IEvent> processEvent(IEvent event) {
         return processFatigue(event, "Вы слишком устали, чтобы сражаться.",

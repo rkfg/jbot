@@ -57,28 +57,28 @@ public class TestGame extends TestBase {
     @Test
     public void testFat() {
         applyTrait(player1, "fat");
-        assertEquals(9, (int) player1.getStat(ATK));
-        assertEquals(9, (int) player1.getStat(DEF));
-        assertEquals(7, (int) player1.getStat(PRT));
+        assertStatChange(player1, ATK, -1);
+        assertStatChange(player1, DEF, -1);
+        assertStatChange(player1, PRT, 2);
     }
 
     @Test
     public void testThin() {
         applyTrait(player1, "thin");
-        assertEquals(8, (int) player1.getStat(ATK));
-        assertEquals(12, (int) player1.getStat(DEF));
-        assertEquals(4, (int) player1.getStat(PRT));
-        assertEquals(35, (int) player1.getStat(HP));
+        assertStatChange(player1, ATK, -2);
+        assertStatChange(player1, DEF, 2);
+        assertStatChange(player1, PRT, -1);
+        assertStatChange(player1, HP, 5);
     }
 
     @Test
     public void testBattle() {
         setDRN(3, 2, 3, 2, 3, 2, 3, 2);
         player1.enqueueEvent(new BattleEvent(player1, player2));
-        assertEquals(29, (int) player1.getStat(HP));
-        assertEquals(29, (int) player2.getStat(HP));
-        assertEquals(Player.BASE_STM - 5, (int) player1.getStat(STM));
-        assertEquals(Player.BASE_STM, (int) player2.getStat(STM));
+        assertStatChange(player1, HP, -1);
+        assertStatChange(player2, HP, -1);
+        assertStatChange(player1, STM, -5);
+        assertStatChange(player2, STM, 0);
     }
 
     @Test
@@ -88,10 +88,10 @@ public class TestGame extends TestBase {
         pickupItem(player2, U_ENERGYCELL);
         assertEquals(W_GAUNTLET, player1.getWeapon().map(IWeapon::getType).orElseGet(() -> fail("no weapon")));
         player1.enqueueEvent(new BattleEvent(player1, player2));
-        assertEquals(30, (int) player1.getStat(HP));
-        assertEquals(29, (int) player2.getStat(HP));
-        assertEquals(Player.BASE_STM - 5, (int) player1.getStat(STM));
-        assertEquals(Player.BASE_STM, (int) player2.getStat(STM));
+        assertStatChange(player1, HP, 0);
+        assertStatChange(player2, HP, -1);
+        assertBattleSTMChange(player1, 1);
+        assertStatChange(player2, STM, 0);
         // check that looting wasn't triggered accidentally
         assertEquals(0, (int) player1.getBackpack().size());
     }
@@ -102,10 +102,10 @@ public class TestGame extends TestBase {
         equipWeapon(player1, W_IRONROD);
         assertEquals(W_IRONROD, player1.getWeapon().map(IWeapon::getType).orElseGet(() -> fail("no weapon")));
         player1.enqueueEvent(new BattleEvent(player1, player2));
-        assertEquals(29, (int) player1.getStat(HP));
-        assertEquals(28, (int) player2.getStat(HP));
-        assertEquals(Player.BASE_STM - 5, (int) player1.getStat(STM));
-        assertEquals(Player.BASE_STM, (int) player2.getStat(STM));
+        assertStatChange(player1, HP, -1);
+        assertStatChange(player2, HP, -2);
+        assertBattleSTMChange(player1, 1);
+        assertBattleSTMChange(player2, 0);
     }
 
     @Test
@@ -128,8 +128,8 @@ public class TestGame extends TestBase {
         player1.enqueueEvent(new BattleEvent(player1, player2));
         assertEquals(hp, player1.getStat(HP));
         assertEquals(0, (int) player2.getStat(HP));
-        assertEquals(Player.BASE_STM - 5, (int) player1.getStat(STM));
-        assertEquals(Player.BASE_STM, (int) player2.getStat(STM));
+        assertBattleSTMChange(player1, 1);
+        assertBattleSTMChange(player2, 0);
         // check deaths
         assertTrue(player1.isAlive());
         assertFalse(player2.isAlive());
@@ -148,28 +148,28 @@ public class TestGame extends TestBase {
         setDRN(3, 3);
         player2.enqueueToggleEffect(new HideEffect());
         assertTrue(player2.hasEffect(HideEffect.TYPE));
-        assertEquals(Player.BASE_STM - 2, (int) player2.getStat(STM));
+        assertStatChange(player2, STM, -2);
         player1.enqueueEvent(new BattleEvent(player1, player2));
         assertTrue(player2.hasEffect(HideEffect.TYPE));
 
         player2.enqueueToggleEffect(new HideEffect());
         assertFalse(player2.hasEffect(HideEffect.TYPE));
-        assertEquals(Player.BASE_STM - 2, (int) player2.getStat(STM));
+        assertStatChange(player2, STM, -2);
 
         player2.enqueueToggleEffect(new HideEffect());
         assertTrue(player2.hasEffect(HideEffect.TYPE));
 
-        assertEquals(30, (int) player1.getStat(HP));
-        assertEquals(30, (int) player2.getStat(HP));
-        assertEquals(Player.BASE_STM - 5, (int) player1.getStat(STM));
-        assertEquals(Player.BASE_STM - 4, (int) player2.getStat(STM));
+        assertStatChange(player1, HP, 0);
+        assertStatChange(player2, HP, 0);
+        assertBattleSTMChange(player1, 1);
+        assertStatChange(player2, STM, -4);
         setDRN(3, 4, 3, 2, 3, 2, 3, 2, 3, 2);
         player1.enqueueEvent(new BattleEvent(player1, player2));
         assertFalse(player2.hasEffect(HideEffect.TYPE));
-        assertEquals(29, (int) player1.getStat(HP));
-        assertEquals(29, (int) player2.getStat(HP));
-        assertEquals(Player.BASE_STM - 10, (int) player1.getStat(STM));
-        assertEquals(Player.BASE_STM - 4, (int) player2.getStat(STM));
+        assertStatChange(player1, HP, -1);
+        assertStatChange(player2, HP, -1);
+        assertBattleSTMChange(player1, 2);
+        assertStatChange(player2, STM, -4);
     }
 
     @Test
@@ -177,10 +177,12 @@ public class TestGame extends TestBase {
         setDRN(3, 3, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2);
         player2.enqueueToggleEffect(new AmbushEffect());
         assertTrue(player2.hasEffect(AmbushEffect.TYPE));
+        assertStatChange(player2, STM, -Player.AMBUSH_FATIGUE_COST);
         player1.enqueueEvent(new BattleEvent(player1, player2));
         assertFalse(player2.hasEffect(AmbushEffect.TYPE));
-        assertEquals(30, (int) player1.getStat(HP));
-        assertEquals(29, (int) player2.getStat(HP));
+        assertBattleSTMChange(player1, 1);
+        assertStatChange(player1, HP, 0);
+        assertStatChange(player2, HP, -1);
     }
 
     @Test
@@ -188,10 +190,11 @@ public class TestGame extends TestBase {
         setDRN(4, 3, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2);
         player2.enqueueToggleEffect(new AmbushEffect());
         assertTrue(player2.hasEffect(AmbushEffect.TYPE));
+        assertStatChange(player2, STM, -Player.AMBUSH_FATIGUE_COST);
         player1.enqueueEvent(new BattleEvent(player1, player2));
         assertFalse(player2.hasEffect(AmbushEffect.TYPE));
-        assertEquals(29, (int) player1.getStat(HP));
-        assertEquals(30, (int) player2.getStat(HP));
+        assertStatChange(player1, HP, -1);
+        assertStatChange(player2, HP, 0);
     }
 
     @Test
@@ -243,7 +246,7 @@ public class TestGame extends TestBase {
         final UseCommand useCommand = new UseCommand();
         useCommand.exec(player1, Stream.of("1"));
         useCommand.exec(player1, Stream.of("1"));
-        assertEquals(Player.BASE_STM + 10, (int) player1.getStat(STM));
+        assertStatChange(player1, STM, 10);
         setDRN(2, 3, 2, 4, 2, 2, 2, 2);
         equipWeapon(player1, W_LASERSAW);
         assertTrue(player1.getWeapon().map(w -> w.hasEffect(ChargeableEffect.TYPE)).orElse(false));
@@ -253,22 +256,22 @@ public class TestGame extends TestBase {
         player1.enqueueEvent(new BattleEvent(player1, player2));
         setDRN(2, 3, 2, 4, 2, 2, 2, 2);
         player1.enqueueEvent(new BattleEvent(player1, player2));
-        assertEquals(30, (int) player1.getStat(HP));
-        assertEquals(27, (int) player2.getStat(HP));
-        assertEquals(Player.BASE_STM - 5, (int) player1.getStat(STM));
-        assertEquals(Player.BASE_STM, (int) player2.getStat(STM));
+        assertStatChange(player1, HP, 0);
+        assertStatChange(player2, HP, -3);
+        assertStatChange(player1, STM, 10 - Player.BATTLE_FATIGUE_COST * 3);
+        assertStatChange(player2, STM, 0);
         assertEquals(0, getWeaponCharges(player1));
         setDRN(2, 2, 2, 2, 2, 2, 2, 2);
         player1.enqueueEvent(new BattleEvent(player1, player2)); // should deduce 1 hp when discharged
-        assertEquals(30, (int) player1.getStat(HP));
-        assertEquals(26, (int) player2.getStat(HP));
-        assertEquals(Player.BASE_STM - 10, (int) player1.getStat(STM));
-        assertEquals(Player.BASE_STM, (int) player2.getStat(STM));
+        assertStatChange(player1, HP, 0);
+        assertStatChange(player2, HP, -4);
+        assertStatChange(player1, STM, 10 - Player.BATTLE_FATIGUE_COST * 4);
+        assertStatChange(player2, STM, 0);
 
         pickupItem(player1, U_DOSHIRAKBEEF);
         useCommand.exec(player1, Stream.of("1"));
         useCommand.exec(player1, Stream.of("1"));
-        assertEquals(Player.BASE_STM, (int) player1.getStat(STM));
+        assertStatChange(player1, STM, 20 - Player.BATTLE_FATIGUE_COST * 4);
 
         // pickup recharge item, check if it disappears on use
         pickupItem(player1, U_ENERGYCELL);
@@ -295,10 +298,10 @@ public class TestGame extends TestBase {
 
         setDRN(2, 2, 2, 2, 2, 2, 2, 2);
         player1.enqueueEvent(new BattleEvent(player1, player2)); // should deduce 3 hp when charged
-        assertEquals(30, (int) player1.getStat(HP));
-        assertEquals(23, (int) player2.getStat(HP));
-        assertEquals(Player.BASE_STM - 5, (int) player1.getStat(STM));
-        assertEquals(Player.BASE_STM, (int) player2.getStat(STM));
+        assertStatChange(player1, HP, 0);
+        assertStatChange(player2, HP, -7);
+        assertStatChange(player1, STM, 20 - Player.BATTLE_FATIGUE_COST * 5);
+        assertStatChange(player2, STM, 0);
     }
 
     @Test
@@ -307,10 +310,10 @@ public class TestGame extends TestBase {
         assertEquals(2, (int) player1.getWeapon().map(w -> w.getStat(ATK)).orElse(0));
         setDRN(2, 3, 2, 2, 4, 2, 3, 2);
         player1.enqueueEvent(new BattleEvent(player1, player2)); // should deduce 2 hp
-        assertEquals(29, (int) player1.getStat(HP));
-        assertEquals(28, (int) player2.getStat(HP));
-        assertEquals(Player.BASE_STM - 5, (int) player1.getStat(STM));
-        assertEquals(Player.BASE_STM, (int) player2.getStat(STM));
+        assertStatChange(player1, HP, -1);
+        assertStatChange(player2, HP, -2);
+        assertBattleSTMChange(player1, 1);
+        assertBattleSTMChange(player2, 0);
         equipArmor(player1, A_CHEATS);
         assertEquals(3, (int) player1.getWeapon().map(w -> w.getStat(ATK)).orElse(0));
         assertEquals(5, (int) player1.getArmor().map(a -> a.getStat(DEF)).orElse(0));
@@ -318,18 +321,18 @@ public class TestGame extends TestBase {
         // try set in battle
         setDRN(2, 4, 2, 2, 7, 2, 3, 2);
         player1.enqueueEvent(new BattleEvent(player1, player2));
-        assertEquals(29, (int) player1.getStat(HP));
-        assertEquals(26, (int) player2.getStat(HP));
-        assertEquals(Player.BASE_STM - 10, (int) player1.getStat(STM));
-        assertEquals(Player.BASE_STM, (int) player2.getStat(STM));
+        assertStatChange(player1, HP, -1);
+        assertStatChange(player2, HP, -4);
+        assertBattleSTMChange(player1, 2);
+        assertBattleSTMChange(player2, 0);
 
-        player1.setAttribute(STM, 5);
+        player1.changeAttribute(STM, 5);
         setDRN(2, 4, 2, 2, 8, 2, 3, 2);
         player1.enqueueEvent(new BattleEvent(player1, player2));
-        assertEquals(29, (int) player1.getStat(HP));
-        assertEquals(24, (int) player2.getStat(HP));
-        assertEquals(0, (int) player1.getStat(STM));
-        assertEquals(Player.BASE_STM, (int) player2.getStat(STM));
+        assertStatChange(player1, HP, -1);
+        assertStatChange(player2, HP, -6);
+        assertBattleSTMChange(player1, 2);
+        assertBattleSTMChange(player2, 0);
 
         player1.enqueueUnequipItem(WEAPON_SLOT);
         assertEquals(4, (int) player1.getArmor().map(a -> a.getStat(DEF)).orElse(0));
@@ -343,28 +346,28 @@ public class TestGame extends TestBase {
     @Test
     public void testBazookasNoWeapon() {
         applyTrait(player1, "bazookahands");
-        assertEquals(10, (int) player1.getStat(ATK));
-        assertEquals(5, (int) player1.getStat(STR));
+        assertStatChange(player1, ATK, 0);
+        assertStatChange(player1, STR, 0);
         setDRN(2, 3, 2, 3, 3, 2, 2, 2);
         player1.enqueueEvent(new BattleEvent(player1, player2));
-        assertEquals(29, (int) player1.getStat(HP));
-        assertEquals(29, (int) player2.getStat(HP));
-        assertEquals(10, (int) player1.getStat(ATK));
-        assertEquals(5, (int) player1.getStat(STR));
+        assertStatChange(player1, HP, -1);
+        assertStatChange(player2, HP, -1);
+        assertStatChange(player1, ATK, 0);
+        assertStatChange(player1, STR, 0);
     }
 
     @Test
     public void testBazookasWithWeapon() {
         applyTrait(player1, "bazookahands");
         equipWeapon(player1, W_GAUNTLET);
-        assertEquals(10, (int) player1.getStat(ATK));
-        assertEquals(5, (int) player1.getStat(STR));
+        assertStatChange(player1, ATK, 0);
+        assertStatChange(player1, STR, 0);
         setDRN(2, 3, 2, 3, 3, 2, 2, 2);
         player1.enqueueEvent(new BattleEvent(player1, player2));
-        assertEquals(29, (int) player1.getStat(HP));
-        assertEquals(30, (int) player2.getStat(HP));
-        assertEquals(10, (int) player1.getStat(ATK));
-        assertEquals(5, (int) player1.getStat(STR));
+        assertStatChange(player1, HP, -1);
+        assertStatChange(player2, HP, 0);
+        assertStatChange(player1, ATK, 0);
+        assertStatChange(player1, STR, 0);
     }
 
     @Test
@@ -376,14 +379,14 @@ public class TestGame extends TestBase {
         command.exec(player1, Stream.of(""));
         defaultStats();
         command.exec(player1, Stream.of("аа", "зп"));
-        assertEquals(2, (int) player1.getAttribute(BONUS_POINTS).orElse(-1));
-        assertEquals(12, (int) player1.getStat(ATK));
-        assertEquals(11, (int) player1.getStat(DEF));
-        assertEquals(5, (int) player1.getStat(STR));
-        assertEquals(5, (int) player1.getStat(PRT));
-        assertEquals(10, (int) player1.getStat(LCK));
-        assertEquals(30, (int) player1.getStat(HP));
-        assertEquals(Player.BASE_STM, (int) player1.getStat(STM));
+        assertBonusPointsSpent(3);
+        assertStatChange(player1, ATK, 2);
+        assertStatChange(player1, DEF, 1);
+        assertStatChange(player1, STR, 0);
+        assertStatChange(player1, PRT, 0);
+        assertStatChange(player1, LCK, 0);
+        assertStatChange(player1, HP, 0);
+        assertStatChange(player1, STM, 0);
         command.exec(player1, Stream.of("с", "б"));
         fullySpent();
         command.exec(player1, Stream.of("с"));
@@ -400,7 +403,7 @@ public class TestGame extends TestBase {
         }
         command.exec(player1, Stream.of("ааа", "зз"));
         defaultStats();
-        assertEquals(0, (int) player1.getAttribute(BONUS_POINTS).orElse(-1));
+        assertBonusPointsSpent(5);
     }
 
     @Test
@@ -409,47 +412,51 @@ public class TestGame extends TestBase {
         player1.detachEffect(StaminaRegenEffect.TYPE); // turn off stamina regen to prevent test failure due to ticks
         defaultStats();
         command.exec(player1, Stream.of("аз"));
-        assertEquals(11, (int) player1.getStat(ATK));
-        assertEquals(11, (int) player1.getStat(DEF));
-        assertEquals(5, (int) player1.getStat(STR));
-        assertEquals(5, (int) player1.getStat(PRT));
-        assertEquals(10, (int) player1.getStat(LCK));
-        assertEquals(30, (int) player1.getStat(HP));
-        assertEquals(Player.BASE_STM, (int) player1.getStat(STM));
-        assertEquals(3, (int) player1.getAttribute(BONUS_POINTS).orElse(-1));
+        assertStatChange(player1, ATK, 1);
+        assertStatChange(player1, DEF, 1);
+        assertStatChange(player1, STR, 0);
+        assertStatChange(player1, PRT, 0);
+        assertStatChange(player1, LCK, 0);
+        assertStatChange(player1, HP, 0);
+        assertStatChange(player1, STM, 0);
+        assertBonusPointsSpent(2);
         for (int i = 0; i < Player.BONUS_EXPIRATON_TICKS; ++i) {
             player1.enqueueEvent(new TickEvent());
         }
         command.exec(player1, Stream.of("ааа", "зз"));
-        assertEquals(11, (int) player1.getStat(ATK));
-        assertEquals(11, (int) player1.getStat(DEF));
-        assertEquals(5, (int) player1.getStat(STR));
-        assertEquals(5, (int) player1.getStat(PRT));
-        assertEquals(10, (int) player1.getStat(LCK));
-        assertEquals(30, (int) player1.getStat(HP));
-        assertEquals(Player.BASE_STM, (int) player1.getStat(STM));
-        assertEquals(0, (int) player1.getAttribute(BONUS_POINTS).orElse(-1));
+        assertStatChange(player1, ATK, 1);
+        assertStatChange(player1, DEF, 1);
+        assertStatChange(player1, STR, 0);
+        assertStatChange(player1, PRT, 0);
+        assertStatChange(player1, LCK, 0);
+        assertStatChange(player1, HP, 0);
+        assertStatChange(player1, STM, 0);
+        assertBonusPointsSpent(5);
+    }
+
+    private void assertBonusPointsSpent(int pts) {
+        assertEquals(Player.BASE_BONUS_POINTS - pts, (int) player1.getAttribute(BONUS_POINTS).orElse(-1));
     }
 
     public void fullySpent() {
-        assertEquals(0, (int) player1.getAttribute(BONUS_POINTS).orElse(-1));
-        assertEquals(12, (int) player1.getStat(ATK));
-        assertEquals(11, (int) player1.getStat(DEF));
-        assertEquals(6, (int) player1.getStat(STR));
-        assertEquals(6, (int) player1.getStat(PRT));
-        assertEquals(10, (int) player1.getStat(LCK));
-        assertEquals(30, (int) player1.getStat(HP));
-        assertEquals(Player.BASE_STM, (int) player1.getStat(STM));
+        assertBonusPointsSpent(5);
+        assertStatChange(player1, ATK, 2);
+        assertStatChange(player1, DEF, 1);
+        assertStatChange(player1, STR, 1);
+        assertStatChange(player1, PRT, 1);
+        assertStatChange(player1, LCK, 0);
+        assertStatChange(player1, HP, 0);
+        assertStatChange(player1, STM, 0);
     }
 
     public void defaultStats() {
-        assertEquals(10, (int) player1.getStat(ATK));
-        assertEquals(10, (int) player1.getStat(DEF));
-        assertEquals(5, (int) player1.getStat(STR));
-        assertEquals(5, (int) player1.getStat(PRT));
-        assertEquals(10, (int) player1.getStat(LCK));
-        assertEquals(30, (int) player1.getStat(HP));
-        assertEquals(Player.BASE_STM, (int) player1.getStat(STM));
+        assertStatChange(player1, ATK, 0);
+        assertStatChange(player1, DEF, 0);
+        assertStatChange(player1, STR, 0);
+        assertStatChange(player1, PRT, 0);
+        assertStatChange(player1, LCK, 0);
+        assertStatChange(player1, HP, 0);
+        assertStatChange(player1, STM, 0);
     }
 
     @Test

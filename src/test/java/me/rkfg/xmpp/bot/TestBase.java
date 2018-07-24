@@ -8,6 +8,7 @@ import static org.mockito.Mockito.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -21,8 +22,10 @@ import org.slf4j.LoggerFactory;
 import me.rkfg.xmpp.bot.message.MatrixMessage;
 import me.rkfg.xmpp.bot.plugins.game.IMutablePlayer;
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
+import me.rkfg.xmpp.bot.plugins.game.Player;
 import me.rkfg.xmpp.bot.plugins.game.World;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.ChargeableEffect;
+import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 import me.rkfg.xmpp.bot.plugins.game.misc.Utils;
 import me.rkfg.xmpp.bot.plugins.game.repository.AbstractContentRepository;
 
@@ -44,6 +47,9 @@ public class TestBase {
     protected IMutablePlayer player3;
     protected IMutablePlayer player4;
     protected IMutablePlayer player5;
+
+    private static final List<Integer> BASE_STATS = Arrays.asList(Player.BASE_HP, Player.BASE_STM, Player.BASE_ATK, Player.BASE_DEF,
+            Player.BASE_STR, Player.BASE_PRT, Player.BASE_LCK);
 
     @BeforeAll
     static void initWorld() {
@@ -134,5 +140,17 @@ public class TestBase {
 
     protected void applyTrait(IPlayer player, String type) {
         World.THIS.getTraitsRepository().getObjectById(type).ifPresent(player::attachEffect);
+    }
+
+    protected void assertBattleSTMChange(IPlayer player, int cnt) {
+        assertStatChange(player, STM, -Player.BATTLE_FATIGUE_COST * cnt);
+    }
+
+    protected void assertStatChange(IPlayer player, TypedAttribute<Integer> attr, int diff) {
+        int i = STATS.indexOf(attr);
+        if (i < 0) {
+            fail("Stat not found");
+        }
+        assertEquals(BASE_STATS.get(i) + diff, (int) player.getStat(attr));
     }
 }

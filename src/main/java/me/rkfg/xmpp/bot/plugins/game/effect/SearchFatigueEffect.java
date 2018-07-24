@@ -9,9 +9,9 @@ public class SearchFatigueEffect extends AbstractEffect implements IFatigueEffec
 
     public static final String TYPE = "searchfatigue";
 
-    public SearchFatigueEffect() {
+    public SearchFatigueEffect(int stmCost) {
         super(TYPE, "устаёт при поисках");
-        initFatigue(4);
+        initFatigue(stmCost);
     }
 
     @Override

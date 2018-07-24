@@ -39,11 +39,37 @@ import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttributeMap;
 
 public class Player extends AbstractEffectReceiver implements IMutablePlayer, IMutableStats {
 
+    public static final int BASE_BONUS_POINTS = 5;
+
+    public static final int BASE_LCK = 10;
+
+    public static final int BASE_PRT = 5;
+
+    public static final int BASE_STR = 5;
+
+    public static final int BASE_DEF = 10;
+
+    public static final int BASE_ATK = 10;
+
+    public static final int BASE_HP = 30;
+
     public static final int BONUS_EXPIRATON_TICKS = 8;
 
     public static final int BASE_STM = 15;
 
     private static final String UNNAMED = "<безымянный>";
+
+    public static final int BATTLE_FATIGUE_COST = 5;
+
+    public static final int AMBUSH_FATIGUE_COST = 7;
+
+    public static final int HIDE_FATIGUE_COST = 2;
+
+    public static final int SEARCH_FATIGUE_COST = 4;
+
+    public static final int YELL_FATIGUE_COST = 2;
+
+    public static final int WHISPER_FATIGUE_COST = 1;
 
     private class LogEntry {
         String message;
@@ -266,25 +292,25 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
         equipment = new TypedAttributeMap();
         backpack = new ArrayList<>();
         name = UNNAMED;
-        stats.put(HP, 30);
-        stats.put(ATK, 10);
-        stats.put(DEF, 10);
-        stats.put(STR, 5);
-        stats.put(PRT, 5);
-        stats.put(LCK, 10);
+        stats.put(HP, BASE_HP);
+        stats.put(ATK, BASE_ATK);
+        stats.put(DEF, BASE_DEF);
+        stats.put(STR, BASE_STR);
+        stats.put(PRT, BASE_PRT);
+        stats.put(LCK, BASE_LCK);
         stats.put(STM, BASE_STM);
-        stats.put(BONUS_POINTS, 5);
+        stats.put(BONUS_POINTS, BASE_BONUS_POINTS);
         equipment.put(WEAPON_SLOT, new Slot("держит в руках"));
         equipment.put(ARMOR_SLOT, new Slot("одет в"));
-        enqueueAttachEffect(new BattleFatigueEffect());
-        enqueueAttachEffect(new HideFatigueEffect());
-        enqueueAttachEffect(new SearchFatigueEffect());
-        enqueueAttachEffect(new AmbushFatigueEffect());
+        enqueueAttachEffect(new BattleFatigueEffect(BATTLE_FATIGUE_COST));
+        enqueueAttachEffect(new HideFatigueEffect(HIDE_FATIGUE_COST));
+        enqueueAttachEffect(new SearchFatigueEffect(SEARCH_FATIGUE_COST));
+        enqueueAttachEffect(new AmbushFatigueEffect(AMBUSH_FATIGUE_COST));
         enqueueAttachEffect(new StaminaRegenEffect());
         enqueueAttachEffect(new EquipRedirectorEffect());
         enqueueAttachEffect(new LootEffect());
         enqueueAttachEffect(new BattleAuraEffect());
-        enqueueAttachEffect(new SpeechFatigueEffect());
+        enqueueAttachEffect(new SpeechFatigueEffect(YELL_FATIGUE_COST, WHISPER_FATIGUE_COST));
         enqueueAttachEffect(new ExpiringBonusPointsEffect(5, BONUS_EXPIRATON_TICKS));
         setState(GamePlayerState.PLAYING);
     }
