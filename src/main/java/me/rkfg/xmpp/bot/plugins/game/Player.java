@@ -61,7 +61,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
 
     public static final int BATTLE_FATIGUE_COST = 5;
 
-    public static final int AMBUSH_FATIGUE_COST = 7;
+    public static final int AMBUSH_FATIGUE_COST = 5;
 
     public static final int HIDE_FATIGUE_COST = 2;
 
