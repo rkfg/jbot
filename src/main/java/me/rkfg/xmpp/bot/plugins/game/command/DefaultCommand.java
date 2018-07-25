@@ -12,13 +12,18 @@ public class DefaultCommand implements ICommandHandler {
 
     @Override
     public Collection<String> getCommand() {
-        return Arrays.asList("");
+        return Arrays.asList("статус");
     }
 
     @Override
     public Optional<String> exec(IPlayer player, Stream<String> args) {
         World.THIS.defaultCommand(player);
         return Optional.empty();
+    }
+    
+    @Override
+    public Optional<String> getHelp() {
+        return Optional.of("Показать ваши характеристики.");
     }
 
     @Override

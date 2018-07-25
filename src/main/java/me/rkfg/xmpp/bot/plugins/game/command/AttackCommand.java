@@ -5,7 +5,9 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import me.rkfg.xmpp.bot.plugins.game.GamePlugin;
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
+import me.rkfg.xmpp.bot.plugins.game.Player;
 import me.rkfg.xmpp.bot.plugins.game.event.BattleEvent;
 
 public class AttackCommand implements ICommandHandler {
@@ -34,8 +36,8 @@ public class AttackCommand implements ICommandHandler {
 
     @Override
     public Optional<String> getHelp() {
-        return Optional.of(
-                "Атаковать противника из списка игроков по его номеру (требует 5 единиц энергии). Список можно посмотреть командой %гм игроки");
+        return Optional.of("Атаковать противника из списка игроков по его номеру (требует " + Player.BATTLE_FATIGUE_COST
+                + " единиц энергии). Список можно посмотреть командой " + GamePlugin.CMD + "игроки");
     }
 
 }

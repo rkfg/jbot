@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
+import me.rkfg.xmpp.bot.plugins.game.Player;
 import me.rkfg.xmpp.bot.plugins.game.event.SearchEvent;
 
 public class SearchCommand implements ICommandHandler {
@@ -25,7 +26,7 @@ public class SearchCommand implements ICommandHandler {
 
     @Override
     public Optional<String> getHelp() {
-        return Optional.of("Искать какие-либо полезные предметы вокруг (требует 4 единицы энергии).");
+        return Optional.of("Искать какие-либо полезные предметы вокруг (требует " + Player.SEARCH_FATIGUE_COST + " единицы энергии).");
     }
 
 }

@@ -1,18 +1,18 @@
 package me.rkfg.xmpp.bot.plugins.game;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import me.rkfg.xmpp.bot.message.Message;
-import me.rkfg.xmpp.bot.plugins.CommandPlugin;
+import me.rkfg.xmpp.bot.plugins.MessagePluginImpl;
 import me.rkfg.xmpp.bot.plugins.game.command.AmbiguousCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.AmbushCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.AttackCommand;
@@ -36,11 +36,11 @@ import me.rkfg.xmpp.bot.plugins.game.command.UseCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.WhisperCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.YellCommand;
 import me.rkfg.xmpp.bot.plugins.game.misc.Attrs.GamePlayerState;
-import ru.ppsrk.gwt.client.ClientAuthException;
-import ru.ppsrk.gwt.client.LogicException;
 
-public class GamePlugin extends CommandPlugin {
+public class GamePlugin extends MessagePluginImpl {
 
+    public static final String CMD = ""; // may be set to '%gm ' if the bot runs other plugins
+    
     @Override
     public void init() {
         World.THIS.init("data");
@@ -50,10 +50,10 @@ public class GamePlugin extends CommandPlugin {
     private Map<String, ICommandHandler> handlers = new HashMap<>();
 
     @Override
-    public String processCommand(Message message, Matcher matcher) throws LogicException, ClientAuthException {
+    public String process(Message message, Matcher matcher) {
         synchronized (World.THIS) {
             List<String> args = new ArrayList<>();
-            final String argsStr = matcher.group(COMMAND_GROUP);
+            final String argsStr = matcher.group(1);
             if (argsStr != null) {
                 args = Stream.of(argsStr.split(" ")).filter(c -> !c.isEmpty()).collect(Collectors.toList());
             }
@@ -127,8 +127,8 @@ public class GamePlugin extends CommandPlugin {
     }
 
     @Override
-    public List<String> getCommand() {
-        return Arrays.asList("gm", "гм");
+    public Pattern getPattern() {
+        return Pattern.compile("(.+)", Pattern.DOTALL);
     }
 
 }

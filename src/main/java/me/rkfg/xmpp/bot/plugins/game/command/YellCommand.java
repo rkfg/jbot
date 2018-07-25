@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
+import me.rkfg.xmpp.bot.plugins.game.Player;
 import me.rkfg.xmpp.bot.plugins.game.World;
 import me.rkfg.xmpp.bot.plugins.game.effect.SpeechFatigueEffect;
 import me.rkfg.xmpp.bot.plugins.game.event.SpeechEvent;
@@ -37,6 +38,6 @@ public class YellCommand implements ICommandHandler {
     @Override
     public Optional<String> getHelp() {
         return Optional.of("проорать что-нибудь на всю игровую зону. Укажите текст сообщения. За каждые "
-                + SpeechFatigueEffect.CHARS_PER_FATIGUE + " символов снимется 2 энергии.");
+                + SpeechFatigueEffect.CHARS_PER_FATIGUE + " символов снимется " + Player.YELL_FATIGUE_COST + " энергии.");
     }
 }

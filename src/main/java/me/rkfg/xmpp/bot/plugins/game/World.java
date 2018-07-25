@@ -172,13 +172,13 @@ public class World extends Player {
         case GATHER:
             switch (player.getState()) {
             case NONE:
-                player.log("Чтобы вступить в игру, напишите %гм участвую");
+                player.log("Чтобы вступить в игру, напишите " + GamePlugin.CMD + "участвую");
                 break;
             case READY:
                 player.log("Вы готовы начать игру.");
                 break;
             case GATHER:
-                player.log("Чтобы подтвердить свою готовность, напишите %гм готов");
+                player.log("Чтобы подтвердить свою готовность, напишите " + GamePlugin.CMD + "готов");
                 break;
             default:
                 player.log("Неверный статус.");
@@ -220,11 +220,11 @@ public class World extends Player {
                     if (readyPlayersPct >= 75 && gatherCnt > 1) {
                         startGame();
                     } else {
-                        player.log("Чтобы отменить свою готовность, напишите %гм готов 0");
+                        player.log("Чтобы отменить свою готовность, напишите " + GamePlugin.CMD + "готов 0");
                     }
                     break;
                 case GATHER:
-                    player.log("Вы будете участвовать в игре. Чтобы отказаться от участия, напишите %гм участвую 0");
+                    player.log("Вы будете участвовать в игре. Чтобы отказаться от участия, напишите " + GamePlugin.CMD + "участвую 0");
                     break;
                 default:
                     player.log("Неверный статус.");

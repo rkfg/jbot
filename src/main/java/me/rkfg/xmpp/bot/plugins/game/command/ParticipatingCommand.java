@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import me.rkfg.xmpp.bot.plugins.game.GamePlugin;
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.World;
 import me.rkfg.xmpp.bot.plugins.game.misc.Attrs.GamePlayerState;
@@ -25,10 +26,10 @@ public class ParticipatingCommand implements ICommandHandler {
         }
         return World.THIS.setPlayerState(player, GamePlayerState.GATHER);
     }
-    
+
     @Override
     public Optional<String> getHelp() {
-        return Optional.of("Зарегистрироваться на игру. Отменить участие можно с помощью %гм участвую 0");
+        return Optional.of("Зарегистрироваться на игру. Отменить участие можно с помощью " + GamePlugin.CMD + "участвую 0");
     }
 
     @Override

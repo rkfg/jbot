@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import me.rkfg.xmpp.bot.plugins.game.GamePlugin;
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.effect.ExpiringBonusPointsEffect;
 
@@ -55,8 +56,8 @@ public class SpendPointsCommand implements ICommandHandler {
         return Optional
                 .of("распределить очки по статам. Без аргумента покажет количество имеющихся очков. Используйте столько букв подряд, "
                         + "сколько очков желаете потратить на стату, отдельные статы можно разделять пробелами по желанию. "
-                        + "Буквы стат: [а]така, [з]ащита, [с]ила, [б]роня, [у]дача, [э]нергия, з[д]оровье. "
-                        + "Например, '%гм бонус аа з сс' добавит 2 атаки, 1 защиту и 2 силы.");
+                        + "Буквы стат: [а]така, [з]ащита, [с]ила, [б]роня, [у]дача, [э]нергия, з[д]оровье. " + "Например, '" + GamePlugin.CMD
+                        + "бонус аа з сс' добавит 2 атаки, 1 защиту и 2 силы.");
     }
 
 }
