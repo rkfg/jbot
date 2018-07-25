@@ -69,13 +69,9 @@ public class BattleEvent extends AbstractEvent {
                         "" + attackEvent.getDamage() };
                 if (attackEvent.isSuccessful()) {
                     if (attackEvent.getDamage() >= 10) {
-                        String[] valsCaps = new String[vals.length];
-                        for (int i = 0; i < vals.length; ++i) {
-                            valsCaps[i] = vals[i].toUpperCase();
-                        }
                         // CRITICAL HIT
-                        attacker.log("atksc", keys, valsCaps);
-                        defender.log("deffc", keys, valsCaps);
+                        attacker.log("atksc", keys, vals, m -> "*%* " + m.toUpperCase() + " *%*");
+                        defender.log("deffc", keys, vals, m -> "@&@ " + m.toUpperCase() + " @&@");
                     } else {
                         attacker.log("atks", keys, vals);
                         defender.log("deff", keys, vals);

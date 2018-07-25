@@ -4,6 +4,7 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import me.rkfg.xmpp.bot.plugins.game.effect.IEffect;
@@ -36,6 +37,10 @@ public interface IGameObject extends IGameBase, IHasDescription {
     }
 
     default void log(String messageType, String[] keys, String[] values) {
+        log(messageType, keys, values, null);
+    }
+
+    default void log(String messageType, String[] keys, String[] values, Function<String, String> postproc) {
         Optional<String> message = World.THIS.getMessageRepository().getRandomObject(DESC_IDX, messageType);
         if (!message.isPresent()) {
             log("Message of type [%s] not found", messageType);
@@ -47,6 +52,9 @@ public interface IGameObject extends IGameBase, IHasDescription {
             }
             for (int i = 0; i < keys.length; ++i) {
                 m = m.replaceAll(Pattern.quote(keys[i]), values[i]);
+            }
+            if (postproc != null) {
+                m = postproc.apply(m);
             }
             log(m);
         });
