@@ -20,7 +20,7 @@ public class RudeDrawingsEffect extends StatsEffect implements ITemporaryEffect 
 
     @Override
     public Collection<IEvent> processEvent(IEvent event) {
-        return processTemporary(event, TYPE);
+        return processTemporary(event, TYPE, "Нехорошие рисунки на вас стёрлись.");
     }
 
 }

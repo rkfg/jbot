@@ -42,6 +42,11 @@ public interface IItem extends IGameObject, IHasAttributes, IHasType {
         getOwner().ifPresent(owner -> owner.log(message));
     }
 
+    @Override
+    default void flushLogs() {
+        getOwner().ifPresent(IGameObject::flushLogs);
+    }
+
     default void onUse() {
 
     }

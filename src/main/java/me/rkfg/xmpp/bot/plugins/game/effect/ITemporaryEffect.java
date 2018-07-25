@@ -14,9 +14,17 @@ public interface ITemporaryEffect extends IEffect {
     }
 
     default Collection<IEvent> processTemporary(IEvent event, String type) {
+        return processTemporary(event, type, null);
+    }
+
+    default Collection<IEvent> processTemporary(IEvent event, String type, String detachMessage) {
         if (event.isOfType(TickEvent.TYPE)) {
             return getAttribute(LIFETIME).map(l -> {
                 if (--l < 1) {
+                    if (detachMessage != null && !detachMessage.isEmpty()) {
+                        getTarget().log(detachMessage);
+                        getTarget().flushLogs();
+                    }
                     return detachEffect(type);
                 } else {
                     setAttribute(LIFETIME, l);

@@ -52,6 +52,10 @@ public interface IGameObject extends IGameBase, IHasDescription {
         });
     }
 
+    default void flushLogs() {
+        // do nothing
+    }
+
     void enqueueEvents(IEvent... events);
 
     <T extends IGameObject> Optional<T> as(TypedAttribute<T> type);
