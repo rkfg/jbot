@@ -4,6 +4,7 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 import static me.rkfg.xmpp.bot.plugins.game.misc.Utils.*;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,7 +103,11 @@ public class World extends Player {
     }
 
     public List<IPlayer> listPlayers() {
-        return players.values().stream().sorted((p1, p2) -> p1.getName().compareTo(p2.getName())).collect(Collectors.toList());
+        Comparator<? super IPlayer> comparator = (p1, p2) -> p1.getName().compareTo(p2.getName());
+        if (getState() != GamePlayerState.PLAYING) {
+            comparator = (p1, p2) -> p1.getId().compareTo(p2.getId());
+        }
+        return players.values().stream().sorted(comparator).collect(Collectors.toList());
     }
 
     private void generateTraits(IPlayer player) {
