@@ -68,8 +68,18 @@ public class BattleEvent extends AbstractEvent {
                 String[] vals = new String[] { attacker.getName(), defender.getName(), attacker.getWeaponName(), defender.getArmorName(),
                         "" + attackEvent.getDamage() };
                 if (attackEvent.isSuccessful()) {
-                    attacker.log("atks", keys, vals);
-                    defender.log("deff", keys, vals);
+                    if (attackEvent.getDamage() >= 10) {
+                        String[] valsCaps = new String[vals.length];
+                        for (int i = 0; i < vals.length; ++i) {
+                            valsCaps[i] = vals[i].toUpperCase();
+                        }
+                        // CRITICAL HIT
+                        attacker.log("atksc", keys, valsCaps);
+                        defender.log("deffc", keys, valsCaps);
+                    } else {
+                        attacker.log("atks", keys, vals);
+                        defender.log("deff", keys, vals);
+                    }
                     final StatsEvent statsEvent = new StatsEvent();
                     statsEvent.setSource(attacker);
                     defender.enqueueEvent(statsEvent.setAttributeChain(HP, -attackEvent.getDamage()));
