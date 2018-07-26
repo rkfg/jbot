@@ -8,7 +8,6 @@ import java.util.Collection;
 import org.slf4j.LoggerFactory;
 
 import me.rkfg.xmpp.bot.plugins.game.World;
-import me.rkfg.xmpp.bot.plugins.game.event.BattleInviteEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.StatsEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
@@ -34,10 +33,6 @@ public class StaminaRegenEffect extends AbstractEffect implements IBattleEffect 
 
     @Override
     public Collection<IEvent> processEvent(IEvent event) {
-        if (event.isOfType(BattleInviteEvent.TYPE) && imAttacker(event)) {
-            setAttribute(IDLE, 0);
-            target.enqueueDetachEffect(CowardEffect.TYPE);
-        }
         if (!event.isOfType(TickEvent.TYPE)) {
             return super.processEvent(event);
         }
@@ -69,12 +64,12 @@ public class StaminaRegenEffect extends AbstractEffect implements IBattleEffect 
         Integer idle = getAttribute(IDLE).orElse(0);
         if (idle == IDLE_LIMIT - IDLE_WARN) {
             target.log("Вы слишком долго сидите без активных действий. "
-                    + "Через %d секунд вы будете ссыклом и вряд ли сможете найти какие-либо предметы.", World.TICKRATE * IDLE_WARN);
+                    + "Через %d секунд вы станете ссыклом и вряд ли сможете найти какие-либо предметы.", World.TICKRATE * IDLE_WARN);
             target.flushLogs();
         }
         if (idle == IDLE_LIMIT) {
             target.enqueueAttachEffect(new CowardEffect());
-            target.log("Вы слишком долго сидите без активных действий и стали ссыклом.");
+            target.log("Вы слишком долго сидели без активных действий и стали ссыклом.");
             target.flushLogs();
         }
     }

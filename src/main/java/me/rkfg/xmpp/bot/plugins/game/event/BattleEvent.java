@@ -4,6 +4,8 @@ import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.effect.BattleFatigueEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.CowardEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.StaminaRegenEffect;
 
 public class BattleEvent extends AbstractEvent {
 
@@ -20,8 +22,13 @@ public class BattleEvent extends AbstractEvent {
     @Override
     public void apply() {
         source.as(PLAYER_OBJ).ifPresent(attacker -> target.as(PLAYER_OBJ).ifPresent(defender -> {
-            if (!attacker.enqueueEvent(createInviteEvent(attacker, defender))
-                    || !defender.enqueueEvent(createInviteEvent(attacker, defender))) {
+            final boolean attackInviteSucceeded = attacker.enqueueEvent(createInviteEvent(attacker, defender));
+            final boolean defendInviteSucceeded = defender.enqueueEvent(createInviteEvent(attacker, defender));
+            if (attackInviteSucceeded) {
+                attacker.getEffect(StaminaRegenEffect.TYPE).ifPresent(e -> e.setAttribute(StaminaRegenEffect.IDLE, 0));
+                attacker.enqueueDetachEffect(CowardEffect.TYPE);
+            }
+            if (!attackInviteSucceeded || !defendInviteSucceeded) {
                 return;
             }
             attacker.enqueueEvent(new BattleBeginsEvent(attacker, defender));
@@ -34,8 +41,7 @@ public class BattleEvent extends AbstractEvent {
             BattleAttackEvent defenceEvent = null;
             int rollLimit = ROLL_LIMIT;
             // roll until at least one attack succeeds
-            while (rollLimit-- > 0 && (attackEvent == null || !attackEvent.isSuccessful())
-                    && (defenceEvent == null || !defenceEvent.isSuccessful())) {
+            while (rollLimit-- > 0 && isRollUnsuccessful(attackEvent, defenceEvent)) {
                 attackEvent = new BattleAttackEvent(attacker, defender);
                 defenceEvent = new BattleAttackEvent(defender, attacker);
             }
@@ -50,6 +56,10 @@ public class BattleEvent extends AbstractEvent {
             attacker.dumpStats();
             defender.dumpStats();
         }));
+    }
+
+    private boolean isRollUnsuccessful(BattleAttackEvent attackEvent, BattleAttackEvent defenceEvent) {
+        return (attackEvent == null || !attackEvent.isSuccessful()) && (defenceEvent == null || !defenceEvent.isSuccessful());
     }
 
     public BattleInviteEvent createInviteEvent(IPlayer attacker, IPlayer defender) {
