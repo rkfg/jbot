@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.World;
+import me.rkfg.xmpp.bot.plugins.game.effect.CowardEffect;
 import me.rkfg.xmpp.bot.plugins.game.item.IItem;
 import me.rkfg.xmpp.bot.plugins.game.item.ISlot;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
@@ -51,11 +52,12 @@ public class SearchEvent extends AbstractEvent {
         int searchDRN = Utils.drn();
         int search = avg + searchDRN;
         int terrDRN = Utils.drn();
-        int territory = terrDRN - 6;
+        int cowardPts = p.getEffect(CowardEffect.TYPE).flatMap(e -> e.getAttribute(CowardEffect.COWARD_PTS)).orElse(0);
+        int territory = terrDRN - 6 + cowardPts;
         int diff = search - territory;
         log.debug("Search started, ATK: {}, DEF: {}, LCK: {}, avg: {}, DRN: {}, search: {}", p.getStat(ATK), p.getStat(DEF), p.getStat(LCK),
                 avg, searchDRN, search);
-        log.debug("territory: {}, DRN: {},  diff: {}", territory, terrDRN, diff);
+        log.debug("territory: {}, DRN: {}, coward pts: {}, diff: {}", territory, terrDRN, cowardPts, diff);
         if (diff < 1) {
             return Optional.empty();
         }

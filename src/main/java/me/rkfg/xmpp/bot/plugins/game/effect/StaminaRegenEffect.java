@@ -7,19 +7,25 @@ import java.util.Collection;
 
 import org.slf4j.LoggerFactory;
 
+import me.rkfg.xmpp.bot.plugins.game.World;
+import me.rkfg.xmpp.bot.plugins.game.event.BattleInviteEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.StatsEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 
-public class StaminaRegenEffect extends AbstractEffect {
+public class StaminaRegenEffect extends AbstractEffect implements IBattleEffect {
 
+    private static final int IDLE_WARN = 2;
     public static final String TYPE = "stmregen";
     public static final TypedAttribute<Integer> REGEN = TypedAttribute.of("regen");
+    public static final TypedAttribute<Integer> IDLE = TypedAttribute.of("idle");
+    public static final Integer IDLE_LIMIT = 9;
 
     public StaminaRegenEffect(int regenPerTick) {
         super(TYPE, "регенерация стамины");
         setAttribute(REGEN, regenPerTick);
+        setAttribute(IDLE, 0);
     }
 
     public StaminaRegenEffect() {
@@ -28,6 +34,10 @@ public class StaminaRegenEffect extends AbstractEffect {
 
     @Override
     public Collection<IEvent> processEvent(IEvent event) {
+        if (event.isOfType(BattleInviteEvent.TYPE) && imAttacker(event)) {
+            setAttribute(IDLE, 0);
+            target.enqueueDetachEffect(CowardEffect.TYPE);
+        }
         if (!event.isOfType(TickEvent.TYPE)) {
             return super.processEvent(event);
         }
@@ -35,6 +45,7 @@ public class StaminaRegenEffect extends AbstractEffect {
             if (!p.isAlive()) {
                 return null;
             }
+            processCowardness();
             int tired = p.getStat(HP) / 2 + drn();
             int wired = p.getStat(STM) + drn();
             if (tired > wired) {
@@ -48,6 +59,25 @@ public class StaminaRegenEffect extends AbstractEffect {
                 return null;
             }
         }).orElseGet(this::noEvent);
+    }
+
+    private void processCowardness() {
+        changeAttribute(IDLE, 1);
+        Integer idle = getAttribute(IDLE).orElse(0);
+        if (!target.hasEffect(CowardEffect.TYPE)) {
+            if (idle > IDLE_LIMIT - IDLE_WARN && idle <= IDLE_LIMIT) {
+                target.log(
+                        "Вы слишком долго сидите без активных действий. "
+                                + "Через %d секунд вы будете ссыклом и вряд ли сможете найти какие-либо предметы.",
+                        World.TICKRATE * (IDLE_LIMIT - idle + 1));
+                target.flushLogs();
+            }
+            if (idle > IDLE_LIMIT) {
+                target.enqueueAttachEffect(new CowardEffect());
+                target.log("Вы слишком долго сидите без активных действий и стали ссыклом.");
+                target.flushLogs();
+            }
+        }
     }
 
     @Override
