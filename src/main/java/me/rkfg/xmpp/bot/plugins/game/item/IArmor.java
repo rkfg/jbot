@@ -34,7 +34,7 @@ public interface IArmor extends IStatsItem {
 
     @Override
     default String getStatsStr() {
-        return String.format(" З:%d/Б:%d [б]", getDefence(), getProtection());
+        return String.format(" [броня] З:%d/Б:%d", getDefence(), getProtection());
     }
 
     @Override
