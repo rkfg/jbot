@@ -130,6 +130,10 @@ public class TestBase {
         World.THIS.getWeaponRepository().getObjectById(type).ifPresent(player::enqueuePickup);
     }
 
+    protected void pickupArmor(IPlayer player, String type) {
+        World.THIS.getArmorRepository().getObjectById(type).ifPresent(player::enqueuePickup);
+    }
+
     protected void pickupItem(IPlayer player, String type) {
         World.THIS.getUsableRepository().getObjectById(type).ifPresent(player::enqueuePickup);
     }

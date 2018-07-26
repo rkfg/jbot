@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import me.rkfg.xmpp.bot.plugins.game.Player;
 import me.rkfg.xmpp.bot.plugins.game.World;
 import me.rkfg.xmpp.bot.plugins.game.command.EquipCommand;
+import me.rkfg.xmpp.bot.plugins.game.command.RebuildItemsCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.SpendPointsCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.UnequipCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.UseCommand;
@@ -463,7 +464,28 @@ public class TestGame extends TestBase {
     public void testSearch() {
         setRandom(randomMock, 2);
         setRandom(searchRandomMock, 0);
-        assertEquals("vodka", SearchEvent.getRandomItem(4).map(IItem::getType).orElse(""));
+        assertEquals("vodka", SearchEvent.getRandomItem(SearchEvent.getRepo(3), 4).map(IItem::getType).orElse(""));
     }
 
+    @Test
+    public void testRebuildSameType() {
+        pickupWeapon(player1, W_CONSOLE);
+        pickupWeapon(player1, W_IRONROD);
+        new RebuildItemsCommand().exec(player1, Stream.of("1", "2"));
+        List<IItem> backpack = player1.getBackpack();
+        assertEquals(1, backpack.size());
+        assertEquals("lasersaw", backpack.get(0).getType());
+    }
+
+    @Test
+    public void testRebuildDiffTypes() {
+        setRandom(randomMock, 2); // will choose usable repo
+        setRandom(searchRandomMock, 1); // will choose second usable item
+        pickupWeapon(player1, W_CONSOLE);
+        pickupArmor(player1, A_CHEATS);
+        new RebuildItemsCommand().exec(player1, Stream.of("1", "2"));
+        List<IItem> backpack = player1.getBackpack();
+        assertEquals(1, backpack.size());
+        assertEquals("doshirakbeef", backpack.get(0).getType());
+    }
 }

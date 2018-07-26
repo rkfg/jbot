@@ -72,26 +72,28 @@ public class SearchEvent extends AbstractEvent {
             tier = 4;
         }
         log.debug("Tier: {}", tier);
-        return getRandomItem(tier);
+        return getRandomItem(getRepo(0), tier);
     }
 
-    public static Optional<? extends IItem> getRandomItem(int tier) {
-        Optional<? extends IItem> found = Optional.empty();
-        int type = Utils.dice("1d3");
-        Optional<IObjectRepository<? extends IItem>> repo;
+    public static Optional<IObjectRepository<? extends IItem>> getRepo(int type) {
+        if (type < 1) {
+            type = Utils.dice("1d3");
+        }
         switch (type) {
         case 1:
-            repo = Optional.of(World.THIS.getWeaponRepository());
-            break;
+            return Optional.of(World.THIS.getWeaponRepository());
         case 2:
-            repo = Optional.of(World.THIS.getArmorRepository());
-            break;
+            return Optional.of(World.THIS.getArmorRepository());
         case 3:
-            repo = Optional.of(World.THIS.getUsableRepository());
-            break;
+            return Optional.of(World.THIS.getUsableRepository());
         default:
             return Optional.empty();
         }
+
+    }
+
+    public static Optional<? extends IItem> getRandomItem(Optional<IObjectRepository<? extends IItem>> repo, int tier) {
+        Optional<? extends IItem> found = Optional.empty();
         while (tier > 0 && !found.isPresent()) {
             final int t = tier;
             found = repo.flatMap(r -> r.getRandomObjectByTier(t));
