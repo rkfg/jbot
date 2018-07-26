@@ -20,7 +20,7 @@ public class StaminaRegenEffect extends AbstractEffect implements IBattleEffect 
     public static final String TYPE = "stmregen";
     public static final TypedAttribute<Integer> REGEN = TypedAttribute.of("regen");
     public static final TypedAttribute<Integer> IDLE = TypedAttribute.of("idle");
-    public static final Integer IDLE_LIMIT = 9;
+    public static final Integer IDLE_LIMIT = 10;
 
     public StaminaRegenEffect(int regenPerTick) {
         super(TYPE, "регенерация стамины");
@@ -62,21 +62,20 @@ public class StaminaRegenEffect extends AbstractEffect implements IBattleEffect 
     }
 
     private void processCowardness() {
+        if (target.hasEffect(CowardEffect.TYPE)) {
+            return;
+        }
         changeAttribute(IDLE, 1);
         Integer idle = getAttribute(IDLE).orElse(0);
-        if (!target.hasEffect(CowardEffect.TYPE)) {
-            if (idle > IDLE_LIMIT - IDLE_WARN && idle <= IDLE_LIMIT) {
-                target.log(
-                        "Вы слишком долго сидите без активных действий. "
-                                + "Через %d секунд вы будете ссыклом и вряд ли сможете найти какие-либо предметы.",
-                        World.TICKRATE * (IDLE_LIMIT - idle + 1));
-                target.flushLogs();
-            }
-            if (idle > IDLE_LIMIT) {
-                target.enqueueAttachEffect(new CowardEffect());
-                target.log("Вы слишком долго сидите без активных действий и стали ссыклом.");
-                target.flushLogs();
-            }
+        if (idle == IDLE_LIMIT - IDLE_WARN) {
+            target.log("Вы слишком долго сидите без активных действий. "
+                    + "Через %d секунд вы будете ссыклом и вряд ли сможете найти какие-либо предметы.", World.TICKRATE * IDLE_WARN);
+            target.flushLogs();
+        }
+        if (idle == IDLE_LIMIT) {
+            target.enqueueAttachEffect(new CowardEffect());
+            target.log("Вы слишком долго сидите без активных действий и стали ссыклом.");
+            target.flushLogs();
         }
     }
 

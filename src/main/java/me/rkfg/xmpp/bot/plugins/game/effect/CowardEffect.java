@@ -13,6 +13,7 @@ public class CowardEffect extends AbstractEffect {
 
     public static final String TYPE = "coward";
     public static final TypedAttribute<Integer> COWARD_PTS = TypedAttribute.of("points");
+    public static final Integer MAX_COWARD = 30;
 
     public CowardEffect() {
         super(TYPE, "ссыкло");
@@ -34,7 +35,9 @@ public class CowardEffect extends AbstractEffect {
     @Override
     public Collection<IEvent> processEvent(IEvent event) {
         if (event.isOfType(TickEvent.TYPE) && target.as(PLAYER_OBJ).map(p -> p.getStat(HP)).orElse(0) > 10) {
-            changeAttribute(COWARD_PTS, 1);
+            if (getAttribute(COWARD_PTS).orElse(0) < MAX_COWARD) {
+                changeAttribute(COWARD_PTS, 1);
+            }
             log.debug("Current coward pts: {}", getAttribute(COWARD_PTS).orElse(0));
         }
         return super.processEvent(event);
@@ -56,5 +59,5 @@ public class CowardEffect extends AbstractEffect {
     public void onAfterDetach() {
         target.log("Вы больше не ссыкло!");
     }
-    
+
 }
