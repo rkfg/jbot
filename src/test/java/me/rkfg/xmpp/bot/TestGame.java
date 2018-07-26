@@ -18,6 +18,7 @@ import me.rkfg.xmpp.bot.plugins.game.command.SpendPointsCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.UnequipCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.UseCommand;
 import me.rkfg.xmpp.bot.plugins.game.effect.AmbushEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.CowardEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.HideEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.StaminaRegenEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.ChargeableEffect;
@@ -464,7 +465,7 @@ public class TestGame extends TestBase {
     public void testSearch() {
         setRandom(randomMock, 2);
         setRandom(searchRandomMock, 0);
-        assertEquals("vodka", SearchEvent.getRandomItem(SearchEvent.getRepo(3), 4).map(IItem::getType).orElse(""));
+        assertEquals("buffout", SearchEvent.getRandomItem(SearchEvent.getRepo(3), 4).map(IItem::getType).orElse(""));
     }
 
     @Test
@@ -487,5 +488,45 @@ public class TestGame extends TestBase {
         List<IItem> backpack = player1.getBackpack();
         assertEquals(1, backpack.size());
         assertEquals("doshirakbeef", backpack.get(0).getType());
+    }
+
+    @Test
+    public void testCowardEffect() {
+        setRandom(searchRandomMock, 0);
+        setRandom(randomMock, 0);
+        player2.setAttribute(HP, 10);
+        for (int i = 0; i < StaminaRegenEffect.IDLE_LIMIT - 1; ++i) {
+            player1.enqueueEvent(new TickEvent());
+            player2.enqueueEvent(new TickEvent());
+        }
+        assertFalse(player1.hasEffect(CowardEffect.TYPE));
+        assertFalse(player2.hasEffect(CowardEffect.TYPE));
+        player1.enqueueEvent(new TickEvent());
+        player2.enqueueEvent(new TickEvent());
+        assertTrue(player1.hasEffect(CowardEffect.TYPE));
+        assertTrue(player2.hasEffect(CowardEffect.TYPE));
+        for (int i = 0; i < 20; ++i) {
+            player1.enqueueEvent(new TickEvent());
+            player2.enqueueEvent(new TickEvent());
+        }
+        assertEquals(30, (int) player1.getEffect(CowardEffect.TYPE).flatMap(e -> e.getAttribute(CowardEffect.COWARD_PTS)).orElse(-1));
+        player1.enqueueEvent(new SearchEvent());
+        assertEquals(0, player1.getBackpack().size());
+        assertFalse(player1.getArmor().isPresent());
+        assertFalse(player1.getWeapon().isPresent());
+        setDRN(3, 2, 3, 2, 3, 2, 3, 2);
+        player1.enqueueEvent(new BattleEvent(player1, player2));
+        assertFalse(player1.hasEffect(CowardEffect.TYPE));
+        assertTrue(player2.hasEffect(CowardEffect.TYPE));
+        setRandom(searchRandomMock, 0);
+        setRandom(randomMock, 0);
+        player1.enqueueEvent(new SearchEvent());
+        assertEquals("console", player1.getWeapon().map(IWeapon::getType).orElse(""));
+
+        assertEquals(0, (int) player2.getEffect(CowardEffect.TYPE).flatMap(e -> e.getAttribute(CowardEffect.COWARD_PTS)).orElse(-1));
+        setRandom(searchRandomMock, 0);
+        setRandom(randomMock, 0);
+        player2.enqueueEvent(new SearchEvent());
+        assertEquals("console", player2.getWeapon().map(IWeapon::getType).orElse(""));
     }
 }

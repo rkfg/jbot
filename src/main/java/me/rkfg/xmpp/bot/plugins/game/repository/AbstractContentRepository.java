@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -103,7 +104,7 @@ public abstract class AbstractContentRepository<O> implements IContentRepository
 
     protected <T> void indexAttr(TypedAttributeMap item, TypedAttribute<T> itemAttr, IndexPointer<T> indexPtr) {
         item.get(CONTENT_ID).ifPresent(cntid -> index.get(indexPtr, k -> new HashMap<>())
-                .ifPresent(map -> item.get(itemAttr).ifPresent(cnt -> map.computeIfAbsent(cnt, k -> new HashSet<>()).add(cntid))));
+                .ifPresent(map -> item.get(itemAttr).ifPresent(cnt -> map.computeIfAbsent(cnt, k -> new TreeSet<>()).add(cntid))));
     }
 
     @Override
