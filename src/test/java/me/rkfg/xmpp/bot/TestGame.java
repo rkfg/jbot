@@ -143,6 +143,10 @@ public class TestGame extends TestBase {
         assertEquals(0, player2.getBackpack().size());
         // check for victory, the game mode should switch to gather
         assertEquals(GamePlayerState.GATHER, World.THIS.getState());
+        player1.enqueueEvent(new TickEvent());
+        player2.enqueueEvent(new TickEvent());
+        assertStatChange(player1, STM, -Player.BATTLE_FATIGUE_COST + 1);
+        assertStatChange(player2, STM, 0);
     }
 
     @Test
