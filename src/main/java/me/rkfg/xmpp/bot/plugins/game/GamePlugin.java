@@ -40,7 +40,7 @@ import me.rkfg.xmpp.bot.plugins.game.misc.Attrs.GamePlayerState;
 public class GamePlugin extends MessagePluginImpl {
 
     public static final String CMD = ""; // may be set to '%gm ' if the bot runs other plugins
-    
+
     @Override
     public void init() {
         World.THIS.init("data");
@@ -60,6 +60,7 @@ public class GamePlugin extends MessagePluginImpl {
             Optional<IPlayer> player = World.THIS.getCurrentPlayer(message);
             List<String> argsf = args;
             if (!player.isPresent()) {
+                log.debug("Not present: f: {}, r: {}, b: {}", message.getFrom(), message.getFromRoom(), message.getBody());
                 return "Игра уже идёт, и вы в ней не участвуете.";
             }
             return player.flatMap(p -> processCommand(argsf, p)).orElseGet(() -> {
