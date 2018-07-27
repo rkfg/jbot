@@ -7,8 +7,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 import me.rkfg.xmpp.bot.message.Message;
-import ru.ppsrk.gwt.client.ClientAuthException;
-import ru.ppsrk.gwt.client.LogicException;
+import ru.ppsrk.gwt.client.GwtUtilException;
 
 public abstract class CommandPlugin extends MessagePluginImpl {
 
@@ -38,15 +37,13 @@ public abstract class CommandPlugin extends MessagePluginImpl {
                 return null;
             }
             return message.getAppeal(target) + result;
-        } catch (final ClientAuthException e) {
+        } catch (final GwtUtilException e) {
             log.warn("{}", e);
-        } catch (final LogicException e) {
-            log.warn("LogicError while processing command: ", e);
         }
         return "ошибка обработки команды, подробности в логе.";
     }
 
-    public abstract String processCommand(Message message, Matcher matcher) throws LogicException, ClientAuthException;
+    public abstract String processCommand(Message message, Matcher matcher) throws GwtUtilException;
 
     public abstract List<String> getCommand();
 

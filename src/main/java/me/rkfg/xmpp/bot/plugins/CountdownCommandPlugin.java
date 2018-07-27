@@ -14,14 +14,11 @@ import java.util.regex.Matcher;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Criteria;
-import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import me.rkfg.xmpp.bot.domain.Countdown;
 import me.rkfg.xmpp.bot.message.Message;
-import ru.ppsrk.gwt.client.ClientAuthException;
-import ru.ppsrk.gwt.client.LogicException;
-import ru.ppsrk.gwt.server.HibernateCallback;
+import ru.ppsrk.gwt.client.GwtUtilException;
 import ru.ppsrk.gwt.server.HibernateUtil;
 
 public class CountdownCommandPlugin extends CommandPlugin {
@@ -43,33 +40,28 @@ public class CountdownCommandPlugin extends CommandPlugin {
             @Override
             public void run() {
                 try {
-                    HibernateUtil.exec(new HibernateCallback<Void>() {
-
-                        @Override
-                        public Void run(Session session) throws LogicException, ClientAuthException {
-                            Date from = new Date(System.currentTimeMillis() - NOTIFY_INTERVAL);
-                            Date to = new Date(System.currentTimeMillis() + NOTIFY_INTERVAL);
-                            @SuppressWarnings("unchecked")
-                            List<Countdown> countdowns = session.createCriteria(Countdown.class).add(Restrictions.between("date", from, to))
-                                    .add(Restrictions.isNull("notified")).list();
-                            for (Countdown countdown : countdowns) {
-                                String dateStr = getFormatFull().format(countdown.getDate());
-                                if (Boolean.TRUE.equals(countdown.getGroupchat())) {
-                                    sendMUCMessage(String.format("%s, наступает событие: %s [%s]", countdown.getCreator(),
-                                            countdown.getName(), dateStr), countdown.getRoom());
-                                } else {
-                                    /*
-                                     * sendMessage(new ChatAdapterImpl(getChatManagerInstance().createChat(countdown.getCreator(), null)),
-                                     * String.format("Наступает событие: %s [%s]", countdown.getName(), dateStr));
-                                     */ }
-                                countdown.setNotified(true);
-                            }
-                            return null;
+                    HibernateUtil.exec(session -> {
+                        Date from = new Date(System.currentTimeMillis() - NOTIFY_INTERVAL);
+                        Date to = new Date(System.currentTimeMillis() + NOTIFY_INTERVAL);
+                        @SuppressWarnings("unchecked")
+                        List<Countdown> countdowns = session.createCriteria(Countdown.class).add(Restrictions.between("date", from, to))
+                                .add(Restrictions.isNull("notified")).list();
+                        for (Countdown countdown : countdowns) {
+                            String dateStr = getFormatFull().format(countdown.getDate());
+                            if (Boolean.TRUE.equals(countdown.getGroupchat())) {
+                                sendMUCMessage(String.format("%s, наступает событие: %s [%s]", countdown.getCreator(), countdown.getName(),
+                                        dateStr), countdown.getRoom());
+                            } else {
+                                /*
+                                 * sendMessage(new ChatAdapterImpl(getChatManagerInstance().createChat(countdown.getCreator(), null)),
+                                 * String.format("Наступает событие: %s [%s]", countdown.getName(), dateStr));
+                                 */ }
+                            countdown.setNotified(true);
                         }
-
+                        return null;
                     });
-                } catch (LogicException | ClientAuthException e) {
-                    e.printStackTrace();
+                } catch (GwtUtilException e) {
+                    log.warn("{}", e);
                 }
             }
         }, CHECK_INTERVAL, CHECK_INTERVAL);
@@ -80,7 +72,7 @@ public class CountdownCommandPlugin extends CommandPlugin {
     }
 
     @Override
-    public String processCommand(Message message, Matcher matcher) throws LogicException, ClientAuthException {
+    public String processCommand(Message message, Matcher matcher) throws GwtUtilException {
         String[] params = matcher.group(COMMAND_GROUP).split(" ");
         if (params.length < 2) {
             return "недостаточно параметров.";
@@ -109,7 +101,7 @@ public class CountdownCommandPlugin extends CommandPlugin {
         return null;
     }
 
-    private String addCountdown(Message message, String[] params) throws ParseException, LogicException, ClientAuthException {
+    private String addCountdown(Message message, String[] params) throws ParseException, GwtUtilException {
         if (params.length < 3) {
             throw new RuntimeException();
         }
@@ -149,72 +141,64 @@ public class CountdownCommandPlugin extends CommandPlugin {
         return StringUtils.join(Arrays.copyOfRange(arr, from, arr.length), ' ');
     }
 
-    private void saveCountdown(final String name, final Date date, final Message message) throws LogicException, ClientAuthException {
-        HibernateUtil.exec(new HibernateCallback<Void>() {
-
-            @Override
-            public Void run(Session session) throws LogicException, ClientAuthException {
-                Countdown countdown = new Countdown();
-                countdown.setDate(date);
-                countdown.setName(name);
-                boolean fromGroupchat = message.isFromGroupchat();
-                countdown.setCreator(message.getNick());
-                if (fromGroupchat) {
-                    countdown.setRoom(message.getFromRoom());
-                } else {
-                    countdown.setRoom(message.getFrom());
-                }
-                countdown.setGroupchat(fromGroupchat);
-                session.save(countdown);
-                return null;
+    private void saveCountdown(final String name, final Date date, final Message message) throws GwtUtilException {
+        HibernateUtil.exec(session -> {
+            Countdown countdown = new Countdown();
+            countdown.setDate(date);
+            countdown.setName(name);
+            boolean fromGroupchat = message.isFromGroupchat();
+            countdown.setCreator(message.getNick());
+            if (fromGroupchat) {
+                countdown.setRoom(message.getFromRoom());
+            } else {
+                countdown.setRoom(message.getFrom());
             }
+            countdown.setGroupchat(fromGroupchat);
+            session.save(countdown);
+            return null;
         });
     }
 
-    private String getCountdown(final Message message, final String name, final TimeZone tz) throws LogicException, ClientAuthException {
-        return HibernateUtil.exec(new HibernateCallback<String>() {
-
-            @Override
-            public String run(Session session) throws LogicException, ClientAuthException {
-                Criteria criteria = session.createCriteria(Countdown.class).add(Restrictions.like("name", "%" + name + "%"));
-                if (message.isFromGroupchat()) {
-                    criteria.add(Restrictions.eq("groupchat", true));
-                } else {
-                    criteria.add(Restrictions.eq("groupchat", false)).add(Restrictions.eq("creator", message.getFrom()));
-                }
-                @SuppressWarnings("unchecked")
-                List<Countdown> countdowns = criteria.list();
-                if (countdowns.isEmpty()) {
-                    return "ничего не найдено.";
-                }
-                StringBuilder sb = new StringBuilder("найдены отсчёты до:\n");
-                long now = System.currentTimeMillis();
-                DateFormat formatFull = getFormatFull();
-                formatFull.setTimeZone(tz);
-                for (Countdown countdown : countdowns) {
-                    Date date = countdown.getDate();
-                    sb.append(countdown.getName()).append(" — ").append(formatFull.format(date));
-                    long left = date.getTime() - now;
-                    String suffix = "\n";
-                    if (left < 0) {
-                        sb.append(", произошло ");
-                        left = -left;
-                        suffix = "назад\n";
-                    } else {
-                        sb.append(", осталось ");
-                    }
-                    for (int i = 0; i < msecs.length; i++) {
-                        long msec = msecs[i];
-                        long uLeft = left / msec;
-                        left = left % msec;
-                        if (uLeft > 0) {
-                            sb.append(uLeft).append(' ').append(unitNames[i]).append(". ");
-                        }
-                    }
-                    sb.append(suffix);
-                }
-                return sb.toString();
+    private String getCountdown(final Message message, final String name, final TimeZone tz) throws GwtUtilException {
+        return HibernateUtil.exec(session -> {
+            Criteria criteria = session.createCriteria(Countdown.class).add(Restrictions.like("name", "%" + name + "%"));
+            if (message.isFromGroupchat()) {
+                criteria.add(Restrictions.eq("groupchat", true));
+            } else {
+                criteria.add(Restrictions.eq("groupchat", false)).add(Restrictions.eq("creator", message.getFrom()));
             }
+            @SuppressWarnings("unchecked")
+            List<Countdown> countdowns = criteria.list();
+            if (countdowns.isEmpty()) {
+                return "ничего не найдено.";
+            }
+            StringBuilder sb = new StringBuilder("найдены отсчёты до:\n");
+            long now = System.currentTimeMillis();
+            DateFormat formatFull = getFormatFull();
+            formatFull.setTimeZone(tz);
+            for (Countdown countdown : countdowns) {
+                Date date = countdown.getDate();
+                sb.append(countdown.getName()).append(" — ").append(formatFull.format(date));
+                long left = date.getTime() - now;
+                String suffix = "\n";
+                if (left < 0) {
+                    sb.append(", произошло ");
+                    left = -left;
+                    suffix = "назад\n";
+                } else {
+                    sb.append(", осталось ");
+                }
+                for (int i = 0; i < msecs.length; i++) {
+                    long msec = msecs[i];
+                    long uLeft = left / msec;
+                    left = left % msec;
+                    if (uLeft > 0) {
+                        sb.append(uLeft).append(' ').append(unitNames[i]).append(". ");
+                    }
+                }
+                sb.append(suffix);
+            }
+            return sb.toString();
         });
     }
 
