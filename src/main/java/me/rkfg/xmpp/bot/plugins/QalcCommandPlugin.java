@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 import ru.ppsrk.gwt.client.ClientAuthenticationException;
 import ru.ppsrk.gwt.client.LogicException;
 
@@ -16,7 +16,7 @@ public class QalcCommandPlugin extends CommandPlugin {
     private final int TIMELIMIT = 3;
 
     @Override
-    public String processCommand(Message message, Matcher matcher) throws ClientAuthenticationException, LogicException {
+    public String processCommand(BotMessage message, Matcher matcher) throws ClientAuthenticationException, LogicException {
         try {
             String inp = matcher.group(COMMAND_GROUP);
             String inpCheck = inp.toLowerCase();

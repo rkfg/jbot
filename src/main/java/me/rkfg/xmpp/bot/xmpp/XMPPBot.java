@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import me.rkfg.xmpp.bot.BotBase;
 import me.rkfg.xmpp.bot.Main;
+import me.rkfg.xmpp.bot.message.BotMessage;
 import me.rkfg.xmpp.bot.message.XMPPMessage;
 import me.rkfg.xmpp.bot.plugins.MessagePlugin;
 
@@ -91,7 +92,7 @@ public class XMPPBot extends BotBase {
         connect();
         ChatManager.setDefaultMatchMode(MatchMode.SUPPLIED_JID);
         getChatManagerInstance().addChatListener((Chat chat, boolean createdLocally) -> chat
-                .addMessageListener((Chat chat2, Message message) -> processMessage(new ChatAdapterImpl(chat2), message)));
+                .addMessageListener((chat2, message) -> processMessage(new ChatAdapterImpl(chat2), new XMPPMessage(message))));
         connection.addAsyncStanzaListener(new StanzaListener() {
 
             @Override
@@ -141,15 +142,16 @@ public class XMPPBot extends BotBase {
         }
     }
 
-    public void processMessage(final ChatAdapter chat, final Message message) {
+    public void processMessage(final ChatAdapter chat, final BotMessage message) {
         commandExecutor.submit(() -> {
             if (nick.equals(XmppStringUtils.parseResource(message.getFrom()))) {
                 return;
             }
-            if (message.getSubject() != null && !message.getSubject().isEmpty()) {
+            Message originalMessage = message.getOriginalMessage();
+            if (originalMessage.getSubject() != null && !originalMessage.getSubject().isEmpty()) {
                 return;
             }
-            if (message.getExtension("replace", "urn:xmpp:message-correct:0") != null) {
+            if (originalMessage.getExtension("replace", "urn:xmpp:message-correct:0") != null) {
                 // skip XEP-0308 corrections
                 return;
             }
@@ -161,7 +163,7 @@ public class XMPPBot extends BotBase {
                     Matcher matcher = pattern.matcher(text);
                     if (matcher.find()) {
                         try {
-                            String result = plugin.process(new XMPPMessage(message), matcher);
+                            String result = plugin.process(message, matcher);
                             if (result != null && !result.isEmpty()) {
                                 sendMessage(chat, StringEscapeUtils.unescapeHtml4(result));
                                 break;

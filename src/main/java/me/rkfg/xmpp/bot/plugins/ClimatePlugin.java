@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 
@@ -86,7 +86,7 @@ public class ClimatePlugin extends CommandPlugin {
     }
 
     @Override
-    public String process(Message message, Matcher matcher) {
+    public String process(BotMessage message, Matcher matcher) {
         if (!message.isFromUser()) {
             // don't store system messages
             return null;
@@ -142,7 +142,7 @@ public class ClimatePlugin extends CommandPlugin {
     }
 
     @Override
-    public String processCommand(Message message, Matcher matcher) throws LogicException, ClientAuthException {
+    public String processCommand(BotMessage message, Matcher matcher) throws LogicException, ClientAuthException {
         StringBuilder sb = new StringBuilder("Климат в чате:\n");
         for (int i = 0; i < climate.length; ++i) {
             sb.append(Person.values()[i].getCategory()).append(": ").append(climate[i]).append(" [").append(climate[i] * 100 / (total > 0 ? total : 1))

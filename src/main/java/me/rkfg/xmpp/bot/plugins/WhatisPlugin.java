@@ -3,7 +3,7 @@ package me.rkfg.xmpp.bot.plugins;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 
 public class WhatisPlugin extends MessagePluginImpl {
 
@@ -16,7 +16,7 @@ public class WhatisPlugin extends MessagePluginImpl {
     }
 
     @Override
-    public String process(Message message, Matcher matcher) {
+    public String process(BotMessage message, Matcher matcher) {
         if (matcher.groupCount() == 3) {
             return googleCommandPlugin.searchString(matcher.group(3));
         }

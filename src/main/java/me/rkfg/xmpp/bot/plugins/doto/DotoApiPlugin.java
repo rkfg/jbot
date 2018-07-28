@@ -22,7 +22,7 @@ import org.codehaus.jackson.map.PropertyNamingStrategy;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 import me.rkfg.xmpp.bot.plugins.doto.json.Ban;
 import me.rkfg.xmpp.bot.plugins.doto.json.Game;
 import me.rkfg.xmpp.bot.plugins.doto.json.LiveGames;
@@ -90,7 +90,7 @@ public class DotoApiPlugin extends DotoCommandPlugin
     }
 
     @Override
-    public String processCommand(Message message, Matcher matcher) throws ClientAuthenticationException, LogicException
+    public String processCommand(BotMessage message, Matcher matcher) throws ClientAuthenticationException, LogicException
     {
         String response = LIVE_MATCHES;
         try

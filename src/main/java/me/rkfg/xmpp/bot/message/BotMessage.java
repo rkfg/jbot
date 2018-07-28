@@ -1,11 +1,11 @@
 package me.rkfg.xmpp.bot.message;
 
-public interface Message {
+public interface BotMessage {
 
     public enum Protocol {
-        XMPP, MATRIX
+        XMPP, MATRIX, IRC
     }
-    
+
     boolean isFromUser();
 
     String getNick();
@@ -14,14 +14,18 @@ public interface Message {
 
     boolean isFromGroupchat();
 
-    String getAppeal();
+    default String getAppeal() {
+        return getAppeal(getNick());
+    }
 
     String getFromRoom();
 
     String getFrom();
 
     String getBody();
-    
+
     Protocol getProtocol();
+
+    <T> T getOriginalMessage();
 
 }

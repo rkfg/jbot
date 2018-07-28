@@ -10,7 +10,7 @@ import org.hibernate.NonUniqueResultException;
 import me.rkfg.xmpp.bot.domain.Markov;
 import me.rkfg.xmpp.bot.domain.MarkovFirstWord;
 import me.rkfg.xmpp.bot.domain.MarkovFirstWordCount;
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 import ru.ppsrk.gwt.client.GwtUtilException;
 import ru.ppsrk.gwt.server.HibernateUtil;
 
@@ -24,7 +24,7 @@ public class MarkovCollectorPlugin extends MessagePluginImpl {
     }
 
     @Override
-    public String process(Message message, final Matcher matcher) {
+    public String process(BotMessage message, final Matcher matcher) {
         if (!message.isFromUser()) {
             // don't store system messages
             return null;

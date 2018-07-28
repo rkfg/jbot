@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 import ru.ppsrk.gwt.client.GwtUtilException;
 import ru.ppsrk.gwt.server.HibernateUtil;
 
@@ -14,7 +14,7 @@ public class DiversityCommandPlugin extends CommandPlugin {
     private static int PRECISION = 5;
 
     @Override
-    public String processCommand(Message message, final Matcher matcher) throws GwtUtilException {
+    public String processCommand(BotMessage message, final Matcher matcher) throws GwtUtilException {
         return HibernateUtil.exec(session -> {
             double precCoeff = Math.pow(10, PRECISION);
             try {

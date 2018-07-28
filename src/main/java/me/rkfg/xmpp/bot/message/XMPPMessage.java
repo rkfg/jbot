@@ -1,12 +1,13 @@
 package me.rkfg.xmpp.bot.message;
 
+import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Message.Type;
 import org.jxmpp.util.XmppStringUtils;
 
-public class XMPPMessage implements Message {
-    private org.jivesoftware.smack.packet.Message msg;
+public class XMPPMessage implements BotMessage {
+    private Message msg;
 
-    public XMPPMessage(org.jivesoftware.smack.packet.Message msg) {
+    public XMPPMessage(Message msg) {
         this.msg = msg;
     }
 
@@ -53,6 +54,12 @@ public class XMPPMessage implements Message {
     @Override
     public Protocol getProtocol() {
         return Protocol.XMPP;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Message getOriginalMessage() {
+        return msg;
     }
 
 }

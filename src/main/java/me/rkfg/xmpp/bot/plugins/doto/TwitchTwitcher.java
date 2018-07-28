@@ -16,7 +16,7 @@ import de.tobj.twitch.streamobserver.TwitchStreamObserver;
 import de.tobj.twitch.streamobserver.channel.event.StreamStatusEvent;
 import de.tobj.twitch.streamobserver.channel.event.StreamUpdateEvent;
 import de.tobj.twitch.streamobserver.channel.listener.StreamListener;
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 import ru.ppsrk.gwt.server.SettingsManager;
@@ -126,7 +126,7 @@ public class TwitchTwitcher extends DotoCommandPlugin
     }
 
     @Override
-    public String processCommand(Message message, Matcher matcher) throws LogicException, ClientAuthException
+    public String processCommand(BotMessage message, Matcher matcher) throws LogicException, ClientAuthException
     {
         CommandLine cl;
         try

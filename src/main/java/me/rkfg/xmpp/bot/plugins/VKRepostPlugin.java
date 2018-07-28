@@ -16,7 +16,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONObject;
 
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 
 public class VKRepostPlugin extends MessagePluginImpl {
 
@@ -29,7 +29,7 @@ public class VKRepostPlugin extends MessagePluginImpl {
     }
 
     @Override
-    public String process(Message message, Matcher matcher) {
+    public String process(BotMessage message, Matcher matcher) {
         String url = matcher.group(1);
         try {
             String apiKey = getSettingsManager().getStringSetting("imgurApiKey");

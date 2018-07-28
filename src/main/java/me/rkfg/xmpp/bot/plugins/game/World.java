@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 import me.rkfg.xmpp.bot.plugins.game.event.IEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.RenameEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.TickEvent;
@@ -89,7 +89,7 @@ public class World extends Player {
         }
     }
 
-    public Optional<IPlayer> getCurrentPlayer(Message message) {
+    public Optional<IPlayer> getCurrentPlayer(BotMessage message) {
         final Optional<IPlayer> player = Optional.ofNullable(players.computeIfAbsent(message.getFrom(), id -> {
             if (getState() == GamePlayerState.PLAYING) {
                 return null;

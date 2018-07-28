@@ -6,14 +6,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import me.rkfg.xmpp.bot.domain.Opinion;
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 import ru.ppsrk.gwt.client.GwtUtilException;
 import ru.ppsrk.gwt.server.HibernateUtil;
 
 public class OpinionCommandPlugin extends CommandPlugin {
 
     @Override
-    public String processCommand(Message message, Matcher matcher) throws GwtUtilException {
+    public String processCommand(BotMessage message, Matcher matcher) throws GwtUtilException {
         String args = matcher.group(COMMAND_GROUP);
         Matcher whois = Pattern.compile("(\"(.+?)\" = (.+))|((.+?) = (.+))").matcher(args);
         if (!whois.find()) {

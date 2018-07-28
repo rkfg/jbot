@@ -15,7 +15,7 @@ import ru.ppsrk.gwt.server.SettingsManager;
 
 public abstract class BotBase implements IBot {
     private static final String PLUGINS_PACKAGE_NAME = "me.rkfg.xmpp.bot.plugins.";
-    private Logger log = LoggerFactory.getLogger(getClass());
+    protected Logger log = LoggerFactory.getLogger(getClass());
     protected SettingsManager sm = SettingsManager.getInstance();
     protected List<MessagePlugin> plugins = new LinkedList<>();
     protected String nick;

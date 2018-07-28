@@ -13,7 +13,7 @@ import org.hibernate.Session;
 import me.rkfg.xmpp.bot.domain.Markov;
 import me.rkfg.xmpp.bot.domain.MarkovFirstWord;
 import me.rkfg.xmpp.bot.domain.MarkovFirstWordCount;
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 import ru.ppsrk.gwt.client.GwtUtilException;
 import ru.ppsrk.gwt.server.HibernateUtil;
 
@@ -67,7 +67,7 @@ public class MarkovResponsePlugin extends MessagePluginImpl {
     }
 
     @Override
-    public String process(final Message message, final Matcher matcher) {
+    public String process(final BotMessage message, final Matcher matcher) {
         try {
             return message.getAppeal() + HibernateUtil.exec(session -> {
                 if (cooldown) {

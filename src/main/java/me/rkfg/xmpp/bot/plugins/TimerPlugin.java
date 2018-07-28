@@ -15,7 +15,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.jxmpp.util.XmppStringUtils;
 
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 
 public class TimerPlugin extends CommandPlugin
 {
@@ -50,7 +50,7 @@ public class TimerPlugin extends CommandPlugin
         buildOptions();
     }
     @Override
-    public String processCommand(Message message, Matcher matcher)
+    public String processCommand(BotMessage message, Matcher matcher)
     {
         String s = "";
         HashMap<String, String> hm= parseParams(matcher);

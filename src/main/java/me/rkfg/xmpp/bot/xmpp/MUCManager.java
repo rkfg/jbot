@@ -12,7 +12,6 @@ import org.jivesoftware.smack.SmackException.NoResponseException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
@@ -22,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import me.rkfg.xmpp.bot.Main;
+import me.rkfg.xmpp.bot.message.XMPPMessage;
 
 public class MUCManager {
     private static Logger log = LoggerFactory.getLogger(Main.class);
@@ -107,13 +107,7 @@ public class MUCManager {
         final ChatAdapter mucAdapted = new MUCAdapterImpl(muc);
         mucParams.setMucAdapted(mucAdapted);
 
-        MessageListener messageListener = new MessageListener() {
-            
-            @Override
-            public void processMessage(Message message) {
-                Main.INSTANCE.processMessage(mucAdapted, message);
-            }
-        };
+        MessageListener messageListener = message -> Main.INSTANCE.processMessage(mucAdapted, new XMPPMessage(message));
         muc.addMessageListener(messageListener);
         mucParams.setMessageListener(messageListener);
         mucsList.put(muc, mucParams);

@@ -17,7 +17,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 import ru.ppsrk.gwt.client.ClientAuthenticationException;
 import ru.ppsrk.gwt.client.LogicException;
 import ru.ppsrk.gwt.server.SettingsManager;
@@ -70,7 +70,7 @@ public class DotoSchedulePlugin extends DotoCommandPlugin
     }
 
     @Override
-    public String processCommand(Message message, Matcher matcher) throws ClientAuthenticationException, LogicException
+    public String processCommand(BotMessage message, Matcher matcher) throws ClientAuthenticationException, LogicException
     {
         String str = "";
         CommandLine commandLine;

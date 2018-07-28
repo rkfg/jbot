@@ -38,7 +38,7 @@ import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 
@@ -148,7 +148,7 @@ public final class CoolStoryPlugin extends CommandPlugin {
     }
 
     @Override
-    public String processCommand(Message message, Matcher matcher) throws LogicException, ClientAuthException {
+    public String processCommand(BotMessage message, Matcher matcher) throws LogicException, ClientAuthException {
         try {
             final String command = matcher.group(1);
 

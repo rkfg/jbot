@@ -13,7 +13,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 import me.rkfg.xmpp.bot.plugins.CommandPlugin;
 import ru.ppsrk.gwt.client.ClientAuthenticationException;
 import ru.ppsrk.gwt.client.LogicException;
@@ -162,7 +162,7 @@ public class V4L3TFollowerPlugin extends CommandPlugin
     };
 
     @Override
-    public String processCommand(Message message, Matcher matcher) throws ClientAuthenticationException, LogicException
+    public String processCommand(BotMessage message, Matcher matcher) throws ClientAuthenticationException, LogicException
     {
         String s = "";
         HashMap<String, String> hm= parseParams(matcher);

@@ -21,7 +21,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 
 /**
  *
@@ -33,7 +33,7 @@ public class CustomSearchPlugin extends CommandPlugin {
     static boolean DEBUG = false;    
     
     @Override
-    public String processCommand(Message message, Matcher matcher) {
+    public String processCommand(BotMessage message, Matcher matcher) {
         return searchString(matcher.group(COMMAND_GROUP));
     }
     

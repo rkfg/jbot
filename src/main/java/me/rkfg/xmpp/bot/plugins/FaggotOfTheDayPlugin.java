@@ -41,7 +41,7 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.Occupant;
 import org.jxmpp.util.XmppStringUtils;
 
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 
@@ -72,7 +72,7 @@ public final class FaggotOfTheDayPlugin extends CommandPlugin {
     }
 
     @Override
-    public String processCommand(Message message, Matcher matcher)
+    public String processCommand(BotMessage message, Matcher matcher)
             throws LogicException, ClientAuthException {
         startListening();
 

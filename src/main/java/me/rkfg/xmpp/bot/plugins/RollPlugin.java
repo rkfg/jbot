@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 
@@ -70,7 +70,7 @@ public final class RollPlugin extends CommandPlugin {
     }
 
     @Override
-    public String processCommand(Message message, Matcher matcher) throws LogicException, ClientAuthException {
+    public String processCommand(BotMessage message, Matcher matcher) throws LogicException, ClientAuthException {
         final String command = matcher.group(COMMAND_GROUP);
         if (command == null) {
             return rollNumber(DEFAULT_LIMIT);

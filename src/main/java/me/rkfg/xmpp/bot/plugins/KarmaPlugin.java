@@ -12,7 +12,7 @@ import org.jivesoftware.smackx.muc.Occupant;
 
 import me.rkfg.xmpp.bot.domain.Karma;
 import me.rkfg.xmpp.bot.domain.KarmaHistory;
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 import me.rkfg.xmpp.bot.nxt.NXTAPI;
 import me.rkfg.xmpp.bot.nxt.Transaction;
 import ru.ppsrk.gwt.client.GwtUtilException;
@@ -77,7 +77,7 @@ public class KarmaPlugin extends CommandPlugin {
 
     @SuppressWarnings("unchecked")
     @Override
-    public String processCommand(final Message message, final Matcher matcher) throws GwtUtilException {
+    public String processCommand(final BotMessage message, final Matcher matcher) throws GwtUtilException {
         return HibernateUtil.exec(session -> {
             List<Karma> karmas;
             String filterNick = matcher.group(COMMAND_GROUP);

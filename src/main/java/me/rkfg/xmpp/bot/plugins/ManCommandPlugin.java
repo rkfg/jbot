@@ -8,14 +8,14 @@ import java.util.regex.Matcher;
 import org.apache.commons.lang3.StringUtils;
 
 import me.rkfg.xmpp.bot.Main;
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 
 public class ManCommandPlugin extends CommandPlugin {
 
     @Override
-    public String processCommand(Message message, Matcher matcher) throws ClientAuthException, LogicException {
+    public String processCommand(BotMessage message, Matcher matcher) throws ClientAuthException, LogicException {
         String cmd = matcher.group(COMMAND_GROUP);
         if (cmd == null || cmd.isEmpty()) {
             List<String> commands = new LinkedList<String>();

@@ -15,7 +15,7 @@ import org.hibernate.Session;
 import me.rkfg.xmpp.bot.domain.Markov;
 import me.rkfg.xmpp.bot.domain.MarkovFirstWord;
 import me.rkfg.xmpp.bot.domain.MarkovFirstWordCount;
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.GwtUtilException;
 import ru.ppsrk.gwt.client.LogicException;
@@ -28,7 +28,7 @@ public class MarkovOptimizeCommandPlugin extends CommandPlugin {
     volatile HashMap<String, ReentrantLock> wordsInProcess = new HashMap<>();
 
     @Override
-    public String processCommand(Message message, Matcher matcher) throws GwtUtilException {
+    public String processCommand(BotMessage message, Matcher matcher) throws GwtUtilException {
         Long[] minmax = HibernateUtil.exec(session -> {
             session.createSQLQuery(
                     "SET REFERENTIAL_INTEGRITY FALSE; truncate table markovfirstword; truncate table markovfirstwordcount; SET REFERENTIAL_INTEGRITY TRUE;")

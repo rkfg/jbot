@@ -2,7 +2,7 @@ package me.rkfg.xmpp.bot.message;
 
 import me.rkfg.xmpp.bot.matrix.StateManager;
 
-public class MatrixMessage implements Message {
+public class MatrixMessage implements BotMessage {
 
     private StateManager displayNames;
     private String fromRoom;
@@ -30,11 +30,11 @@ public class MatrixMessage implements Message {
 
     @Override
     public String getAppeal(String target) {
-        return getFormattedFrom() + ": ";
+        return getFormattedFrom(target) + ": ";
     }
 
-    public String getFormattedFrom() {
-        return "<a href=\"https://matrix.to/#/" + from + "\">" + getNick() + "</a>";
+    public String getFormattedFrom(String nick) {
+        return "<a href=\"https://matrix.to/#/" + from + "\">" + nick + "</a>";
     }
 
     @Override
@@ -89,5 +89,11 @@ public class MatrixMessage implements Message {
 
     public void addResendTS(long shift) {
         resendTS += shift;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public MatrixMessage getOriginalMessage() {
+        return this;
     }
 }

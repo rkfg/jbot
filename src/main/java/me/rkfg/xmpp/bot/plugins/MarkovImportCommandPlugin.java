@@ -11,14 +11,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 import ru.ppsrk.gwt.client.ClientAuthenticationException;
 import ru.ppsrk.gwt.client.LogicException;
 
 public class MarkovImportCommandPlugin extends CommandPlugin {
 
     @Override
-    public String processCommand(Message message, final Matcher matcher) throws ClientAuthenticationException, LogicException {
+    public String processCommand(BotMessage message, final Matcher matcher) throws ClientAuthenticationException, LogicException {
         File file = new File(matcher.group(COMMAND_GROUP));
         final MarkovCollectorPlugin markovCollectorPlugin = new MarkovCollectorPlugin();
         int c = 0;

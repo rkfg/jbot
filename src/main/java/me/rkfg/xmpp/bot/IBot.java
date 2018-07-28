@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.jivesoftware.smack.chat.ChatManager;
-import org.jivesoftware.smack.packet.Message;
 
+import me.rkfg.xmpp.bot.message.BotMessage;
 import me.rkfg.xmpp.bot.plugins.MessagePlugin;
 import me.rkfg.xmpp.bot.xmpp.ChatAdapter;
 import me.rkfg.xmpp.bot.xmpp.MUCManager;
@@ -22,7 +22,7 @@ public interface IBot {
 
     String getBotNick();
 
-    void processMessage(ChatAdapter mucAdapted, Message message);
+    void processMessage(ChatAdapter mucAdapted, BotMessage message);
 
     String sendMessage(String message, String mucName);
 

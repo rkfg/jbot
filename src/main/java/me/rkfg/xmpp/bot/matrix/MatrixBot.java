@@ -32,7 +32,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.jivesoftware.smack.chat.ChatManager;
-import org.jivesoftware.smack.packet.Message;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import me.rkfg.xmpp.bot.BotBase;
 import me.rkfg.xmpp.bot.exceptions.NotImplementedException;
 import me.rkfg.xmpp.bot.message.MatrixMessage;
+import me.rkfg.xmpp.bot.message.BotMessage;
 import me.rkfg.xmpp.bot.plugins.MessagePlugin;
 import me.rkfg.xmpp.bot.xmpp.ChatAdapter;
 import me.rkfg.xmpp.bot.xmpp.MUCManager;
@@ -306,7 +306,7 @@ public class MatrixBot extends BotBase {
     }
 
     @Override
-    public void processMessage(ChatAdapter mucAdapted, Message message) {
+    public void processMessage(ChatAdapter mucAdapted, BotMessage message) {
         throw new NotImplementedException();
     }
 

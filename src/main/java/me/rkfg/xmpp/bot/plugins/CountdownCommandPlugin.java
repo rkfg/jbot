@@ -17,7 +17,7 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 
 import me.rkfg.xmpp.bot.domain.Countdown;
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 import ru.ppsrk.gwt.client.GwtUtilException;
 import ru.ppsrk.gwt.server.HibernateUtil;
 
@@ -72,7 +72,7 @@ public class CountdownCommandPlugin extends CommandPlugin {
     }
 
     @Override
-    public String processCommand(Message message, Matcher matcher) throws GwtUtilException {
+    public String processCommand(BotMessage message, Matcher matcher) throws GwtUtilException {
         String[] params = matcher.group(COMMAND_GROUP).split(" ");
         if (params.length < 2) {
             return "недостаточно параметров.";
@@ -101,7 +101,7 @@ public class CountdownCommandPlugin extends CommandPlugin {
         return null;
     }
 
-    private String addCountdown(Message message, String[] params) throws ParseException, GwtUtilException {
+    private String addCountdown(BotMessage message, String[] params) throws ParseException, GwtUtilException {
         if (params.length < 3) {
             throw new RuntimeException();
         }
@@ -141,7 +141,7 @@ public class CountdownCommandPlugin extends CommandPlugin {
         return StringUtils.join(Arrays.copyOfRange(arr, from, arr.length), ' ');
     }
 
-    private void saveCountdown(final String name, final Date date, final Message message) throws GwtUtilException {
+    private void saveCountdown(final String name, final Date date, final BotMessage message) throws GwtUtilException {
         HibernateUtil.exec(session -> {
             Countdown countdown = new Countdown();
             countdown.setDate(date);
@@ -159,7 +159,7 @@ public class CountdownCommandPlugin extends CommandPlugin {
         });
     }
 
-    private String getCountdown(final Message message, final String name, final TimeZone tz) throws GwtUtilException {
+    private String getCountdown(final BotMessage message, final String name, final TimeZone tz) throws GwtUtilException {
         return HibernateUtil.exec(session -> {
             Criteria criteria = session.createCriteria(Countdown.class).add(Restrictions.like("name", "%" + name + "%"));
             if (message.isFromGroupchat()) {

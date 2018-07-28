@@ -18,7 +18,7 @@ import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 
 public class TitlePlugin extends MessagePluginImpl {
 
@@ -34,7 +34,7 @@ public class TitlePlugin extends MessagePluginImpl {
     }
 
     @Override
-    public String process(Message message, Matcher matcher) {
+    public String process(BotMessage message, Matcher matcher) {
         String url;
         try {
             url = URLDecoder.decode(matcher.group(1), StandardCharsets.UTF_8.name());

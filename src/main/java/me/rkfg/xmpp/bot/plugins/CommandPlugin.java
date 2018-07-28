@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
-import me.rkfg.xmpp.bot.message.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 import ru.ppsrk.gwt.client.GwtUtilException;
 
 public abstract class CommandPlugin extends MessagePluginImpl {
@@ -23,7 +23,7 @@ public abstract class CommandPlugin extends MessagePluginImpl {
     }
 
     @Override
-    public String process(Message message, Matcher matcher) {
+    public String process(BotMessage message, Matcher matcher) {
         if (!message.isFromUser()) {
             return null;
         }
@@ -43,7 +43,7 @@ public abstract class CommandPlugin extends MessagePluginImpl {
         return "ошибка обработки команды, подробности в логе.";
     }
 
-    public abstract String processCommand(Message message, Matcher matcher) throws GwtUtilException;
+    public abstract String processCommand(BotMessage message, Matcher matcher) throws GwtUtilException;
 
     public abstract List<String> getCommand();
 
