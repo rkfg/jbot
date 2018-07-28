@@ -33,7 +33,7 @@ public class RoomParticipantsManager {
 
     public boolean isDirectChat(String roomId) {
         Set<String> users = getUsers(roomId);
-        return users.size() == 2 && users.contains(mxid); // only I left
+        return users.size() == 2 && users.contains(mxid);
     }
 
     public Set<String> getEmptyRooms() {
