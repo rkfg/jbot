@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import me.rkfg.xmpp.bot.Main;
 import me.rkfg.xmpp.bot.message.Message;
 import me.rkfg.xmpp.bot.plugins.MessagePluginImpl;
 import me.rkfg.xmpp.bot.plugins.game.command.AmbiguousCommand;
@@ -52,6 +53,9 @@ public class GamePlugin extends MessagePluginImpl {
     @Override
     public String process(Message message, Matcher matcher) {
         synchronized (World.THIS) {
+            if (!Main.INSTANCE.isDirectChat(message.getFromRoom())) {
+                return null;
+            }
             List<String> args = new ArrayList<>();
             final String argsStr = matcher.group(1);
             if (argsStr != null) {
