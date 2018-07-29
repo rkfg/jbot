@@ -65,10 +65,11 @@ public class IRCBot extends BotBase implements IBot {
     @Override
     public void run() throws LogicException {
         init();
+        sm.setDefault("maxLine", "256");
         Configuration conf = new Configuration.Builder().setLogin(sm.getStringSetting("login")).setName(sm.getStringSetting("nick"))
                 .setNickservPassword(sm.getStringSetting("password")).addServer(sm.getStringSetting("ircServer"))
                 .addAutoJoinChannel("#" + sm.getStringSetting("join")).addListener(new Listener()).setAutoReconnect(true)
-                .setAutoReconnectDelay(5000).setMaxLineLength(256).buildConfiguration();
+                .setAutoReconnectDelay(5000).setMaxLineLength(sm.getIntegerSetting("maxLine")).buildConfiguration();
         while (!Thread.interrupted()) {
             try {
                 bot = new PircBotX(conf);
