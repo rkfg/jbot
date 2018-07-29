@@ -46,7 +46,7 @@ public class UnequipEvent extends AbstractEvent {
                         logTargetComment();
                         p.enqueueEvent(new UnequippedEvent(item));
                     } catch (NotEquippableException e) {
-                        target.log("Не удалось снять %s: %s", item.getItemDescription(), e.getMessage());
+                        target.log("Не удалось снять %s: %s.", item.getItemDescription(), e.getMessage());
                         cancel();
                     }
                 })));

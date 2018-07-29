@@ -34,11 +34,11 @@ public class EquipEvent extends AbstractEvent {
             String desc = i.getDescription().orElse("<предмет>");
             try {
                 p.equipItem(i);
-                setDescription(String.format("Вы надеваете %s", desc));
+                setDescription(String.format("Вы надеваете %s.", desc));
                 logTargetComment();
                 p.enqueueEvent(new EquippedEvent());
             } catch (NotEquippableException e) {
-                target.log("Не удалось надеть %s: %s", desc, e.getMessage());
+                target.log("Не удалось надеть %s: %s.", desc, e.getMessage());
                 cancel();
             }
         }));
