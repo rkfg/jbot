@@ -6,11 +6,15 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.net.ssl.SSLSocketFactory;
+
 import org.jivesoftware.smack.chat.ChatManager;
 import org.pircbotx.Configuration;
+import org.pircbotx.Configuration.Builder;
 import org.pircbotx.PircBotX;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.hooks.ListenerAdapter;
+import org.pircbotx.hooks.events.ConnectEvent;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 
@@ -37,6 +41,14 @@ public class IRCBot extends BotBase implements IBot {
         @Override
         public void onPrivateMessage(PrivateMessageEvent event) throws Exception {
             processMessage(new IRCMessage(event));
+        }
+
+        @Override
+        public void onConnect(ConnectEvent event) throws Exception {
+            String modes = sm.getStringSetting("ircModes");
+            if (modes != null && !modes.isEmpty()) {
+                bot.sendIRC().mode(bot.getNick(), modes);
+            }
         }
 
         private void processMessage(IRCMessage ircMessage) {
@@ -66,10 +78,21 @@ public class IRCBot extends BotBase implements IBot {
     public void run() throws LogicException {
         init();
         sm.setDefault("maxLine", "256");
-        Configuration conf = new Configuration.Builder().setLogin(sm.getStringSetting("login")).setName(sm.getStringSetting("nick"))
-                .setNickservPassword(sm.getStringSetting("password")).addServer(sm.getStringSetting("ircServer"))
+        sm.setDefault("ircPort", "6667");
+        sm.setDefault("ircSsl", "0");
+        final Builder builder = new Configuration.Builder().setLogin(sm.getStringSetting("login")).setName(sm.getStringSetting("nick"))
+                .setNickservPassword(sm.getStringSetting("password"))
+                .addServer(sm.getStringSetting("ircServer"), sm.getIntegerSetting("ircPort"))
                 .addAutoJoinChannel("#" + sm.getStringSetting("join")).addListener(new Listener()).setAutoReconnect(true)
-                .setAutoReconnectDelay(5000).setMaxLineLength(sm.getIntegerSetting("maxLine")).buildConfiguration();
+                .setAutoReconnectDelay(5000).setMaxLineLength(sm.getIntegerSetting("maxLine"));
+        if ("1".equals(sm.getStringSetting("ircSsl"))) {
+            builder.setSocketFactory(SSLSocketFactory.getDefault());
+        }
+        String realName = sm.getStringSetting("ircRealName");
+        if (realName != null && !realName.isEmpty()) {
+            builder.setRealName(realName);
+        }
+        Configuration conf = builder.buildConfiguration();
         while (!Thread.interrupted()) {
             try {
                 bot = new PircBotX(conf);
