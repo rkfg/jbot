@@ -134,7 +134,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
         stats.get(BONUS_POINTS).filter(p -> p > 0).ifPresent(p -> sb.append(" | Бонусные очки: ").append(p));
         final String effectsStr = listEffects().stream().filter(IEffect::isVisible)
                 .map(effect -> effect.getDescription().orElse(effect.getType())).reduce(pipeReducer).orElse("нет эффектов");
-        sb.append("\nЭффекты: ").append(effectsStr);
+        sb.append("\nЭффекты: ").append(effectsStr).append(".");
         final String slotsStr = SLOTS.stream()
                 .map(slotAttr -> equipment.get(slotAttr)
                         .map(s -> String.format("%s: %s", s.getDescription().orElse(""),
