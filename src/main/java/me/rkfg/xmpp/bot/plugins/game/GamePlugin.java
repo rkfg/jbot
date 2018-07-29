@@ -32,7 +32,6 @@ import me.rkfg.xmpp.bot.plugins.game.command.RebuildItemsCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.SearchCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.SpendPointsCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.UnequipCommand;
-import me.rkfg.xmpp.bot.plugins.game.command.UnknownCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.UseCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.WhisperCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.YellCommand;
@@ -77,6 +76,9 @@ public class GamePlugin extends MessagePluginImpl {
     public Optional<String> processCommand(List<String> args, IPlayer player) {
         String cmd = args.stream().findFirst().map(String::toLowerCase).orElse("");
         ICommandHandler f = findHandler(handlers, cmd);
+        if (f == null) {
+            return Optional.empty();
+        }
         if (!f.deadAllowed() && !player.isAlive() && World.THIS.getState() == GamePlayerState.PLAYING) {
             return Optional.of("Эта команда сейчас не разрешена, так как вы умерли.");
         }
@@ -98,9 +100,6 @@ public class GamePlugin extends MessagePluginImpl {
                     }
                 }
             }
-        }
-        if (f == null) {
-            f = new UnknownCommand();
         }
         return f;
     }

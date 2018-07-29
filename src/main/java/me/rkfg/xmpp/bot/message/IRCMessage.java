@@ -31,7 +31,7 @@ public class IRCMessage implements BotMessage {
 
     @Override
     public boolean isFromUser() {
-        return !channel.isPresent();
+        return true;
     }
 
     @Override
@@ -41,7 +41,7 @@ public class IRCMessage implements BotMessage {
 
     @Override
     public String getAppeal(String target) {
-        return target + ": ";
+        return "";
     }
 
     @Override
