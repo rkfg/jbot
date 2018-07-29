@@ -33,7 +33,7 @@ public class UnequipCommand implements ICommandHandler {
 
     @Override
     public Optional<String> getHelp() {
-        return Optional.of("освободить слот (о — оружие, б — броня).");
+        return Optional.of("Освободить слот (о — оружие, б — броня).");
     }
 
 }

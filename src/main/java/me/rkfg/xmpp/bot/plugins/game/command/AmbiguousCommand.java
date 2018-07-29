@@ -17,7 +17,7 @@ public class AmbiguousCommand implements ICommandHandler {
 
     @Override
     public Optional<String> exec(IPlayer player, Stream<String> args) {
-        return Optional.of("неоднозначная команда, используйте более полную форму.");
+        return Optional.of("Неоднозначная команда, используйте более полную форму.");
     }
 
     @Override
