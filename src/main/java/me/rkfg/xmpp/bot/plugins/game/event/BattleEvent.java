@@ -75,13 +75,13 @@ public class BattleEvent extends AbstractEvent {
                     && attacker.as(PLAYER_OBJ).flatMap(IPlayer::getWeapon).map(a -> a.enqueueEvent(attackEvent)).orElse(true)
                     && attacker.enqueueEvent(attackEvent)) {
                 String[] keys = new String[] { "%atk%", "%def%", "%wpn%", "%prt%", "%hp%" };
-                String[] vals = new String[] { attacker.getName(), defender.getName(), attacker.getWeaponName(), defender.getArmorName(),
-                        "" + attackEvent.getDamage() };
+                String[] vals = new String[] { attacker.getName(), defender.getName(), "<b>" + attacker.getWeaponName() + "</b>",
+                        "<b>" + defender.getArmorName() + "</b>", "<b><red>" + attackEvent.getDamage() + "</red></b>" };
                 if (attackEvent.isSuccessful()) {
                     if (attackEvent.getDamage() >= 10) {
                         // CRITICAL HIT
-                        attacker.log("atksc", keys, vals, m -> "*%* " + m.toUpperCase() + " *%*");
-                        defender.log("deffc", keys, vals, m -> "@&@ " + m.toUpperCase() + " @&@");
+                        attacker.log("atksc", keys, vals, m -> "<u>*%* " + m.toUpperCase() + " *%*</u>");
+                        defender.log("deffc", keys, vals, m -> "<u>@&@ " + m.toUpperCase() + " @&@</u>");
                     } else {
                         attacker.log("atks", keys, vals);
                         defender.log("deff", keys, vals);

@@ -34,8 +34,9 @@ public class ItemStatEffect extends AttrStatsEffect implements IUseEffect {
     }
 
     private String describe() {
-        return IntStream.range(0, KEYS.size()).mapToObj(idx -> getIntParameterByKey(KEYS.get(idx))
-                .map(stat -> String.format("%s %s на %d", MESSAGES.get(idx).toLowerCase(), stat > 0 ? "увеличится" : "уменьшится", stat)))
+        return IntStream.range(0, KEYS.size())
+                .mapToObj(idx -> getIntParameterByKey(KEYS.get(idx)).map(stat -> MESSAGES.get(idx).toLowerCase() + " "
+                        + (stat > 0 ? "увеличится на <b><green>" + stat + "</green></b>" : "уменьшится на <b><red>" + -stat + "</red></b>")))
                 .filter(Optional::isPresent).map(Optional::get).reduce(commaReducer).orElse("");
     }
 }

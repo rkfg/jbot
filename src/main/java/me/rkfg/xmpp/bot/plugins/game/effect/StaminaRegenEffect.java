@@ -46,7 +46,7 @@ public class StaminaRegenEffect extends AbstractEffect implements IBattleEffect 
             if (tired > wired) {
                 LoggerFactory.getLogger(getClass()).debug("{} stamina+++", p.getId());
                 int regen = getAttribute(REGEN).orElse(0);
-                p.log("+%d энергии, итого %d", regen, p.getStat(STM) + regen);
+                p.log("+%d энергии, итого <b>%d</b>", regen, p.getStat(STM) + regen);
                 p.flushLogs();
                 return singleEvent(new StatsEvent().setAttributeChain(STM, regen));
             } else {

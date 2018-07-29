@@ -38,15 +38,15 @@ public class UnequipEvent extends AbstractEvent {
                 .ifPresent(s -> target.as(MUTABLEPLAYER_OBJ).ifPresent(p -> p.getSlot(s).flatMap(ISlot::getItem).ifPresent(item -> {
                     try {
                         p.unequipItem(s);
-                        String unequipMessage = "Вы освобождаете слот [%s] и убираете %s в рюкзак.";
+                        String unequipMessage = "Вы освобождаете слот <u>%s</u> и убираете <b>%s</b> в рюкзак.";
                         if (!p.isAlive()) {
-                            unequipMessage = "Противник освобождает ваш слот [%s] и убирает %s в рюкзак.";
+                            unequipMessage = "Противник освобождает ваш слот <u>%s</u> и убирает <b>%s</b> в рюкзак.";
                         }
                         setDescription(String.format(unequipMessage, s.getName(), item.getItemDescription()));
                         logTargetComment();
                         p.enqueueEvent(new UnequippedEvent(item));
                     } catch (NotEquippableException e) {
-                        target.log("Не удалось снять %s: %s.", item.getItemDescription(), e.getMessage());
+                        target.log("Не удалось снять <b>%s</b>: %s.", item.getItemDescription(), e.getMessage());
                         cancel();
                     }
                 })));

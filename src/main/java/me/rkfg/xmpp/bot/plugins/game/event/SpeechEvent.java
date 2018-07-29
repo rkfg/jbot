@@ -43,7 +43,7 @@ public class SpeechEvent extends AbstractEvent {
             }
             return Optional.empty();
         }).orElse("шепчет вам");
-        target.log("%s %s: %s", author, volume, getAttribute(MESSAGE).orElse("<нерзаборчивое бормотание>"));
+        target.log("%s %s: <i>%s</i>", author, volume, getAttribute(MESSAGE).orElse("<нерзаборчивое бормотание>"));
         target.as(PLAYER_OBJ).ifPresent(IPlayer::flushLogs);
     }
 

@@ -18,7 +18,7 @@ public class RenameEvent extends AbstractEvent {
     @Override
     public void apply() {
         target.as(MUTABLEPLAYER_OBJ).ifPresent(p -> p.setName(getAttribute(NAME).orElse(p.getName())));
-        target.log("Персонажа теперь зовут %s.", Utils.getPlayerName(target));
+        target.log("Персонажа теперь зовут <i>%s</i>.", Utils.getPlayerName(target));
     }
 
 }

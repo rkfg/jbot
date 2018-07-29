@@ -24,7 +24,7 @@ public class ListBackpackCommand implements ICommandHandler {
     public Optional<String> exec(IPlayer player, Stream<String> args) {
         List<IItem> backpack = player.getBackpack();
         return Optional.of("В рюкзаке можно найти: " + IntStream.range(0, backpack.size()).mapToObj(
-                idx -> String.format("{%d}: %s", idx + 1, backpack.get(idx).getDescription(Verbosity.WITH_PARAMS).orElse("неизвестно")))
+                idx -> String.format("<u>{%d}</u>: <b>%s</b>", idx + 1, backpack.get(idx).getDescription(Verbosity.WITH_PARAMS).orElse("неизвестно")))
                 .reduce(commaReducer).orElse("рюкзак пуст"));
     }
 

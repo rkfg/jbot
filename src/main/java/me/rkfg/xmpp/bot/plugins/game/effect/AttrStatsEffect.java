@@ -25,7 +25,8 @@ public class AttrStatsEffect extends AbstractEffect {
         for (int i = 0; i < KEYS.size(); ++i) {
             int idx = i;
             getIntParameterByKey(KEYS.get(i)).ifPresent(stat -> {
-                useTarget.log("%s %s на %d.", MESSAGES.get(idx), stat > 0 ? "увеличивается" : "уменьшается", stat);
+                useTarget.log(MESSAGES.get(idx) + " "
+                        + (stat > 0 ? "увеличивается на <b><green>" + stat + "</green></b>." : "уменьшается на <b><red>" + -stat + "</red></b>."));
                 statsEvent.setAttribute(EFFECT_ATTRS.get(idx), stat);
             });
         }

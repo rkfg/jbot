@@ -128,16 +128,17 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
         StringBuilder sb = new StringBuilder("Статы: ");
         final String statsStr = STATS.stream().map(attr -> stats.get(attr).map(stat -> {
             Integer modStat = applyWeaponArmorStats(stat, attr);
-            return attr.getName() + ": " + (modStat.equals(stat) ? stat : modStat + " (" + stat + ")");
+            return attr.getName() + ": <b>" + (modStat.equals(stat) ? stat : modStat + " (" + stat + ")") + "</b>";
         })).filter(Optional::isPresent).map(Optional::get).reduce(pipeReducer).orElse("нет стат");
-        sb.append(statsStr);
-        stats.get(BONUS_POINTS).filter(p -> p > 0).ifPresent(p -> sb.append(" | Бонусные очки: ").append(p));
+        sb.append(statsStr).append('.');
+        stats.get(BONUS_POINTS).filter(p -> p > 0).ifPresent(p -> sb.append(" | Бонусные очки: ").append("<b>" + p + "</b>"));
         final String effectsStr = listEffects().stream().filter(IEffect::isVisible)
-                .map(effect -> effect.getDescription().orElse(effect.getType())).reduce(pipeReducer).orElse("нет эффектов");
+                .map(effect -> "<b>" + effect.getDescription().orElse(effect.getType()) + "</b>").reduce(pipeReducer)
+                .orElse("нет эффектов");
         sb.append("\nЭффекты: ").append(effectsStr).append(".");
         final String slotsStr = SLOTS.stream()
                 .map(slotAttr -> equipment.get(slotAttr)
-                        .map(s -> String.format("%s: %s", s.getDescription().orElse(""),
+                        .map(s -> String.format("%s: <b>%s</b>", s.getDescription().orElse(""),
                                 s.getItem().flatMap(i -> i.getDescription(Verbosity.WITH_PARAMS)).orElse("пусто")))
                         .orElse(""))
                 .reduce(pipeReducer).orElse("нет слотов");
@@ -345,7 +346,7 @@ public class Player extends AbstractEffectReceiver implements IMutablePlayer, IM
                     return a + ". " + s;
                 });
         if (!description.isPresent()) {
-            return Optional.of("Об этом персонаже нельзя сказать ничего особенного.");
+            description = Optional.of("Об этом персонаже нельзя сказать ничего особенного.");
         }
         return description;
     }
