@@ -6,17 +6,25 @@ import org.pircbotx.Channel;
 import org.pircbotx.User;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.MessageEvent;
+import org.pircbotx.hooks.events.PrivateMessageEvent;
 
 public class IRCMessage implements BotMessage {
 
     private Optional<Channel> channel;
     private User user;
     private String message;
-    private MessageEvent event;
+    private Event event;
 
     public IRCMessage(MessageEvent event) {
         this.event = event;
         channel = Optional.ofNullable(event.getChannel());
+        user = event.getUser();
+        message = event.getMessage();
+    }
+
+    public IRCMessage(PrivateMessageEvent event) {
+        this.event = event;
+        channel = Optional.empty();
         user = event.getUser();
         message = event.getMessage();
     }
@@ -43,12 +51,12 @@ public class IRCMessage implements BotMessage {
 
     @Override
     public String getFromRoom() {
-        return channel.map(Channel::getName).orElse(null);
+        return channel.map(Channel::getName).orElse(user.getNick());
     }
 
     @Override
     public String getFrom() {
-        return user.getLogin();
+        return user.getNick();
     }
 
     @Override

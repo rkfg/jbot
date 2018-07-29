@@ -12,6 +12,7 @@ import org.pircbotx.PircBotX;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.MessageEvent;
+import org.pircbotx.hooks.events.PrivateMessageEvent;
 
 import me.rkfg.xmpp.bot.BotBase;
 import me.rkfg.xmpp.bot.IBot;
@@ -33,6 +34,11 @@ public class IRCBot extends BotBase implements IBot {
             processMessage(new IRCMessage(event));
         }
 
+        @Override
+        public void onPrivateMessage(PrivateMessageEvent event) throws Exception {
+            processMessage(new IRCMessage(event));
+        }
+
         private void processMessage(IRCMessage ircMessage) {
             String body = ircMessage.getBody();
             for (MessagePlugin plugin : plugins) {
@@ -43,7 +49,7 @@ public class IRCBot extends BotBase implements IBot {
                         try {
                             String result = plugin.process(ircMessage, matcher);
                             if (result != null && !result.isEmpty()) {
-                                ircMessage.getOriginalMessage().respond(result);
+                                ircMessage.getOriginalMessage().respond(result.replace('\n', ' '));
                                 break;
                             }
                         } catch (Exception e) {
@@ -59,10 +65,10 @@ public class IRCBot extends BotBase implements IBot {
     @Override
     public void run() throws LogicException {
         init();
-        Configuration conf = new Configuration.Builder().setName(sm.getStringSetting("login")).setNickservNick(sm.getStringSetting("nick"))
+        Configuration conf = new Configuration.Builder().setLogin(sm.getStringSetting("login")).setName(sm.getStringSetting("nick"))
                 .setNickservPassword(sm.getStringSetting("password")).addServer(sm.getStringSetting("ircServer"))
                 .addAutoJoinChannel("#" + sm.getStringSetting("join")).addListener(new Listener()).setAutoReconnect(true)
-                .setAutoReconnectDelay(5000).buildConfiguration();
+                .setAutoReconnectDelay(5000).setMaxLineLength(256).buildConfiguration();
         while (!Thread.interrupted()) {
             try {
                 bot = new PircBotX(conf);
@@ -80,13 +86,17 @@ public class IRCBot extends BotBase implements IBot {
 
     @Override
     public String sendMessage(String message, String mucName) {
-        bot.sendIRC().message(mucName, message);
+        bot.sendIRC().message(mucName, removeLineBreaks(message));
         return null;
+    }
+
+    private String removeLineBreaks(String message) {
+        return message.replace('\n', ' ');
     }
 
     @Override
     public void sendMessage(String message) {
-        bot.getUserBot().getChannels().forEach(c -> c.send().message(message));
+        bot.getUserBot().getChannels().forEach(c -> c.send().message(removeLineBreaks(message)));
     }
 
     @Override
@@ -106,7 +116,7 @@ public class IRCBot extends BotBase implements IBot {
 
     @Override
     public boolean isDirectChat(String roomId) {
-        return false;
+        return !roomId.startsWith("#");
     }
 
 }
