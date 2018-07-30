@@ -80,8 +80,8 @@ public class BattleEvent extends AbstractEvent {
                 if (attackEvent.isSuccessful()) {
                     if (attackEvent.getDamage() >= 10) {
                         // CRITICAL HIT
-                        attacker.log("atksc", keys, vals, m -> "<u>*%* " + m.toUpperCase() + " *%*</u>");
-                        defender.log("deffc", keys, vals, m -> "<u>@&@ " + m.toUpperCase() + " @&@</u>");
+                        attacker.log("atksc", keys, vals, m -> "<_dblue><green>*%* " + m.toUpperCase() + " *%*</green></_dblue>");
+                        defender.log("deffc", keys, vals, m -> "<_purple><yellow>@&@ " + m.toUpperCase() + " @&@</yellow></_purple>");
                     } else {
                         attacker.log("atks", keys, vals);
                         defender.log("deff", keys, vals);

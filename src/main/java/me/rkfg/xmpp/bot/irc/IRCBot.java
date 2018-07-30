@@ -88,9 +88,22 @@ public class IRCBot extends BotBase implements IBot {
         REPLACES.put("b", Colors.BOLD);
         REPLACES.put("i", Colors.ITALICS);
         REPLACES.put("u", Colors.UNDERLINE);
+        REPLACES.put("white", Colors.WHITE);
+        REPLACES.put("black", Colors.BLACK);
         REPLACES.put("red", Colors.RED);
         REPLACES.put("brown", Colors.BROWN);
+        REPLACES.put("magenta", Colors.MAGENTA);
+        REPLACES.put("purple", Colors.PURPLE);
+        REPLACES.put("olive", Colors.OLIVE);
+        REPLACES.put("yellow", Colors.YELLOW);
         REPLACES.put("green", Colors.GREEN);
+        REPLACES.put("dgreen", Colors.DARK_GREEN);
+        REPLACES.put("gray", Colors.LIGHT_GRAY);
+        REPLACES.put("dgray", Colors.DARK_GRAY);
+        REPLACES.put("blue", Colors.BLUE);
+        REPLACES.put("dblue", Colors.DARK_BLUE);
+        REPLACES.put("teal", Colors.TEAL);
+        REPLACES.put("cyan", Colors.CYAN);
     }
 
     @Override
@@ -146,13 +159,27 @@ public class IRCBot extends BotBase implements IBot {
                             && message.substring(i + 1).toLowerCase().startsWith(r.getKey() + ">")) {
                         i += r.getKey().length() + 2;
                         result.append(r.getValue());
-                        setState(state, r.getValue());
+                        setState(state, r.getValue(), true);
+                        codeFound = true;
+                    }
+                    if (message.length() > i + r.getKey().length() + 2
+                            && message.substring(i + 1).toLowerCase().startsWith("_" + r.getKey() + ">")) {
+                        i += r.getKey().length() + 3;
+                        result.append(r.getValue().substring(0, 1) + "," + r.getValue().substring(1));
+                        setState(state, r.getValue(), false);
                         codeFound = true;
                     }
                     if (message.length() > i + r.getKey().length() + 2
                             && message.substring(i + 1).toLowerCase().startsWith("/" + r.getKey() + ">")) {
                         i += r.getKey().length() + 3;
-                        removeState(state, r.getValue());
+                        removeState(state, r.getValue(), true);
+                        needRestore = true;
+                        codeFound = true;
+                    }
+                    if (message.length() > i + r.getKey().length() + 3
+                            && message.substring(i + 1).toLowerCase().startsWith("/_" + r.getKey() + ">")) {
+                        i += r.getKey().length() + 4;
+                        removeState(state, r.getValue(), false);
                         needRestore = true;
                         codeFound = true;
                     }
@@ -170,32 +197,43 @@ public class IRCBot extends BotBase implements IBot {
         return result.toString();
     }
 
-    private void removeState(List<String> state, String value) {
+    private void removeState(List<String> state, String value, boolean foreground) {
         if (Colors.BOLD.equals(value) || Colors.ITALICS.equals(value) || Colors.UNDERLINE.equals(value)) {
             state.remove(value);
         } else {
-            state.remove("F_" + value);
+            state.remove((foreground ? "F_" : "B_") + value.substring(1));
         }
     }
 
     private void restoreState(List<String> state, StringBuilder result) {
         result.append(Colors.NORMAL);
-        boolean colorSet = false;
+        String fgColor = null;
+        String bgColor = null;
         for (String s : state) {
-            if (!s.startsWith("F_")) {
+            if (fgColor == null && s.startsWith("F_")) {
+                fgColor = s.substring(2);
+            } else if (bgColor == null && s.startsWith("B_")) {
+                bgColor = s.substring(2);
+            } else {
                 result.append(s);
-            } else if (!colorSet) {
-                result.append(s.substring(2));
-                colorSet = true;
             }
+        }
+        if (fgColor != null || bgColor != null) {
+            result.append("\u0003");
+        }
+        if (fgColor != null) {
+            result.append(fgColor);
+        }
+        if (bgColor != null) {
+            result.append("," + bgColor);
         }
     }
 
-    private void setState(List<String> state, String value) {
+    private void setState(List<String> state, String value, boolean foreground) {
         if (Colors.BOLD.equals(value) || Colors.ITALICS.equals(value) || Colors.UNDERLINE.equals(value)) {
             state.add(0, value);
         } else {
-            state.add(0, "F_" + value);
+            state.add(0, (foreground ? "F_" : "B_") + value.substring(1));
         }
     }
 
