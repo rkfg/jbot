@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.pircbotx.Colors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MessageParser {
 
@@ -20,6 +22,7 @@ public class MessageParser {
     private boolean codeFound = false;
     private boolean needRestore = false;
     private int lastSpaceIdx = 0;
+    private Logger log = LoggerFactory.getLogger(getClass());
 
     public static void init() {
         REPLACES.put("b", Colors.BOLD);
@@ -67,6 +70,7 @@ public class MessageParser {
                 }
                 sb.append(ch);
                 if (sb.length() > maxLength && lastSpaceIdx > 0 && lastSpaceIdx < maxLength) {
+                    log.debug("sblen: {}, maxlen: {}, lastSpace: {}", sb.length(), maxLength, lastSpaceIdx);
                     result.add(sb.substring(0, lastSpaceIdx));
                     String tail = sb.substring(lastSpaceIdx + 1);
                     sb = new StringBuilder();

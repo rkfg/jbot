@@ -89,12 +89,12 @@ public class IRCBot extends BotBase implements IBot {
         sm.setDefault("maxLine", "256");
         sm.setDefault("ircPort", "6667");
         sm.setDefault("ircSsl", "0");
+        maxLength = sm.getIntegerSetting("maxLine");
         final Builder builder = new Configuration.Builder().setLogin(sm.getStringSetting("login")).setName(sm.getStringSetting("nick"))
                 .setNickservPassword(sm.getStringSetting("password"))
                 .addServer(sm.getStringSetting("ircServer"), sm.getIntegerSetting("ircPort"))
                 .addAutoJoinChannel("#" + sm.getStringSetting("join")).addListener(new Listener()).setAutoReconnect(true)
-                .setAutoReconnectDelay(5000).setMessageDelay(100);
-        maxLength = sm.getIntegerSetting("maxLine");
+                .setAutoReconnectDelay(5000).setMaxLineLength(maxLength).setMessageDelay(100);
         if ("1".equals(sm.getStringSetting("ircSsl"))) {
             builder.setSocketFactory(SSLSocketFactory.getDefault());
         }
