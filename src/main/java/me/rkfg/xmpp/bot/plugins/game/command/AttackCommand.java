@@ -22,7 +22,7 @@ public class AttackCommand implements ICommandHandler {
         try {
             IPlayer defender = getPlayer(args);
             if (defender == attacker) {
-                return Optional.of("нельзя атаковать себя.");
+                return Optional.of("Нельзя атаковать себя.");
             }
             if (!defender.isAlive()) {
                 return Optional.of(defender.getName() + " мёртв.");

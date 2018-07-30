@@ -34,7 +34,8 @@ public class BattleEvent extends AbstractEvent {
             attacker.enqueueEvent(new BattleBeginsEvent(attacker, defender));
             defender.enqueueEvent(new BattleBeginsEvent(attacker, defender));
             String[] keys = new String[] { "%atk%", "%def%", "%wpn%", "%prt%" };
-            String[] vals = new String[] { attacker.getName(), defender.getName(), attacker.getWeaponName(), defender.getArmorName() };
+            String[] vals = new String[] { attacker.getName(), defender.getName(), "<b>" + attacker.getWeaponName() + "</b>",
+                    "<b>" + defender.getArmorName() + "</b>" };
             attacker.log("atkb", keys, vals);
             defender.log("defb", keys, vals);
             BattleAttackEvent attackEvent = null;

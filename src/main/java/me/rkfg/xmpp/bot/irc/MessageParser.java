@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Map.Entry;
 
 import org.pircbotx.Colors;
@@ -48,10 +49,11 @@ public class MessageParser {
 
     public MessageParser(String message, int maxLength) {
         this.maxLength = maxLength;
-        this.message = message.replace('\n', ' ');
+        this.message = message.replace('\n', ' ').trim();
     }
 
     public List<String> process() {
+        int lastCharIdx = 0;
         while (i < message.length()) {
             final char ch = message.charAt(i);
             codeFound = false;
@@ -61,20 +63,34 @@ public class MessageParser {
                     parseOpenBGTag(r);
                     parseCloseTag(r);
                     parseCloseBGTag(r);
+                    if (codeFound) {
+                        break;
+                    }
                 }
             }
             if (!codeFound) {
                 if (needRestore) {
-                    restoreState();
+                    restoreState(true);
                     needRestore = false;
                 }
                 sb.append(ch);
-                if (sb.length() > maxLength && lastSpaceIdx > 0 && lastSpaceIdx < maxLength) {
+                lastCharIdx = sb.length();
+                if (sb.length() > maxLength) {
+                    int skip = 1;
+                    if (lastSpaceIdx == 0) {
+                        lastSpaceIdx = lastCharIdx - 1;
+                        skip = 0;
+                    }
                     log.debug("sblen: {}, maxlen: {}, lastSpace: {}", sb.length(), maxLength, lastSpaceIdx);
                     result.add(sb.substring(0, lastSpaceIdx));
-                    String tail = sb.substring(lastSpaceIdx + 1);
+                    String tail = "";
+                    tail = sb.substring(lastSpaceIdx + skip);
                     sb = new StringBuilder();
-                    restoreState();
+                    restoreState(false);
+                    // don't duplicate formatting if it was moved to the new line
+                    if (tail.startsWith(sb.toString())) {
+                        sb.setLength(0);
+                    }
                     sb.append(tail);
                     lastSpaceIdx = 0;
                 }
@@ -109,7 +125,8 @@ public class MessageParser {
     public void parseOpenBGTag(Entry<String, String> r) {
         if (message.length() > i + r.getKey().length() + 2 && message.substring(i + 1).toLowerCase().startsWith("_" + r.getKey() + ">")) {
             i += r.getKey().length() + 3;
-            sb.append("\u0003" + state.stream().filter(s -> s.startsWith("F_")).findFirst().orElse("99") + "," + r.getValue().substring(1));
+            sb.append("\u0003" + state.stream().filter(s -> s.startsWith("F_")).map(s -> s.substring(2)).findFirst().orElse("99") + ","
+                    + r.getValue().substring(1));
             setState(r.getValue(), false);
             codeFound = true;
         }
@@ -132,27 +149,25 @@ public class MessageParser {
         }
     }
 
-    private void restoreState() {
-        sb.append(Colors.NORMAL);
-        String fgColor = null;
-        String bgColor = null;
+    private void restoreState(boolean reset) {
+        if (reset) {
+            sb.append(Colors.NORMAL);
+        }
+        Optional<String> fgColor = Optional.empty();
+        Optional<String> bgColor = Optional.empty();
         for (String s : state) {
-            if (fgColor == null && s.startsWith("F_")) {
-                fgColor = s.substring(2);
-            } else if (bgColor == null && s.startsWith("B_")) {
-                bgColor = s.substring(2);
+            if (!fgColor.isPresent() && s.startsWith("F_")) {
+                fgColor = Optional.of(s.substring(2));
+            } else if (!bgColor.isPresent() && s.startsWith("B_")) {
+                bgColor = Optional.of(s.substring(2));
             } else {
                 sb.append(s);
             }
         }
-        if (fgColor != null || bgColor != null) {
+        if (fgColor.isPresent() || bgColor.isPresent()) {
             sb.append("\u0003");
-        }
-        if (fgColor != null) {
-            sb.append(fgColor);
-        }
-        if (bgColor != null) {
-            sb.append("," + bgColor);
+            sb.append(fgColor.orElse("99"));
+            bgColor.ifPresent(bgc -> sb.append("," + bgc));
         }
     }
 
