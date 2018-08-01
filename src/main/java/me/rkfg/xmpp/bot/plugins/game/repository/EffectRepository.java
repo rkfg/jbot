@@ -17,7 +17,6 @@ import me.rkfg.xmpp.bot.plugins.game.effect.item.CursedEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.ItemStatEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.RechargeEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.RudeDrawEffect;
-import me.rkfg.xmpp.bot.plugins.game.effect.item.RudeDrawingsEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.SetEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.trait.BazookaHandsEffect;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
@@ -43,7 +42,6 @@ public class EffectRepository extends AbstractContentRepository<IEffect> {
         addEffect(StatsEffect.class);
         addEffect(RechargeEffect.class);
         addEffect(RudeDrawEffect.class);
-        addEffect(RudeDrawingsEffect.class);
         addEffect(SetEffect.class);
         addEffect(TraitStatsEffect.class);
         addEffect(TraitEffect.class);
