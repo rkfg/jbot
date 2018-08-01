@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -124,10 +125,24 @@ public class GamePlugin extends MessagePluginImpl {
         registerHandler(new YellCommand());
         registerHandler(new SpendPointsCommand());
         registerHandler(new ManCommand(handlers));
+        Set<String> commands = handlers.keySet();
+        for (Entry<String, ICommandHandler> handler : handlers.entrySet()) {
+            int i = 1;
+            String cmd = handler.getKey();
+            while (i < cmd.length()) {
+                String prefix = cmd.substring(0, i);
+                if (commands.stream().filter(s -> s.startsWith(prefix)).count() == 1) {
+                    handler.getValue().setFormattedCommand("<u>" + prefix + "</u>" + (i < cmd.length() ? cmd.substring(i) : ""));
+                    break;
+                }
+                ++i;
+            }
+        }
     }
 
     private void registerHandler(ICommandHandler handler) {
-        handler.getCommand().forEach(c -> handlers.put(c, handler));
+        handlers.put(handler.getCommand(), handler);
+        handler.setFormattedCommand("<u>" + handler.getCommand() + "</u>");
     }
 
     @Override

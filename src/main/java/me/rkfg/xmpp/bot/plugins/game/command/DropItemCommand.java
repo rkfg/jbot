@@ -1,20 +1,18 @@
 package me.rkfg.xmpp.bot.plugins.game.command;
 
-import static java.util.Arrays.*;
 import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
-import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.item.IItem;
 
-public class DropItemCommand implements ICommandHandler {
+public class DropItemCommand extends AbstractCommand {
 
     @Override
-    public Collection<String> getCommand() {
-        return asList("выбросить");
+    public String getCommand() {
+        return "выбросить";
     }
 
     @Override

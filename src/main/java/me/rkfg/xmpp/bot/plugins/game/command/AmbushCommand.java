@@ -1,7 +1,5 @@
 package me.rkfg.xmpp.bot.plugins.game.command;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -9,11 +7,11 @@ import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.Player;
 import me.rkfg.xmpp.bot.plugins.game.effect.AmbushEffect;
 
-public class AmbushCommand implements ICommandHandler {
+public class AmbushCommand extends AbstractCommand {
 
     @Override
-    public Collection<String> getCommand() {
-        return Arrays.asList("засада");
+    public String getCommand() {
+        return "засада";
     }
 
     @Override

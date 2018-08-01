@@ -1,19 +1,16 @@
 package me.rkfg.xmpp.bot.plugins.game.command;
 
-import static java.util.Collections.*;
-
-import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import me.rkfg.xmpp.bot.plugins.game.GamePlugin;
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 
-public class UnknownCommand implements ICommandHandler {
+public class UnknownCommand extends AbstractCommand {
 
     @Override
-    public Collection<String> getCommand() {
-        return emptySet();
+    public String getCommand() {
+        return "";
     }
 
     @Override

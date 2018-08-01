@@ -1,8 +1,5 @@
 package me.rkfg.xmpp.bot.plugins.game.command;
 
-import static java.util.Arrays.*;
-
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -15,11 +12,11 @@ import me.rkfg.xmpp.bot.plugins.game.effect.SpeechFatigueEffect;
 import me.rkfg.xmpp.bot.plugins.game.event.SpeechEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.SpeechEvent.Volume;
 
-public class WhisperCommand implements ICommandHandler {
+public class WhisperCommand extends AbstractCommand {
 
     @Override
-    public Collection<String> getCommand() {
-        return asList("шепнуть");
+    public String getCommand() {
+        return "шепнуть";
     }
 
     @Override

@@ -1,8 +1,5 @@
 package me.rkfg.xmpp.bot.plugins.game.command;
 
-import static java.util.Arrays.*;
-
-import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -11,11 +8,11 @@ import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.World;
 import me.rkfg.xmpp.bot.plugins.game.misc.Attrs.GamePlayerState;
 
-public class ParticipatingCommand implements ICommandHandler {
+public class ParticipatingCommand extends AbstractCommand {
 
     @Override
-    public Collection<String> getCommand() {
-        return asList("участвую");
+    public String getCommand() {
+        return "участвую";
     }
 
     @Override

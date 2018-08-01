@@ -1,6 +1,5 @@
 package me.rkfg.xmpp.bot.plugins.game.command;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -11,7 +10,7 @@ import me.rkfg.xmpp.bot.plugins.game.item.IItem;
 
 public interface ICommandHandler {
 
-    Collection<String> getCommand();
+    String getCommand();
 
     Optional<String> exec(IPlayer player, Stream<String> args);
 
@@ -48,4 +47,8 @@ public interface ICommandHandler {
         return getFirstIntegerArg(args).filter(v -> v > 0 && v <= playersList.size()).map(i -> playersList.get(i - 1))
                 .orElseThrow(NumberFormatException::new);
     }
+
+    String getFormattedCommand();
+
+    void setFormattedCommand(String formattedCommand);
 }

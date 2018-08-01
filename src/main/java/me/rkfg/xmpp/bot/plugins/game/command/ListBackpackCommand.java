@@ -2,8 +2,6 @@ package me.rkfg.xmpp.bot.plugins.game.command;
 
 import static me.rkfg.xmpp.bot.plugins.game.misc.Utils.*;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -13,11 +11,11 @@ import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.item.IItem;
 import me.rkfg.xmpp.bot.plugins.game.misc.IHasDescription.Verbosity;
 
-public class ListBackpackCommand implements ICommandHandler {
+public class ListBackpackCommand extends AbstractCommand {
 
     @Override
-    public Collection<String> getCommand() {
-        return Arrays.asList("рюкзак");
+    public String getCommand() {
+        return "рюкзак";
     }
 
     @Override

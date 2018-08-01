@@ -2,18 +2,16 @@ package me.rkfg.xmpp.bot.plugins.game.command;
 
 import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 
-public class UnequipCommand implements ICommandHandler {
+public class UnequipCommand extends AbstractCommand {
 
     @Override
-    public Collection<String> getCommand() {
-        return Arrays.asList("снять");
+    public String getCommand() {
+        return "снять";
     }
 
     @Override

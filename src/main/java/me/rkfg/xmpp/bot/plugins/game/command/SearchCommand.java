@@ -1,7 +1,5 @@
 package me.rkfg.xmpp.bot.plugins.game.command;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -9,11 +7,11 @@ import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.Player;
 import me.rkfg.xmpp.bot.plugins.game.event.SearchEvent;
 
-public class SearchCommand implements ICommandHandler {
+public class SearchCommand extends AbstractCommand {
 
     @Override
-    public Collection<String> getCommand() {
-        return Arrays.asList("искать");
+    public String getCommand() {
+        return "искать";
     }
 
     @Override

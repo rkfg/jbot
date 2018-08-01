@@ -2,8 +2,6 @@ package me.rkfg.xmpp.bot.plugins.game.command;
 
 import static me.rkfg.xmpp.bot.plugins.game.misc.Utils.*;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,7 +12,7 @@ import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.World;
 import me.rkfg.xmpp.bot.plugins.game.misc.Attrs.GamePlayerState;
 
-public class ListPlayersCommand implements ICommandHandler {
+public class ListPlayersCommand extends AbstractCommand {
 
     @Override
     public Optional<String> exec(IPlayer player, Stream<String> args) {
@@ -57,8 +55,8 @@ public class ListPlayersCommand implements ICommandHandler {
     }
 
     @Override
-    public Collection<String> getCommand() {
-        return Arrays.asList("игроки");
+    public String getCommand() {
+        return "игроки";
     }
 
     @Override

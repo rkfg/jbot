@@ -1,7 +1,5 @@
 package me.rkfg.xmpp.bot.plugins.game.command;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -10,11 +8,11 @@ import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.Player;
 import me.rkfg.xmpp.bot.plugins.game.event.BattleEvent;
 
-public class AttackCommand implements ICommandHandler {
+public class AttackCommand extends AbstractCommand {
 
     @Override
-    public Collection<String> getCommand() {
-        return Arrays.asList("атака");
+    public String getCommand() {
+        return "атака";
     }
 
     @Override

@@ -3,7 +3,6 @@ package me.rkfg.xmpp.bot.plugins.game.command;
 import static java.util.Arrays.*;
 import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -12,13 +11,13 @@ import me.rkfg.xmpp.bot.plugins.game.GamePlugin;
 import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.effect.ExpiringBonusPointsEffect;
 
-public class SpendPointsCommand implements ICommandHandler {
+public class SpendPointsCommand extends AbstractCommand {
 
     private static final List<String> STAT_CHARS = asList("д", "э", "а", "з", "с", "б", "у");
 
     @Override
-    public Collection<String> getCommand() {
-        return asList("бонус");
+    public String getCommand() {
+        return "бонус";
     }
 
     @Override

@@ -1,8 +1,5 @@
 package me.rkfg.xmpp.bot.plugins.game.command;
 
-import static java.util.Arrays.*;
-
-import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -13,11 +10,11 @@ import me.rkfg.xmpp.bot.plugins.game.effect.SpeechFatigueEffect;
 import me.rkfg.xmpp.bot.plugins.game.event.SpeechEvent;
 import me.rkfg.xmpp.bot.plugins.game.event.SpeechEvent.Volume;
 
-public class YellCommand implements ICommandHandler {
+public class YellCommand extends AbstractCommand {
 
     @Override
-    public Collection<String> getCommand() {
-        return asList("орнуть");
+    public String getCommand() {
+        return "орнуть";
     }
 
     @Override

@@ -1,10 +1,8 @@
 package me.rkfg.xmpp.bot.plugins.game.command;
 
-import static java.util.Arrays.*;
 import static me.rkfg.xmpp.bot.plugins.game.misc.Attrs.*;
 import static me.rkfg.xmpp.bot.plugins.game.misc.Utils.*;
 
-import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -19,14 +17,14 @@ import me.rkfg.xmpp.bot.plugins.game.item.IItem;
 import me.rkfg.xmpp.bot.plugins.game.item.IItem.Type;
 import me.rkfg.xmpp.bot.plugins.game.repository.IObjectRepository;
 
-public class RebuildItemsCommand implements ICommandHandler {
+public class RebuildItemsCommand extends AbstractCommand {
 
     private static final int REBUILD_RETRIES = 10;
     private static final int ITEMS_REQUIRED = 2;
 
     @Override
-    public Collection<String> getCommand() {
-        return asList("пересобрать");
+    public String getCommand() {
+        return "пересобрать";
     }
 
     @Override
