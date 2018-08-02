@@ -26,8 +26,8 @@ import me.rkfg.xmpp.bot.message.XMPPMessage;
 public class MUCManager {
     private static Logger log = LoggerFactory.getLogger(Main.class);
     private static DiscussionHistory history = new DiscussionHistory();
-    private Map<MultiUserChat, MUCParams> mucsList = new ConcurrentHashMap<MultiUserChat, MUCParams>();
-    private Map<String, MultiUserChat> mucsJIDs = new ConcurrentHashMap<String, MultiUserChat>();
+    private Map<MultiUserChat, MUCParams> mucsList = new ConcurrentHashMap<>();
+    private Map<String, MultiUserChat> mucsJIDs = new ConcurrentHashMap<>();
 
     public MUCManager() {
         history.setMaxStanzas(0);
@@ -58,7 +58,7 @@ public class MUCManager {
      * @return map of JID (if JIDs are visible) or nick (otherwise) to occupant object.
      */
     public Map<String, Occupant> listMUCOccupantsByJID(String roomJID) {
-        Map<String, Occupant> occupants = new HashMap<String, Occupant>();
+        Map<String, Occupant> occupants = new HashMap<>();
         MultiUserChat multiUserChat = mucsJIDs.get(roomJID);
         for (String occupantName : multiUserChat.getOccupants()) {
             Occupant occupant = multiUserChat.getOccupant(occupantName);
@@ -99,7 +99,7 @@ public class MUCManager {
              * джойна. А можно просто игнорировать это. (Энивей mucsAdapted разрастается, хотя не должен в этом случае, поэтому быдлокод
              * сильно хуже не стал)
              **/
-            e.printStackTrace();
+            log.warn("{}", e);
         }
 
         MUCParams mucParams = new MUCParams();

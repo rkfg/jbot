@@ -35,13 +35,11 @@ import org.jivesoftware.smack.chat.ChatManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import me.rkfg.xmpp.bot.BotBase;
 import me.rkfg.xmpp.bot.exceptions.NotImplementedException;
-import me.rkfg.xmpp.bot.message.MatrixMessage;
 import me.rkfg.xmpp.bot.message.BotMessage;
+import me.rkfg.xmpp.bot.message.MatrixMessage;
 import me.rkfg.xmpp.bot.plugins.MessagePlugin;
 import me.rkfg.xmpp.bot.xmpp.ChatAdapter;
 import me.rkfg.xmpp.bot.xmpp.MUCManager;
@@ -60,7 +58,6 @@ public class MatrixBot extends BotBase {
     private HttpClient httpClient = HttpClientBuilder.create().build();
     private RequestConfig reqConfig = RequestConfig.custom().setSocketTimeout(TIMEOUT).setConnectTimeout(TIMEOUT)
             .setConnectionRequestTimeout(TIMEOUT).build();
-    private Logger log = LoggerFactory.getLogger(getClass());
     private StateManager stateManager = new StateManager();
     private RoomParticipantsManager roomParticipantsManager = null;
     private Map<String, Transaction> pendingEvents = new HashMap<>();
@@ -180,7 +177,9 @@ public class MatrixBot extends BotBase {
             JSONObject content = event.getJSONObject("content");
             if (!initialSync && "m.room.message".equals(type)) {
                 String body = content.getString("body");
-                log.debug(event.toString(4));
+                if (log.isDebugEnabled()) {
+                    log.debug(event.toString(4));
+                }
                 log.debug("Content: {}", body);
                 if (!fromMyself(event)) {
                     processMessage(body, roomId, senderId);
