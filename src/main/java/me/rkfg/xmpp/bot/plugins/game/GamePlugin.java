@@ -30,6 +30,7 @@ import me.rkfg.xmpp.bot.plugins.game.command.ManCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.ParticipatingCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.ReadyCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.RebuildItemsCommand;
+import me.rkfg.xmpp.bot.plugins.game.command.RulesCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.SearchCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.SpendPointsCommand;
 import me.rkfg.xmpp.bot.plugins.game.command.UnequipCommand;
@@ -124,6 +125,7 @@ public class GamePlugin extends MessagePluginImpl {
         registerHandler(new WhisperCommand());
         registerHandler(new YellCommand());
         registerHandler(new SpendPointsCommand());
+        registerHandler(new RulesCommand());
         registerHandler(new ManCommand(handlers));
         Set<String> commands = handlers.keySet();
         for (Entry<String, ICommandHandler> handler : handlers.entrySet()) {
