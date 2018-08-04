@@ -44,6 +44,9 @@ public class MatrixMessage implements BotMessage {
     }
 
     private String processTags(String body) {
+        if (body == null) {
+            return null;
+        }
         for (Entry<String, String> entry : REPLACES.entrySet()) {
             body = body.replaceAll("<" + entry.getKey() + ">", "<font color=\"#" + entry.getValue() + "\">");
             body = body.replaceAll("<_" + entry.getKey() + ">", "<font data-mx-bg-color=\"#" + entry.getValue() + "\">");
