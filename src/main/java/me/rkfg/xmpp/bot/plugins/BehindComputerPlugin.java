@@ -15,20 +15,20 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.message.BasicNameValuePair;
 
+import me.rkfg.xmpp.bot.IBot;
 import me.rkfg.xmpp.bot.Utils;
 import me.rkfg.xmpp.bot.message.BotMessage;
-import me.rkfg.xmpp.bot.message.BotMessage.Protocol;
 import ru.ppsrk.gwt.client.ClientAuthenticationException;
 import ru.ppsrk.gwt.client.LogicException;
 
 public class BehindComputerPlugin extends CommandPlugin {
 
-    private final static String INVALID_ADDRESS = "с этого адреса нельзя общаться с Закомповьем.";
+    private static final String INVALID_ADDRESS = "с этого адреса нельзя общаться с Закомповьем.";
 
     @Override
     public String processCommand(BotMessage message, Matcher matcher) throws ClientAuthenticationException, LogicException {
         String from = message.getFrom();
-        if (message.getProtocol() == Protocol.XMPP) {
+        if (message.getProtocol() == IBot.Protocol.XMPP) {
             if (!from.matches("^.+?@behind\\.computer/.*$")) {
                 return INVALID_ADDRESS;
             }

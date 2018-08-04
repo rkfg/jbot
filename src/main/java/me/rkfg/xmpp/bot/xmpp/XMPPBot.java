@@ -183,9 +183,9 @@ public class XMPPBot extends BotBase {
             try {
                 chatAdapter.sendMessage(message);
                 Thread.sleep(1000);
-            } catch (XMPPException | NotConnectedException e1) {
-                log.warn("{}", e1);
-            } catch (InterruptedException e2) {
+            } catch (XMPPBotException e) {
+                log.warn("{}", e);
+            } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         });
@@ -222,5 +222,10 @@ public class XMPPBot extends BotBase {
     @Override
     public boolean isDirectChat(String roomId) {
         return mucManager.listMUCs().stream().noneMatch(m -> m.getRoom().equals(roomId));
+    }
+
+    @Override
+    public Protocol getProtocol() {
+        return Protocol.XMPP;
     }
 }

@@ -1,9 +1,10 @@
 package me.rkfg.xmpp.bot.xmpp;
 
 import org.jivesoftware.smack.SmackException.NotConnectedException;
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+
+import me.rkfg.xmpp.bot.message.BotMessage;
 
 public class MUCAdapterImpl extends LoggingChatAdapter {
     private MultiUserChat multiUserChat;
@@ -13,11 +14,21 @@ public class MUCAdapterImpl extends LoggingChatAdapter {
         this.multiUserChat = multiUserChat;
     }
 
-    public void sendActualMessage(String message) throws XMPPException, NotConnectedException {
-        multiUserChat.sendMessage(message);
+    @Override
+    public void sendActualMessage(String message) {
+        try {
+            multiUserChat.sendMessage(message);
+        } catch (NotConnectedException e) {
+            throw new XMPPBotException(e);
+        }
     }
 
-    public void sendActualMessage(Message message) throws XMPPException, NotConnectedException {
-        multiUserChat.sendMessage(message);
+    @Override
+    public void sendActualMessage(BotMessage message) {
+        try {
+            multiUserChat.sendMessage((Message) message.getOriginalMessage());
+        } catch (NotConnectedException e) {
+            throw new XMPPBotException(e);
+        }
     }
 }

@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 
 import javax.net.ssl.SSLSocketFactory;
 
-import org.jivesoftware.smack.chat.ChatManager;
 import org.pircbotx.Configuration;
 import org.pircbotx.Configuration.Builder;
 import org.pircbotx.PircBotX;
@@ -21,12 +20,8 @@ import org.pircbotx.hooks.events.PrivateMessageEvent;
 
 import me.rkfg.xmpp.bot.BotBase;
 import me.rkfg.xmpp.bot.IBot;
-import me.rkfg.xmpp.bot.exceptions.NotImplementedException;
-import me.rkfg.xmpp.bot.message.BotMessage;
 import me.rkfg.xmpp.bot.message.IRCMessage;
 import me.rkfg.xmpp.bot.plugins.MessagePlugin;
-import me.rkfg.xmpp.bot.xmpp.ChatAdapter;
-import me.rkfg.xmpp.bot.xmpp.MUCManager;
 import ru.ppsrk.gwt.client.LogicException;
 
 public class IRCBot extends BotBase implements IBot {
@@ -114,11 +109,6 @@ public class IRCBot extends BotBase implements IBot {
     }
 
     @Override
-    public void processMessage(ChatAdapter mucAdapted, BotMessage message) {
-        throw new NotImplementedException();
-    }
-
-    @Override
     public String sendMessage(String message, String mucName) {
         postprocessMessage(message).forEach(msg -> bot.sendIRC().message(mucName, msg));
         return null;
@@ -139,18 +129,13 @@ public class IRCBot extends BotBase implements IBot {
     }
 
     @Override
-    public ChatManager getChatManagerInstance() {
-        return null;
-    }
-
-    @Override
-    public MUCManager getMUCManager() {
-        return null;
-    }
-
-    @Override
     public boolean isDirectChat(String roomId) {
         return !roomId.startsWith("#");
+    }
+
+    @Override
+    public Protocol getProtocol() {
+        return Protocol.IRC;
     }
 
 }

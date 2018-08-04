@@ -1,11 +1,9 @@
 package me.rkfg.xmpp.bot.xmpp;
 
-import org.jivesoftware.smack.SmackException.NotConnectedException;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Message;
+import me.rkfg.xmpp.bot.message.BotMessage;
 
 public interface ChatAdapter {
-    public void sendMessage(String message) throws XMPPException, NotConnectedException;
+    public void sendMessage(String message);
 
-    public void sendMessage(Message message) throws XMPPException, NotConnectedException;
+    public void sendMessage(BotMessage message);
 }

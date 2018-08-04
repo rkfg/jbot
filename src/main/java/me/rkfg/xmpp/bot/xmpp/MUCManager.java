@@ -107,7 +107,7 @@ public class MUCManager {
         final ChatAdapter mucAdapted = new MUCAdapterImpl(muc);
         mucParams.setMucAdapted(mucAdapted);
 
-        MessageListener messageListener = message -> Main.INSTANCE.processMessage(mucAdapted, new XMPPMessage(message));
+        MessageListener messageListener = message -> ((XMPPBot) Main.INSTANCE).processMessage(mucAdapted, new XMPPMessage(message));
         muc.addMessageListener(messageListener);
         mucParams.setMessageListener(messageListener);
         mucsList.put(muc, mucParams);

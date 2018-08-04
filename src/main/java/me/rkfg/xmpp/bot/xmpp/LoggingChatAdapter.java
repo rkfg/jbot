@@ -1,10 +1,9 @@
 package me.rkfg.xmpp.bot.xmpp;
 
-import org.jivesoftware.smack.SmackException.NotConnectedException;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import me.rkfg.xmpp.bot.message.BotMessage;
 
 public abstract class LoggingChatAdapter implements ChatAdapter {
 
@@ -19,17 +18,19 @@ public abstract class LoggingChatAdapter implements ChatAdapter {
         log.info("<{}>: {}", from, message);
     }
 
-    public void sendMessage(String message) throws XMPPException, NotConnectedException {
+    @Override
+    public void sendMessage(String message) {
         logMessage(from, message);
         sendActualMessage(message);
     }
 
-    public void sendMessage(Message message) throws XMPPException, NotConnectedException {
+    @Override
+    public void sendMessage(BotMessage message) {
         logMessage(from, message.getBody());
         sendActualMessage(message);
     }
 
-    protected abstract void sendActualMessage(String message) throws XMPPException, NotConnectedException;
+    protected abstract void sendActualMessage(String message);
 
-    protected abstract void sendActualMessage(Message message) throws XMPPException, NotConnectedException;
+    protected abstract void sendActualMessage(BotMessage message);
 }

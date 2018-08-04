@@ -67,11 +67,18 @@ public abstract class BotBase implements IBot {
     protected void loadPlugins(String pluginClassesNamesStr) {
         String[] pluginClassesNames = pluginClassesNamesStr.split(",\\s?");
         log.debug("Plugins found: {}", (Object) pluginClassesNames);
+        final Protocol protocol = getProtocol();
         for (String pluginName : pluginClassesNames) {
             try {
                 Class<? extends MessagePlugin> clazz = Class.forName(PLUGINS_PACKAGE_NAME + pluginName).asSubclass(MessagePlugin.class);
-                plugins.add(clazz.getDeclaredConstructor().newInstance());
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+                final MessagePlugin instance = clazz.getDeclaredConstructor().newInstance();
+                if (instance.getCompatibleProtocols().contains(protocol)) {
+                    plugins.add(instance);
+                } else {
+                    log.info("Plugin {} is incompatible with current protocol {}, not loading.", pluginName, protocol);
+                }
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException | NoSuchMethodException | SecurityException e) {
                 log.warn("Couldn't load plugin {}: {}", pluginName, e);
             }
         }

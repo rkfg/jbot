@@ -1,10 +1,8 @@
 package me.rkfg.xmpp.bot.message;
 
-public interface BotMessage {
+import me.rkfg.xmpp.bot.IBot;
 
-    public enum Protocol {
-        XMPP, MATRIX, IRC
-    }
+public interface BotMessage {
 
     boolean isFromUser();
 
@@ -24,7 +22,7 @@ public interface BotMessage {
 
     String getBody();
 
-    Protocol getProtocol();
+    IBot.Protocol getProtocol();
 
     <T> T getOriginalMessage();
 

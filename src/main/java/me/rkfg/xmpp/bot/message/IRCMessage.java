@@ -8,6 +8,8 @@ import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 
+import me.rkfg.xmpp.bot.IBot;
+
 public class IRCMessage implements BotMessage {
 
     private Optional<Channel> channel;
@@ -65,8 +67,8 @@ public class IRCMessage implements BotMessage {
     }
 
     @Override
-    public Protocol getProtocol() {
-        return Protocol.IRC;
+    public IBot.Protocol getProtocol() {
+        return IBot.Protocol.IRC;
     }
 
     @SuppressWarnings("unchecked")

@@ -31,18 +31,13 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.jivesoftware.smack.chat.ChatManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import me.rkfg.xmpp.bot.BotBase;
-import me.rkfg.xmpp.bot.exceptions.NotImplementedException;
-import me.rkfg.xmpp.bot.message.BotMessage;
 import me.rkfg.xmpp.bot.message.MatrixMessage;
 import me.rkfg.xmpp.bot.plugins.MessagePlugin;
-import me.rkfg.xmpp.bot.xmpp.ChatAdapter;
-import me.rkfg.xmpp.bot.xmpp.MUCManager;
 import ru.ppsrk.gwt.client.LogicException;
 
 public class MatrixBot extends BotBase {
@@ -308,25 +303,10 @@ public class MatrixBot extends BotBase {
     }
 
     @Override
-    public void processMessage(ChatAdapter mucAdapted, BotMessage message) {
-        throw new NotImplementedException();
-    }
-
-    @Override
     public void sendMessage(String message) {
         for (String roomId : stateManager.listRooms()) {
             sendMessage(message, roomId);
         }
-    }
-
-    @Override
-    public ChatManager getChatManagerInstance() {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public MUCManager getMUCManager() {
-        throw new NotImplementedException();
     }
 
     @Override
@@ -338,5 +318,10 @@ public class MatrixBot extends BotBase {
     @Override
     public boolean isDirectChat(String roomId) {
         return roomParticipantsManager.isDirectChat(roomId);
+    }
+
+    @Override
+    public Protocol getProtocol() {
+        return Protocol.MATRIX;
     }
 }

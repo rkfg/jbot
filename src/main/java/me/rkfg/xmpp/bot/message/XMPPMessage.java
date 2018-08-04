@@ -4,6 +4,8 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Message.Type;
 import org.jxmpp.util.XmppStringUtils;
 
+import me.rkfg.xmpp.bot.IBot;
+
 public class XMPPMessage implements BotMessage {
     private Message msg;
 
@@ -52,8 +54,8 @@ public class XMPPMessage implements BotMessage {
     }
 
     @Override
-    public Protocol getProtocol() {
-        return Protocol.XMPP;
+    public IBot.Protocol getProtocol() {
+        return IBot.Protocol.XMPP;
     }
 
     @SuppressWarnings("unchecked")

@@ -4,17 +4,24 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
 
 import org.jivesoftware.smackx.muc.Occupant;
 
+import com.google.common.collect.Sets;
+
+import me.rkfg.xmpp.bot.IBot;
+import me.rkfg.xmpp.bot.Main;
+import me.rkfg.xmpp.bot.IBot.Protocol;
 import me.rkfg.xmpp.bot.domain.Karma;
 import me.rkfg.xmpp.bot.domain.KarmaHistory;
 import me.rkfg.xmpp.bot.message.BotMessage;
 import me.rkfg.xmpp.bot.nxt.NXTAPI;
 import me.rkfg.xmpp.bot.nxt.Transaction;
+import me.rkfg.xmpp.bot.xmpp.XMPPBot;
 import ru.ppsrk.gwt.client.GwtUtilException;
 import ru.ppsrk.gwt.server.HibernateUtil;
 import ru.ppsrk.gwt.server.SettingsManager;
@@ -86,7 +93,7 @@ public class KarmaPlugin extends CommandPlugin {
             }
             karmas = session.createQuery("from Karma k order by k.karma").list();
             StringBuilder sb = new StringBuilder("Карма участников:\n");
-            Map<String, Occupant> occupants = getMUCManager().listMUCOccupantsByJID(message.getFromRoom());
+            Map<String, Occupant> occupants = ((XMPPBot) Main.INSTANCE).getMUCManager().listMUCOccupantsByJID(message.getFromRoom());
             for (Karma karma : karmas) {
                 String name = karma.getJid();
                 Occupant jidOccupant = occupants.get(name);
@@ -116,5 +123,10 @@ public class KarmaPlugin extends CommandPlugin {
                 + ", к платежу приложите сообщение с JID, для которого хотите увеличить карму на X пунктов. "
                 + "Для уменьшения кармы поставьте перед JID знак минуса через пробел (например: - admin@domain.com).\n" + "Пример: "
                 + PREFIX + "k admin";
+    }
+    
+    @Override
+    public Set<Protocol> getCompatibleProtocols() {
+        return Sets.newHashSet(IBot.Protocol.XMPP);
     }
 }

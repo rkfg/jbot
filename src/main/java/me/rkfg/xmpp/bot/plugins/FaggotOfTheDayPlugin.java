@@ -41,7 +41,14 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.Occupant;
 import org.jxmpp.util.XmppStringUtils;
 
+import com.google.common.collect.Sets;
+
+import me.rkfg.xmpp.bot.IBot;
+import me.rkfg.xmpp.bot.IBot.Protocol;
+import me.rkfg.xmpp.bot.Main;
 import me.rkfg.xmpp.bot.message.BotMessage;
+import me.rkfg.xmpp.bot.xmpp.MUCManager;
+import me.rkfg.xmpp.bot.xmpp.XMPPBot;
 import ru.ppsrk.gwt.client.ClientAuthException;
 import ru.ppsrk.gwt.client.LogicException;
 
@@ -65,6 +72,7 @@ public final class FaggotOfTheDayPlugin extends CommandPlugin {
     private final AtomicBoolean startedListener = new AtomicBoolean(false);
     private final Timer timer = new Timer();
     private final Random random = new Random();
+    private final MUCManager mucManager = ((XMPPBot) Main.INSTANCE).getMUCManager();
 
     @Override
     public void init() {
@@ -72,15 +80,14 @@ public final class FaggotOfTheDayPlugin extends CommandPlugin {
     }
 
     @Override
-    public String processCommand(BotMessage message, Matcher matcher)
-            throws LogicException, ClientAuthException {
+    public String processCommand(BotMessage message, Matcher matcher) throws LogicException, ClientAuthException {
         startListening();
 
         if (faggot == null) {
             calculateFaggot();
         }
 
-        final Occupant sender = getMUCManager().getMUCOccupant(message.getFrom());
+        final Occupant sender = mucManager.getMUCOccupant(message.getFrom());
         final String senderJid = XmppStringUtils.parseBareJid(sender.getJid());
         final String faggotJid = XmppStringUtils.parseBareJid(faggot.getJid());
         if (senderJid.equals(faggotJid)) {
@@ -88,9 +95,7 @@ public final class FaggotOfTheDayPlugin extends CommandPlugin {
         }
 
         final String roomJid = XmppStringUtils.parseBareJid(message.getFrom());
-        final Occupant occupant = Optional
-                .ofNullable(getMUCManager().listMUCOccupantsByJID(roomJid).get(faggotJid))
-                .orElse(faggot);
+        final Occupant occupant = Optional.ofNullable(mucManager.listMUCOccupantsByJID(roomJid).get(faggotJid)).orElse(faggot);
 
         return INFO_FAGGOT_IS + occupant.getNick() + ".";
     }
@@ -105,10 +110,7 @@ public final class FaggotOfTheDayPlugin extends CommandPlugin {
         final String commands = StringUtils.join(ALL_COMMANDS, "|");
         final String sampleCommand = PREFIX + ALL_COMMANDS.get(0);
 
-        return
-                "узнать, кто сегодня Пидор дня.\n" +
-                "Формат: <" + commands + ">\n" +
-                "Пример: " + sampleCommand;
+        return "узнать, кто сегодня Пидор дня.\n" + "Формат: <" + commands + ">\n" + "Пример: " + sampleCommand;
     }
 
     private void startTimer() {
@@ -136,9 +138,9 @@ public final class FaggotOfTheDayPlugin extends CommandPlugin {
             return;
         }
 
-        getMUCManager().listMUCs().forEach(muc -> {
+        mucManager.listMUCs().forEach(muc -> {
             muc.addMessageListener(message -> {
-               occupants.add(muc.getOccupant(message.getFrom()));
+                occupants.add(muc.getOccupant(message.getFrom()));
             });
 
             occupants.addAll(getAllOccupants(muc));
@@ -146,8 +148,7 @@ public final class FaggotOfTheDayPlugin extends CommandPlugin {
     }
 
     private Set<Occupant> getAllOccupants(MultiUserChat muc) {
-        return muc.getOccupants().stream().map(muc::getOccupant)
-                .filter(occupant -> !occupant.getNick().equals(getBotNick()))
+        return muc.getOccupants().stream().map(muc::getOccupant).filter(occupant -> !occupant.getNick().equals(getBotNick()))
                 .collect(Collectors.toSet());
     }
 
@@ -162,20 +163,21 @@ public final class FaggotOfTheDayPlugin extends CommandPlugin {
             return;
         }
 
-        final Set<String> uniqueJids = occupants.stream()
-                .map(Occupant::getJid)
-                .map(XmppStringUtils::parseBareJid)
+        final Set<String> uniqueJids = occupants.stream().map(Occupant::getJid).map(XmppStringUtils::parseBareJid)
                 .collect(Collectors.toSet());
         log.info("Contenders for today’s Faggot of the Day title: {}", uniqueJids);
 
         final int i = random.nextInt(uniqueJids.size());
         final String faggotJid = uniqueJids.stream().skip(i).findFirst().get();
-        faggot = occupants.stream()
-                .filter(occupant -> faggotJid.equals(XmppStringUtils.parseBareJid(occupant.getJid())))
-                .findFirst().get();
+        faggot = occupants.stream().filter(occupant -> faggotJid.equals(XmppStringUtils.parseBareJid(occupant.getJid()))).findFirst().get();
         log.info("{} becomes Faggot of the Day!", faggot.getNick());
 
         occupants.clear();
+    }
+    
+    @Override
+    public Set<Protocol> getCompatibleProtocols() {
+        return Sets.newHashSet(IBot.Protocol.XMPP);
     }
 
 }

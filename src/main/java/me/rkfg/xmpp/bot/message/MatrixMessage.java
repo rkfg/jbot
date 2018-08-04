@@ -1,5 +1,6 @@
 package me.rkfg.xmpp.bot.message;
 
+import me.rkfg.xmpp.bot.IBot;
 import me.rkfg.xmpp.bot.matrix.StateManager;
 
 public class MatrixMessage implements BotMessage {
@@ -63,8 +64,8 @@ public class MatrixMessage implements BotMessage {
     }
 
     @Override
-    public Protocol getProtocol() {
-        return Protocol.MATRIX;
+    public IBot.Protocol getProtocol() {
+        return IBot.Protocol.MATRIX;
     }
 
     public int getRetryCount() {
