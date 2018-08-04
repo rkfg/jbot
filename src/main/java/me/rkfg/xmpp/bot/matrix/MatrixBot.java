@@ -98,7 +98,7 @@ public class MatrixBot extends BotBase {
                 synchronized (failedEvents) {
                     failedEvents.stream().filter(m -> m.getResendTS() < System.currentTimeMillis() && m.getRetryCount() > 0).forEach(m -> {
                         log.info("Resent to {}, {}", m.getFromRoom(), m.getBody());
-                        final JSONObject resp = doSendMessage(m.getBody(), m.getFromRoom());
+                        final JSONObject resp = doSendMessage(m);
                         if (resp != null && resp.has(EVENT_ID)) {
                             log.info("Successfully resent to {}", m.getFromRoom());
                             m.setRetryCount(0);
@@ -229,14 +229,15 @@ public class MatrixBot extends BotBase {
                 .addParameter("access_token", token).build();
     }
 
-    private JSONObject doSendMessage(String body, String roomId) {
+    private JSONObject doSendMessage(MatrixMessage message) {
         try {
-            JSONObject resp = put(ROOMS + roomId + "/send/m.room.message/jbot" + System.currentTimeMillis(),
-                    new JSONObject().put("msgtype", "m.text").put("formatted_body", body.replaceAll("\n", "<br/>"))
-                            .put("format", "org.matrix.custom.html").put("body", body.replaceAll("<[^>]*>([^<]*)</[^>]*>", "$1")));
+            JSONObject resp = put(ROOMS + message.getFromRoom() + "/send/m.room.message/jbot" + System.currentTimeMillis(),
+                    new JSONObject().put("msgtype", "m.text").put("formatted_body", message.getBody().replaceAll("\n", "<br/>"))
+                            .put("format", "org.matrix.custom.html")
+                            .put("body", message.getBody().replaceAll("<[^>]*>([^<]*)</[^>]*>", "$1")));
             String eventId = resp.optString(EVENT_ID);
             if (!eventId.isEmpty()) {
-                pendingEvents.put(eventId, new Transaction(eventId, new MatrixMessage(stateManager, body, roomId, null)));
+                pendingEvents.put(eventId, new Transaction(eventId, message));
             }
             return resp;
         } catch (JSONException | URISyntaxException | IOException e) {
@@ -247,7 +248,8 @@ public class MatrixBot extends BotBase {
 
     @Override
     public String sendMessage(String body, String roomId) {
-        final JSONObject resp = doSendMessage(body, roomId);
+        final MatrixMessage msg = new MatrixMessage(stateManager, body, roomId, null);
+        final JSONObject resp = doSendMessage(msg);
         String eventId = null;
         long retry = 0;
         if (resp != null) {
@@ -260,7 +262,6 @@ public class MatrixBot extends BotBase {
         long resendTS = System.currentTimeMillis() + retry + 100;
         synchronized (failedEvents) {
             log.warn("Message failed, resend at {}", resendTS);
-            final MatrixMessage msg = new MatrixMessage(stateManager, body, roomId, null);
             msg.setResendTS(resendTS);
             failedEvents.add(msg);
         }

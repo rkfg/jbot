@@ -1,10 +1,15 @@
 package me.rkfg.xmpp.bot.message;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import me.rkfg.xmpp.bot.IBot;
 import me.rkfg.xmpp.bot.matrix.StateManager;
 
 public class MatrixMessage implements BotMessage {
 
+    private static final Map<String, String> REPLACES = new HashMap<>();
     private StateManager displayNames;
     private String fromRoom;
     private String from;
@@ -12,11 +17,40 @@ public class MatrixMessage implements BotMessage {
     private int retryCount = 3;
     private long resendTS = 0;
 
+    static {
+        REPLACES.put("white", "FFFFFF");
+        REPLACES.put("black", "000000");
+        REPLACES.put("dblue", "00007F");
+        REPLACES.put("dgreen", "009300");
+        REPLACES.put("red", "FF0000");
+        REPLACES.put("brown", "7F0000");
+        REPLACES.put("purple", "9C009C");
+        REPLACES.put("olive", "FC7F00");
+        REPLACES.put("yellow", "FFFF00");
+        REPLACES.put("green", "00FC00");
+        REPLACES.put("teal", "009393");
+        REPLACES.put("cyan", "00FFFF");
+        REPLACES.put("blue", "0000FC");
+        REPLACES.put("magenta", "FF00FF");
+        REPLACES.put("dgray", "7F7F7F");
+        REPLACES.put("gray", "D2D2D2");
+    }
+
     public MatrixMessage(StateManager displayNames, String body, String fromRoom, String from) {
         this.displayNames = displayNames;
         this.fromRoom = fromRoom;
         this.from = from;
-        this.body = body;
+        this.body = processTags(body);
+    }
+
+    private String processTags(String body) {
+        for (Entry<String, String> entry : REPLACES.entrySet()) {
+            body = body.replaceAll("<" + entry.getKey() + ">", "<font color=\"#" + entry.getValue() + "\">");
+            body = body.replaceAll("<_" + entry.getKey() + ">", "<font data-mx-bg-color=\"#" + entry.getValue() + "\">");
+            body = body.replaceAll("</" + entry.getKey() + ">", "</font>");
+            body = body.replaceAll("</_" + entry.getKey() + ">", "</font>");
+        }
+        return body;
     }
 
     @Override
