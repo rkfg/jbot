@@ -14,7 +14,7 @@ import ru.ppsrk.gwt.server.SettingsManager;
 
 public interface IBot {
 
-    void run() throws LogicException;
+    int run() throws LogicException;
 
     SettingsManager getSettingsManager();
 

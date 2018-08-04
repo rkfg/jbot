@@ -84,7 +84,7 @@ public class IRCBot extends BotBase implements IBot {
     }
 
     @Override
-    public void run() throws LogicException {
+    public int run() throws LogicException {
         init();
         sm.setDefault("maxLine", "256");
         sm.setDefault("ircPort", "6667");
@@ -107,8 +107,10 @@ public class IRCBot extends BotBase implements IBot {
                 bot.startBot();
             } catch (IOException | IrcException e) {
                 log.warn("{}", e);
+                return 2;
             }
         }
+        return 0;
     }
 
     @Override

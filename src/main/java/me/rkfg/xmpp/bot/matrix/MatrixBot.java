@@ -64,23 +64,24 @@ public class MatrixBot extends BotBase {
     private List<MatrixMessage> failedEvents = new LinkedList<>();
 
     @Override
-    public void run() throws LogicException {
+    public int run() throws LogicException {
         try {
             init();
             token = sm.getStringSetting("matrixToken");
             ownMXID = sm.getStringSetting("mxid");
             if (ownMXID == null) {
-                throw new LogicException("Set mxid property in settings.ini");
+                log.error("Set mxid property in settings.ini");
+                return 1;
             }
             roomParticipantsManager = new RoomParticipantsManager(ownMXID);
             if (token == null) {
                 log.error("Please set matrixToken in settings.ini to the access token");
-                System.exit(1);
+                return 1;
             }
             apiServer = sm.getStringSetting("apiServer");
             if (apiServer == null) {
                 log.error("Please set apiServer in settings.ini to the server you'd like to use (ex. matrix.org)");
-                System.exit(1);
+                return 1;
             }
             JSONObject resp = get("sync", new BasicNameValuePair("timeout", "30000"));
             String next = resp.getString("next_batch");
@@ -89,7 +90,9 @@ public class MatrixBot extends BotBase {
             loopSync(next);
         } catch (IOException | URISyntaxException e) {
             log.warn("{}", e);
+            return 2;
         }
+        return 0;
     }
 
     private void startRetryLoop() {

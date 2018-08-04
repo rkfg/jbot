@@ -48,9 +48,9 @@ public class Main {
     public static void main(String[] args) throws LogicException {
         if (INSTANCE == null) {
             log.error("Set 'type' parameter in settings.ini to the bot type (xmpp, matrix or irc).");
-            return;
+            System.exit(-1);
         }
-        INSTANCE.run();
+        System.exit(INSTANCE.run());
     }
 
 }

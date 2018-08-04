@@ -51,7 +51,7 @@ public class XMPPBot extends BotBase {
     private String[] mucs;
 
     @Override
-    public void run() {
+    public int run() {
         init();
         mucs = org.apache.commons.lang3.StringUtils.split(sm.getStringSetting("join"), ',');
         XMPPTCPConnectionConfiguration conf = XMPPTCPConnectionConfiguration.builder().setServiceName(sm.getStringSetting("server"))
@@ -119,6 +119,7 @@ public class XMPPBot extends BotBase {
                 Thread.currentThread().interrupt();
             }
         }
+        return 0;
     }
 
     private void connect() {
