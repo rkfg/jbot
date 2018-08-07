@@ -194,7 +194,6 @@ public class MatrixBot extends BotBase {
                     roomParticipantsManager.addUser(roomId, senderId);
                 }
                 if (leave) {
-                    stateManager.removeDisplayName(senderId);
                     roomParticipantsManager.removeUser(roomId, senderId);
                 }
             }
