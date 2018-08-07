@@ -72,7 +72,7 @@ public class MatrixMessage implements BotMessage {
     }
 
     public String getFormattedFrom(String nick) {
-        return "<a href=\"https://matrix.to/#/" + from + "\">" + nick + "</a>";
+        return "<a href=\"https://matrix.to/#/" + displayNames.getMXID(nick) + "\">" + nick + "</a>";
     }
 
     @Override
