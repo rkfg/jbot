@@ -42,6 +42,7 @@ import ru.ppsrk.gwt.client.LogicException;
 
 public class MatrixBot extends BotBase {
 
+    private static final String STATE = "state";
     private static final String RETRY_AFTER_MS = "retry_after_ms";
     private static final String EVENT_ID = "event_id";
     private static final String ROOMS = "rooms/";
@@ -137,10 +138,10 @@ public class MatrixBot extends BotBase {
             JSONObject room = joinedRooms.getJSONObject(roomIdStr);
             stateManager.joinRoom(roomIdStr);
             JSONArray events = room.getJSONObject("timeline").getJSONArray(EVENTS);
-            processEvents(initialSync, roomIdStr, events);
-            if (initialSync) {
-                events = room.getJSONObject("state").getJSONArray(EVENTS);
-                processEvents(initialSync, roomIdStr, events);
+            if (!room.has(STATE) || room.getJSONObject(STATE).getJSONArray(EVENTS).length() == 0) {
+                processEvents(false, roomIdStr, events);
+            } else {
+                processEvents(true, roomIdStr, room.getJSONObject(STATE).getJSONArray(EVENTS));
             }
         }
         JSONObject invitedRooms = rooms.getJSONObject("invite");
