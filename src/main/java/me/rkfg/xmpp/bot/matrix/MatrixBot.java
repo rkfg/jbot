@@ -146,25 +146,26 @@ public class MatrixBot extends BotBase {
         JSONObject invitedRooms = rooms.getJSONObject("invite");
         for (Object roomId : invitedRooms.keySet()) {
             String roomIdStr = (String) roomId;
-            try {
-                log.info("Invited to {}, joining", roomIdStr);
-                post(ROOMS + roomIdStr + "/join", new JSONObject());
-            } catch (URISyntaxException | IOException e) {
-                log.warn("{}", e);
-            }
+            log.info("Invited to {}, joining", roomIdStr);
+            joinRoom(roomIdStr);
             roomParticipantsManager.addUser(roomIdStr, ownMXID);
             processEvents(initialSync, roomIdStr, invitedRooms.getJSONObject(roomIdStr).getJSONObject("invite_state").getJSONArray(EVENTS));
         }
         Set<String> emptyRooms = roomParticipantsManager.getEmptyRooms();
         emptyRooms.stream().forEach(roomId -> {
-            try {
-                log.info("No more users in {}, leaving", roomId);
-                post(ROOMS + roomId + "/leave", new JSONObject());
-            } catch (URISyntaxException | IOException e) {
-                log.warn("{}", e);
-            }
+            log.info("No more users in {}, leaving", roomId);
+            leaveRoom(roomId);
         });
         emptyRooms.stream().forEach(roomParticipantsManager::removeRoom);
+    }
+
+    @Override
+    public void joinRoom(String roomName) {
+        try {
+            post(ROOMS + roomName + "/join", new JSONObject());
+        } catch (URISyntaxException | IOException e) {
+            log.warn("{}", e);
+        }
     }
 
     public void processEvents(boolean initialSync, String roomId, JSONArray events) {
@@ -323,5 +324,14 @@ public class MatrixBot extends BotBase {
     @Override
     public Protocol getProtocol() {
         return Protocol.MATRIX;
+    }
+
+    @Override
+    public void leaveRoom(String roomName) {
+        try {
+            post(ROOMS + roomName + "/leave", new JSONObject());
+        } catch (URISyntaxException | IOException e) {
+            log.warn("{}", e);
+        }
     }
 }

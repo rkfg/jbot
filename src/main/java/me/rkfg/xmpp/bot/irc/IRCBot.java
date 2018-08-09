@@ -138,4 +138,14 @@ public class IRCBot extends BotBase implements IBot {
         return Protocol.IRC;
     }
 
+    @Override
+    public void joinRoom(String roomName) {
+        bot.sendIRC().joinChannel(roomName);
+    }
+
+    @Override
+    public void leaveRoom(String roomName) {
+        bot.getUserBot().getChannels().stream().filter(c -> c.getName().equals(roomName)).forEach(c -> c.send().part());
+    }
+
 }

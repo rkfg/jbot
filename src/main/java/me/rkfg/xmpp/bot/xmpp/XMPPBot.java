@@ -228,4 +228,18 @@ public class XMPPBot extends BotBase {
     public Protocol getProtocol() {
         return Protocol.XMPP;
     }
+
+    @Override
+    public void joinRoom(String roomName) {
+        try {
+            mucManager.join(connection, roomName, nick);
+        } catch (NotConnectedException e) {
+            log.warn("{}", e);
+        }
+    }
+
+    @Override
+    public void leaveRoom(String roomName) {
+        mucManager.leave(roomName);
+    }
 }

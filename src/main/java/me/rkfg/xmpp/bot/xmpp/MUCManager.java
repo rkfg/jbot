@@ -71,6 +71,16 @@ public class MUCManager {
         return occupants;
     }
 
+    public void leave(String mucName) {
+        mucsList.keySet().stream().filter(k -> k.getRoom().equals(mucName)).forEach(t -> {
+            try {
+                t.leave();
+            } catch (NotConnectedException e) {
+                log.warn("{}", e);
+            }
+        });
+    }
+
     public void leave() throws NotConnectedException {
         for (MultiUserChat multiUserChat : listMUCs()) {
             log.info("Leaving previously joined {}", multiUserChat.getRoom());

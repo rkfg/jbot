@@ -31,4 +31,8 @@ public interface IBot {
     
     Protocol getProtocol();
 
+    void joinRoom(String roomName);
+
+    void leaveRoom(String roomName);
+
 }
