@@ -34,7 +34,7 @@ public class StdinPlugin extends MessagePluginImpl {
                             // stdin is not connected
                             break;
                         }
-                        sendMUCMessage(line);
+                        sendMessage(line);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

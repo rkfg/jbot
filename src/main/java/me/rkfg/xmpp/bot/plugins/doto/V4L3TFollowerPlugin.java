@@ -101,7 +101,7 @@ public class V4L3TFollowerPlugin extends CommandPlugin
         @Override
         public void onStatus(Status status) {
             String w = "@" + status.getUser().getScreenName() + " - " + status.getText();
-            sendMUCMessage(w);
+            sendMessage(w);
         }
 
         @Override

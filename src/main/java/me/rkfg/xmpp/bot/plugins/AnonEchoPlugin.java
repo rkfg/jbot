@@ -14,7 +14,7 @@ public class AnonEchoPlugin extends CommandPlugin {
     @Override
     public String processCommand(BotMessage message, Matcher matcher) throws LogicException, ClientAuthException {
         String s = matcher.group(COMMAND_GROUP);
-        sendMUCMessage(s, XmppStringUtils.parseBareJid(message.getFromRoom()));
+        sendMessage(s, XmppStringUtils.parseBareJid(message.getFromRoom()));
         return "Ok";
     }
 

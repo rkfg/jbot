@@ -30,11 +30,11 @@ public abstract class MessagePluginImpl implements MessagePlugin {
         return Main.INSTANCE.getSettingsManager();
     }
 
-    protected void sendMUCMessage(String message, String mucName) {
-        Main.INSTANCE.sendMessage(message, mucName);
+    protected void sendMessage(String message, String roomName) {
+        Main.INSTANCE.sendMessage(message, roomName);
     }
 
-    protected void sendMUCMessage(String message) {
+    protected void sendMessage(String message) {
         Main.INSTANCE.sendMessage(message);
     }
 

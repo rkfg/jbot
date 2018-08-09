@@ -45,11 +45,11 @@ public class MarkovResponsePlugin extends MessagePluginImpl {
                         if (first != null && last != null && last - first < ANSWERS_LIMIT_TIME) {
                             cooldown = true;
                             Thread.sleep(random.nextInt(1000) + 1000);
-                            sendMUCMessage("Устала вам отвечать. Отдохну.");
+                            sendMessage("Устала вам отвечать. Отдохну.");
                             Thread.sleep(
                                     random.nextInt((COOLDOWN_HOURS_MAX - COOLDOWN_HOURS_MIN) * 3600000) + COOLDOWN_HOURS_MIN * 3600000);
                             cooldown = false;
-                            sendMUCMessage("Отдохнула.");
+                            sendMessage("Отдохнула.");
                         }
                     } else {
                         Thread.sleep(1000);

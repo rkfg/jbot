@@ -49,7 +49,7 @@ public class CountdownCommandPlugin extends CommandPlugin {
                         for (Countdown countdown : countdowns) {
                             String dateStr = getFormatFull().format(countdown.getDate());
                             if (Boolean.TRUE.equals(countdown.getGroupchat())) {
-                                sendMUCMessage(String.format("%s, наступает событие: %s [%s]", countdown.getCreator(), countdown.getName(),
+                                sendMessage(String.format("%s, наступает событие: %s [%s]", countdown.getCreator(), countdown.getName(),
                                         dateStr), countdown.getRoom());
                             } else {
                                 /*

@@ -94,7 +94,7 @@ public class TwitchTwitcher extends DotoCommandPlugin
                 {
                     streamStatus.put(channel, newStatus);
                     String message = String.format("-> Stream http://www.twitch.tv/%s was updated: %s", channel, newStatus);
-                    sendMUCMessage(message);
+                    sendMessage(message);
                 }
             }
 
@@ -115,7 +115,7 @@ public class TwitchTwitcher extends DotoCommandPlugin
                 streamStatus.put(channel, status);
 
                 String message = String.format("-> Stream http://www.twitch.tv/%s is up: %s", channel, status);
-                sendMUCMessage(message);
+                sendMessage(message);
             }
         });
 

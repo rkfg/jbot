@@ -40,7 +40,7 @@ public class TimerPlugin extends CommandPlugin
         @Override
         public void run()
         {
-            sendMUCMessage(msg, to);
+            sendMessage(msg, to);
         }
     };
     @Override

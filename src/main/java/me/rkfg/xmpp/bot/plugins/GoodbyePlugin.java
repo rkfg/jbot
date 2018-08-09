@@ -25,7 +25,7 @@ public class GoodbyePlugin extends MessagePluginImpl {
 
             @Override
             public void run() {
-                sendMUCMessage(getSettingsManager().getStringSetting("goodbye_msg"));
+                sendMessage(getSettingsManager().getStringSetting("goodbye_msg"));
                 try {
                     Thread.sleep(3000);
                 } catch (InterruptedException e) {
