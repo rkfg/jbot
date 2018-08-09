@@ -11,6 +11,7 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -25,6 +26,8 @@ import me.rkfg.xmpp.bot.plugins.game.IPlayer;
 import me.rkfg.xmpp.bot.plugins.game.Player;
 import me.rkfg.xmpp.bot.plugins.game.World;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.ChargeableEffect;
+import me.rkfg.xmpp.bot.plugins.game.item.IItem;
+import me.rkfg.xmpp.bot.plugins.game.item.IWeapon;
 import me.rkfg.xmpp.bot.plugins.game.misc.TypedAttribute;
 import me.rkfg.xmpp.bot.plugins.game.misc.Utils;
 import me.rkfg.xmpp.bot.plugins.game.repository.AbstractContentRepository;
@@ -156,5 +159,21 @@ public class TestBase {
             fail("Stat not found");
         }
         assertEquals(BASE_STATS.get(i) + diff, (int) player.getStat(attr));
+    }
+
+    protected void assertHasWeapon(IPlayer player, String type) {
+        Optional<String> weaponName = player.getWeapon().map(IWeapon::getType);
+        if (!weaponName.isPresent()) {
+            fail();
+        }
+        assertEquals(type, weaponName.get());
+    }
+
+    protected void assertHasBackpackItem(IMutablePlayer player, int idx, String type) {
+        List<IItem> backpack = player.getBackpack();
+        assertTrue(backpack.size() > idx);
+        IItem item = backpack.get(idx);
+        assertNotNull(item);
+        assertEquals(type, item.getType());
     }
 }

@@ -110,6 +110,10 @@ public class World extends Player {
         return players.values().stream().sorted(comparator).collect(Collectors.toList());
     }
 
+    public List<IPlayer> listAlivePlayers() {
+        return players.values().stream().filter(p -> p.isAlive()).collect(Collectors.toList());
+    }
+
     private void generateTraits(IPlayer player) {
         player.as(MUTABLEPLAYER_OBJ).ifPresent(IMutablePlayer::reset);
         Stream.of("const", "mental", "addict").forEach(s -> {

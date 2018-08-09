@@ -533,4 +533,24 @@ public class TestGame extends TestBase {
         player2.enqueueEvent(new SearchEvent());
         assertEquals("console", player2.getWeapon().map(IWeapon::getType).orElse(""));
     }
+
+    @Test
+    public void testItemDrop() {
+        pickupItem(player1, "godsgift");
+        setRandom(searchRandomMock, 0);
+        new UseCommand().exec(player1, Stream.of("1"));
+        assertHasBackpackItem(player1, 0, A_CHEATS);
+        assertHasBackpackItem(player2, 0, A_CHEATS);
+        assertHasBackpackItem(player3, 0, A_CHEATS);
+        assertHasBackpackItem(player4, 0, A_CHEATS);
+        assertHasBackpackItem(player5, 0, A_CHEATS);
+        pickupItem(player1, "devilsgift");
+        new UseCommand().exec(player1, Stream.of("2"));
+        assertHasBackpackItem(player1, 1, W_LASERSAW);
+        assertHasBackpackItem(player2, 1, W_LASERSAW);
+        assertHasBackpackItem(player3, 1, W_LASERSAW);
+        assertHasBackpackItem(player4, 1, W_LASERSAW);
+        assertHasBackpackItem(player5, 1, W_LASERSAW);
+    }
+
 }

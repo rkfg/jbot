@@ -14,6 +14,7 @@ import me.rkfg.xmpp.bot.plugins.game.effect.TraitStatsEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.AlcoEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.ChargeableEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.CursedEffect;
+import me.rkfg.xmpp.bot.plugins.game.effect.item.ItemDropEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.ItemStatEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.RechargeEffect;
 import me.rkfg.xmpp.bot.plugins.game.effect.item.RudeDrawEffect;
@@ -38,6 +39,7 @@ public class EffectRepository extends AbstractContentRepository<IEffect> {
         addEffect(ChargeableEffect.class);
         addEffect(CursedEffect.class);
         addEffect(DeadEffect.class);
+        addEffect(ItemDropEffect.class);
         addEffect(ItemStatEffect.class);
         addEffect(StatsEffect.class);
         addEffect(RechargeEffect.class);
