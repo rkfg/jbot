@@ -70,7 +70,6 @@ public class CustomSearchPlugin extends CommandPlugin {
             if (str == null)
             {
                 res = "чё?";
-                return res;
             }
             else
             {
@@ -86,16 +85,14 @@ public class CustomSearchPlugin extends CommandPlugin {
                     log.info(text.text());
                     log.info(link.attr("href"));
                 } 
-                res = String.format("%s\n%s\n%s", title.text(), text.text(), URLDecoder.decode(link.attr("href"),"UTF-8"));
-
-                return res;
+                res = String.format("%s | %s | %s", title.text(), text.text(), URLDecoder.decode(link.attr("href"),"UTF-8"));
             }
         } catch (NullPointerException ex)
         {
             log.error(ex.getMessage());
             res = "ничего не найдено!";
-            return res;
         }
+        return res;
     }
     
     @Override
