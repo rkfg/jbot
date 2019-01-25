@@ -22,7 +22,7 @@ import me.rkfg.xmpp.bot.message.BotMessage;
 
 public class TitlePlugin extends MessagePluginImpl {
 
-    private static final int MAX_BODY_SIZE = 102400;
+    private static final int MAX_BODY_SIZE = 1024000;
     private static final int TIMEOUT = 10000;
     private Logger log = LoggerFactory.getLogger(getClass());
     private Pattern hostnamePattern = Pattern.compile("https?://([^/]*)/?.*", Pattern.CASE_INSENSITIVE);
