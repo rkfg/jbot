@@ -19,12 +19,11 @@ import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 
 import me.rkfg.xmpp.bot.BotBase;
-import me.rkfg.xmpp.bot.IBot;
 import me.rkfg.xmpp.bot.message.IRCMessage;
 import me.rkfg.xmpp.bot.plugins.MessagePlugin;
 import ru.ppsrk.gwt.client.LogicException;
 
-public class IRCBot extends BotBase implements IBot {
+public class IRCBot extends BotBase {
 
     private PircBotX bot;
 
